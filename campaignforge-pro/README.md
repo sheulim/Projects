@@ -2,6 +2,8 @@
 
 A campaign and portfolio management product that extends [CampaignForge](https://github.com/sheulim/insightful-campaign-buddy): AI planning from one brief, ready-to-post output for every social channel, and a portfolio layer for budget, timeline, risk and executive reporting.
 
+**Live site:** https://campaign-forge.netlify.app
+
 **Interactive design:** https://claude.ai/artifact/2U64oiurGdf6ph7AbK5ABh (private to the owner until shared from the page's Share menu)
 
 > All figures, names and the brand “Kesar & Co.” in the screens are sample data.
