@@ -24,6 +24,7 @@
     --saffron:#f3ae55; --saffron-soft:#3a2c16;
     --slate:#8ea3b8; --danger:#ff7c8e; --danger-soft:#3b1d24; --warn:#f0b35c;
     --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.3);
+    color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
@@ -33,6 +34,7 @@
   --saffron:#f3ae55; --saffron-soft:#3a2c16;
   --slate:#8ea3b8; --danger:#ff7c8e; --danger-soft:#3b1d24; --warn:#f0b35c;
   --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.3);
+    color-scheme:dark;
 }
 *{box-sizing:border-box}
 html,body{margin:0}
@@ -1416,8 +1418,16 @@ $('swReplies').onclick = () => { state.prefs.replies = !state.prefs.replies; sav
 $('swQuick').onclick = () => { state.prefs.quick = !state.prefs.quick; save(); render(); };
 $('editPlan').onclick = () => openBuilder(emptyPlan(), 'manual');
 $('respeak').onclick = () => { renderChecks({}); $('setupWords').innerHTML = ''; $('setupDraft').disabled = true; showSetup('voice'); };
-$('sampleBtn').onclick = async () => { if (!confirm('Replace everything on this device with sample data?')) return; await clearAudio(); loadSample(); enterApp(); };
-$('wipeBtn').onclick = () => { if (confirm('Wipe your plan, entries and voice notes from this device?')) wipe(); };
+// Two-tap confirmation inside the page (browser dialogs are blocked in some viewers).
+function twoTap(btn, ask, action){
+  btn.onclick = () => {
+    if (btn.dataset.armed){ clearTimeout(btn._t); btn.textContent = btn.dataset.label; delete btn.dataset.armed; action(); return; }
+    btn.dataset.label = btn.textContent; btn.dataset.armed = '1'; btn.textContent = ask;
+    btn._t = setTimeout(() => { btn.textContent = btn.dataset.label; delete btn.dataset.armed; }, 4000);
+  };
+}
+twoTap($('sampleBtn'), 'Tap to replace', async () => { await clearAudio(); loadSample(); enterApp(); toast('Sample data loaded'); });
+twoTap($('wipeBtn'), 'Tap to wipe', () => wipe());
 $('exportBtn').onclick = () => {
   const rows = [['recorded_at_ist','source','seconds','transcript','corrected','result','date','type','amount_inr','envelope','description']];
   for (const r of [...state.recs].sort((a,b) => a.at - b.at)){
