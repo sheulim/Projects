@@ -10,12 +10,12 @@ A campaign and portfolio management product that extends [CampaignForge](https:/
 
 | # | Screen | File | What it does |
 |---|---|---|---|
-| 01 | Portfolio command centre | `design/Main.dc.html` | KPIs, pacing alerts, campaign health, this week, posts by channel, upcoming key dates, get-started checklist |
-| 02 | Brand kit | `design/Brand.dc.html` | Brand voice, words to use and avoid, product facts, persona, colours, languages, disclaimer, guardrail checks |
-| 2b | Key dates library | `design/Dates.dc.html` | Annual festivals, holidays and shopping days for India (national and states) and international markets, with brand fit and lead time |
+| 01 | Portfolio command centre | `design/Main.dc.html` | KPIs, pacing alerts, campaign health, this week, content mix by channel, upcoming moments, setup checklist |
+| 02 | Company DNA | `design/Brand.dc.html` | Brand voice, words to use and avoid, product facts, persona, colours, languages, disclaimer, guardrail checks |
+| 2b | Moments calendar | `design/Dates.dc.html` | Annual festivals, holidays and shopping days for India (national and states) and international markets, with brand fit and lead time |
 | + | New campaign | `design/New.dc.html` | Templates, brief with voice input and AI writing help, target markets, channels, tone, language, posts per week, live generation progress |
-| 03 | Plan workspace | `design/Plan.dc.html` | Month calendar by channel, key dates with “Plan a post”, target days, filters, approve all, Steer the AI |
-| 04 | Strategist score | `design/Score.dc.html` | Rubric score out of 100, history, one-click fixes |
+| 03 | Plan workspace | `design/Plan.dc.html` | Month calendar by channel, moments with “Add content”, target days, filters, approve visible, Refine with AI |
+| 04 | Readiness score | `design/Score.dc.html` | Rubric score out of 100, history, quick fixes |
 | 05 | Post studio | `design/Studio.dc.html` | Status workflow, copy variants, brand checks, channel previews |
 | 5b | Creative brief | `design/Brief.dc.html` | Structured brief, deliverables by platform, concept images, hand-off to video |
 | 06 | Video studio | `design/Reel.dc.html` | Storyboard, AI voiceover, captions; reels, Shorts and YouTube from one script |
@@ -29,7 +29,7 @@ Channels covered: Instagram, Facebook, YouTube, X, LinkedIn, TikTok (non-India m
 
 ## Proposed phasing
 
-1. **Phase 1:** templates, brand kit, key dates library, Steer the AI, strategist score, calendar and approvals, budget planner, dashboard, ready-to-post output with export packages for every channel.
+1. **Phase 1:** campaign types, Company DNA, moments calendar, Refine with AI, readiness score, calendar and approvals, budget planner, dashboard, ready-to-post output with export packages for every channel.
 2. **Phase 2:** auto-posting through connected accounts (after each platform's app approval), portfolio timeline and tasks, prioritisation, risks, executive report.
 3. **Phase 3:** full video generation at scale and live spend feeds from ad platforms (paid APIs; cost before committing).
 

@@ -38,12 +38,12 @@ a{color:#f2a93b}a:hover{color:#ffc46b}
 <div class="disp" style="font-size: 17px; font-weight: 600">CampaignForge <span style="color: #f2a93b">Pro</span></div>
 </div>
 <a class="nav" href="Main.dc.html"><span class="num">01</span>Portfolio</a>
-<a class="nav" href="Brand.dc.html"><span class="num">02</span>Brand kit</a>
-<a class="nav" href="Dates.dc.html"><span class="num">2b</span>Key dates library</a>
+<a class="nav" href="Brand.dc.html"><span class="num">02</span>Company DNA</a>
+<a class="nav" href="Dates.dc.html"><span class="num">2b</span>Moments calendar</a>
 <div class="eyebrow" style="padding: 14px 12px 4px">Create</div>
 <a class="nav" href="New.dc.html"><span class="num">+</span>New campaign</a>
 <a class="nav" href="Plan.dc.html"><span class="num">03</span>Plan workspace</a>
-<a class="nav" href="Score.dc.html"><span class="num">04</span>Strategist score</a>
+<a class="nav" href="Score.dc.html"><span class="num">04</span>Readiness score</a>
 <a class="nav" href="Studio.dc.html"><span class="num">05</span>Post studio</a>
 <a class="nav" href="Brief.dc.html"><span class="num">5b</span>Creative brief</a>
 <a class="nav" href="Reel.dc.html"><span class="num">06</span>Video studio</a>
@@ -77,13 +77,13 @@ a{color:#f2a93b}a:hover{color:#ffc46b}
 </section>
 <section class="panel" style="padding: 20px; display: grid; grid-template-columns: 300px minmax(0, 1.25fr) minmax(0, 1fr); gap: 26px">
 <div style="display: flex; flex-direction: column; gap: 14px">
-<h2 class="disp" style="margin: 0; font-size: 18px; font-weight: 600">Plan your budget</h2>
+<h2 class="disp" style="margin: 0; font-size: 18px; font-weight: 600">Budget allocator</h2>
 <div style="display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 10px">
 <div><label for="tb" style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px">Total budget</label><input id="tb" value="14,00,000" style="width: 100%; box-sizing: border-box; background: #14161c; border: 1px solid #343945; border-radius: 10px; color: #eceef2; font-family: inherit; font-size: 14px; padding: 10px 12px"></div>
 <div><label for="cur" style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px">Currency</label><select id="cur" style="width: 100%; box-sizing: border-box; background: #14161c; border: 1px solid #343945; border-radius: 10px; color: #eceef2; font-family: inherit; font-size: 14px; padding: 10px 12px"><option>INR</option><option>USD</option><option>AED</option><option>GBP</option></select></div>
 </div>
 <div><span style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px">Priority</span><div style="display: flex; gap: 6px; flex-wrap: wrap"><sc-for list="{{prio}}" as="p" hint-placeholder-count="3"><button type="button" class="{{p.cls}}" onClick="{{p.pick}}">{{p.label}}</button></sc-for></div></div>
-<div style="display: flex; gap: 8px"><button class="btn pri" type="button">Plan budget</button><button class="btn" type="button">Apply</button></div>
+<div style="display: flex; gap: 8px"><button class="btn pri" type="button">Allocate budget</button><button class="btn" type="button">Apply</button></div>
 <p style="margin: 0; font-size: 13px; line-height: 1.5; color: #dfe2e8">{{prioWhy}}</p>
 <div style="border-top: 1px solid #2a2e38; padding-top: 12px"><div class="eyebrow" style="margin-bottom: 6px">Tips</div><div style="font-size: 12px; line-height: 1.55; color: #b4b9c4">{{tip}}</div></div>
 </div>
@@ -178,9 +178,9 @@ act: 'width: 12px; border-radius: 3px; background: #f2a93b; height: ' + Math.rou
 };
 });
 var PR = {
-bal: ['Balanced', [28, 25, 18, 4, 18, 7], [9, 10, 13, 14, 16, 13, 13, 12], 'Balanced: spend follows the channel plan, with the peak in the week of Diwali.', 'Steady build to the Diwali week, then hold for post-festival and wedding-season gifting.'],
-aw: ['Awareness', [25, 10, 25, 2, 30, 8], [16, 16, 14, 12, 12, 10, 10, 10], 'Awareness: more on outdoor and influencers to reach new buyers early.', 'Front-loaded so people know the brand before festive buying starts.'],
-cv: ['Conversions', [35, 35, 8, 8, 6, 8], [6, 8, 10, 14, 20, 16, 14, 12], 'Conversions: more on search, Meta and email, where orders come from.', 'Back-loaded to the days buyers are ready to order.']
+bal: ['Even split', [28, 25, 18, 4, 18, 7], [9, 10, 13, 14, 16, 13, 13, 12], 'Even split: spend follows the channel plan, with the peak in the week of Diwali.', 'Steady build to the Diwali week, then hold for post-festival and wedding-season gifting.'],
+aw: ['Reach', [25, 10, 25, 2, 30, 8], [16, 16, 14, 12, 12, 10, 10, 10], 'Reach: more on outdoor and influencers to reach new buyers early.', 'Front-loaded so people know the brand before festive buying starts.'],
+cv: ['Sales', [35, 35, 8, 8, 6, 8], [6, 8, 10, 14, 20, 16, 14, 12], 'Sales: more on search, Meta and email, where orders come from.', 'Back-loaded to the days buyers are ready to order.']
 };
 var WHY = ['Festive creative and retargeting', 'Catches “Diwali gift box” searches', 'Local reach and trust', 'Cheapest repeat orders', 'Visibility near stores', 'Shoots and edits'];
 var CHN = ['Meta ads', 'Google search', 'Influencers', 'Email / CRM', 'Outdoor (OOH)', 'Content production'];
@@ -188,7 +188,7 @@ var cur = PR[this.state.prio];
 var fmt = function (pc) { return '₹' + (14 * pc / 100).toFixed(2) + ' L'; };
 var split = CHN.map(function (c, i) { var pc = cur[1][i]; return { ch: c, why: WHY[i], pct: pc + '%', amt: fmt(pc) }; });
 var byWeek = cur[2].map(function (pc, i) { return { k: 'W' + (i + 1), pct: pc + '%', amt: fmt(pc), bar: 'height: 8px; border-radius: 4px; background: #5ee0c9; width: ' + Math.round(pc / 20 * 100) + '%' }; });
-var prio = [['bal', 'Balanced'], ['aw', 'Awareness'], ['cv', 'Conversions']].map(function (x) { return { label: x[1], cls: self.state.prio === x[0] ? 'btn sel' : 'btn', pick: function () { self.setState({ prio: x[0] }); } }; });
+var prio = [['bal', 'Even split'], ['aw', 'Reach'], ['cv', 'Sales']].map(function (x) { return { label: x[1], cls: self.state.prio === x[0] ? 'btn sel' : 'btn', pick: function () { self.setState({ prio: x[0] }); } }; });
 return { prio: prio, split: split, byWeek: byWeek, prioName: cur[0], prioWhy: cur[3], weekWhy: cur[4], tip: 'Review CPL weekly and move money to the cheapest channel. Keep the same brand look across every channel. Hold back 5–10% for the best-performing week.', amounts: amounts, leads: leads.toLocaleString('en-IN'), oohLeft: '₹' + (1.3 - this.state.amt).toFixed(1) + ' L', weeks: weeks };
 }
 }

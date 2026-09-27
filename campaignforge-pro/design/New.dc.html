@@ -38,12 +38,12 @@ a{color:#f2a93b}a:hover{color:#ffc46b}
 <div class="disp" style="font-size: 17px; font-weight: 600">CampaignForge <span style="color: #f2a93b">Pro</span></div>
 </div>
 <a class="nav" href="Main.dc.html"><span class="num">01</span>Portfolio</a>
-<a class="nav" href="Brand.dc.html"><span class="num">02</span>Brand kit</a>
-<a class="nav" href="Dates.dc.html"><span class="num">2b</span>Key dates library</a>
+<a class="nav" href="Brand.dc.html"><span class="num">02</span>Company DNA</a>
+<a class="nav" href="Dates.dc.html"><span class="num">2b</span>Moments calendar</a>
 <div class="eyebrow" style="padding: 14px 12px 4px">Create</div>
 <a class="nav on" href="New.dc.html"><span class="num">+</span>New campaign</a>
 <a class="nav" href="Plan.dc.html"><span class="num">03</span>Plan workspace</a>
-<a class="nav" href="Score.dc.html"><span class="num">04</span>Strategist score</a>
+<a class="nav" href="Score.dc.html"><span class="num">04</span>Readiness score</a>
 <a class="nav" href="Studio.dc.html"><span class="num">05</span>Post studio</a>
 <a class="nav" href="Brief.dc.html"><span class="num">5b</span>Creative brief</a>
 <a class="nav" href="Reel.dc.html"><span class="num">06</span>Video studio</a>
@@ -64,7 +64,7 @@ a{color:#f2a93b}a:hover{color:#ffc46b}
 <h1 class="disp" style="margin: 6px 0 0; font-size: 32px; font-weight: 600">New campaign</h1>
 </div>
 <div>
-<span class="lbl">Start from a template</span>
+<span class="lbl">Choose a campaign type</span>
 <div style="display: flex; flex-wrap: wrap; gap: 8px">
 <sc-for list="{{templates}}" as="t" hint-placeholder-count="7"><button type="button" class="{{t.cls}}" onClick="{{t.pick}}">{{t.label}}</button></sc-for>
 </div>
@@ -74,18 +74,18 @@ a{color:#f2a93b}a:hover{color:#ffc46b}
 <div><label class="lbl" for="goal">Campaign goal</label><input id="goal" class="fld" value="{{goal}}"></div>
 </div>
 <div>
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px"><label class="lbl" for="brief" style="margin: 0">Business brief</label><div style="display: flex; gap: 8px"><select class="fld" aria-label="Brief language" style="width: 170px; padding: 8px 12px"><option>English (India)</option><option>Hindi</option><option>Telugu</option></select><button class="btn" type="button">Speak</button></div></div>
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px"><label class="lbl" for="brief" style="margin: 0">Business brief</label><div style="display: flex; gap: 8px"><select class="fld" aria-label="Brief language" style="width: 170px; padding: 8px 12px"><option>English (India)</option><option>Hindi</option><option>Telugu</option></select><button class="btn" type="button">Dictate</button></div></div>
 <textarea id="brief" class="fld" rows="3">{{brief}}</textarea>
-<div style="display: flex; gap: 8px; margin-top: 8px"><button class="btn ai" type="button">Write it for me</button><button class="btn ai" type="button">Improve with AI</button></div>
+<div style="display: flex; gap: 8px; margin-top: 8px"><button class="btn ai" type="button">Draft with AI</button><button class="btn ai" type="button">Polish with AI</button></div>
 </div>
 <div>
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px"><label class="lbl" for="aud" style="margin: 0">Target audience</label><button class="btn" type="button">Speak</button></div>
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px"><label class="lbl" for="aud" style="margin: 0">Target audience</label><button class="btn" type="button">Dictate</button></div>
 <textarea id="aud" class="fld" rows="2">{{audience}}</textarea>
 </div>
 <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px">
 <div><label class="lbl" for="sd">Start date</label><input id="sd" class="fld" value="28/09/2026"></div>
 <div><label class="lbl" for="du">Duration</label><select id="du" class="fld"><option>4 weeks</option><option>6 weeks</option><option>8 weeks</option></select></div>
-<div><label class="lbl" for="ppw">Posts per week</label><input id="ppw" class="fld" value="4"></div>
+<div><label class="lbl" for="ppw">Weekly cadence</label><input id="ppw" class="fld" value="4"></div>
 <div><label class="lbl" for="bud">Budget (₹) · Pro</label><input id="bud" class="fld" value="[YOUR BUDGET]"></div>
 </div>
 <div>
@@ -94,14 +94,14 @@ a{color:#f2a93b}a:hover{color:#ffc46b}
 <sc-for list="{{channels}}" as="c" hint-placeholder-count="10"><button type="button" class="{{c.cls}}" onClick="{{c.pick}}">{{c.label}}</button></sc-for>
 </div>
 </div>
-<div><span class="lbl">Target markets <span style="font-weight: 400; color: #a3a9b5">· festival and holiday dates load from the <a href="Dates.dc.html">key dates library</a></span></span><div style="display: flex; flex-wrap: wrap; gap: 8px"><button class="pill on" type="button">India · national</button><button class="pill on" type="button">India · Telangana</button><button class="pill" type="button">UAE</button><button class="pill" type="button">UK</button><button class="pill" type="button">USA</button><button class="pill" type="button">Global</button><button class="pill" type="button">+ Add</button></div></div>
+<div><span class="lbl">Target markets <span style="font-weight: 400; color: #a3a9b5">· festival and holiday dates load from the <a href="Dates.dc.html">Moments calendar</a></span></span><div style="display: flex; flex-wrap: wrap; gap: 8px"><button class="pill on" type="button">India · national</button><button class="pill on" type="button">India · Telangana</button><button class="pill" type="button">UAE</button><button class="pill" type="button">UK</button><button class="pill" type="button">USA</button><button class="pill" type="button">Global</button><button class="pill" type="button">+ Add</button></div></div>
 <div style="display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 16px">
 <div><span class="lbl">Tone</span><div style="display: flex; flex-wrap: wrap; gap: 8px"><button class="pill" type="button">Professional</button><button class="pill on" type="button">Friendly</button><button class="pill" type="button">Bold</button><button class="pill" type="button">Playful</button><button class="pill" type="button">Luxury</button></div></div>
 <div><label class="lbl" for="cl">Content language</label><select id="cl" class="fld"><option>English</option><option>English + Hindi</option><option>Telugu</option></select></div>
 </div>
 <div class="panel" style="padding: 14px 16px; display: flex; gap: 12px; align-items: flex-start">
 <input id="bk" type="checkbox" checked style="width: 20px; height: 20px; accent-color: #f2a93b; margin-top: 2px">
-<label for="bk" style="font-size: 14px"><strong>Use brand kit</strong><br><span style="color: #b4b9c4">Follow your saved brand voice and rules. <a href="Brand.dc.html">Edit your brand kit</a></span></label>
+<label for="bk" style="font-size: 14px"><strong>Apply Company DNA</strong><br><span style="color: #b4b9c4">Follow your saved brand voice and rules. <a href="Brand.dc.html">Edit Company DNA</a></span></label>
 </div>
 <div style="display: flex; gap: 12px; align-items: center">
 <button class="btn pri" type="button" onClick="{{generate}}" style="min-height: 48px; padding: 0 28px; font-size: 16px">Generate plan</button>
@@ -114,7 +114,7 @@ a{color:#f2a93b}a:hover{color:#ffc46b}
 <ul style="margin: 12px 0 0; padding-left: 18px; font-size: 14px; line-height: 1.7; color: #dfe2e8">
 <li>Dated calendar, {{postCount}} posts</li>
 <li>Ad scripts, copy variants, creative briefs</li>
-<li>Strategist score out of 100</li>
+<li>Readiness score out of 100</li>
 <li>Channel budget split and KPI targets (Pro)</li>
 <li>Tasks and milestones on the timeline (Pro)</li>
 </ul>
@@ -138,7 +138,7 @@ a{color:#f2a93b}a:hover{color:#ffc46b}
 </div>
 </sc-for>
 </div>
-<p style="margin: 0; font-size: 14px; color: #a3a9b5">This usually takes 15 to 30 seconds. Brand kit rules are applied as each week is written.</p>
+<p style="margin: 0; font-size: 14px; color: #a3a9b5">This usually takes under a minute. Company DNA rules are applied as each week is written.</p>
 <sc-if value="{{ready}}" hint-placeholder-val="{{false}}"><a class="btn pri" href="Plan.dc.html" style="min-height: 48px; padding: 0 28px">Open plan</a></sc-if>
 </div>
 </section>
@@ -156,10 +156,10 @@ var T = {
 launch: { label: 'Product launch', goal: 'Product launch', brief: 'We are launching a new product that solves a real problem with a fresh approach.', aud: 'Early adopters aged 25–45 who follow new launches and value quality.', note: 'Teaser, launch day and post-launch proof phases.' },
 aware: { label: 'Brand awareness', goal: 'Brand awareness', brief: 'We want more people in our city to know who we are and what we stand for.', aud: 'Local families and young professionals who have not bought from us yet.', note: 'Reach-led mix, story content, frequency caps.' },
 lead: { label: 'Lead generation', goal: 'Lead generation', brief: 'We sell corporate gift boxes and want enquiries from HR and admin teams for festive gifting.', aud: 'HR and admin decision-makers at companies with 50–500 staff.', note: 'LinkedIn and search heavy; every post ends in a form or call CTA; CPL target set in Budget.' },
-event: { label: 'Event sign-ups', goal: 'Event sign-ups', brief: 'We are hosting a tasting evening and need confirmed registrations.', aud: 'Food lovers within 10 km of the venue.', note: 'Countdown cadence, reminders at 7, 3 and 1 days.' },
+event: { label: 'Event registrations', goal: 'Event registrations', brief: 'We are hosting a tasting evening and need confirmed registrations.', aud: 'Food lovers within 10 km of the venue.', note: 'Countdown cadence, reminders at 7, 3 and 1 days.' },
 festive: { label: 'Festive sale · Pro', goal: 'Festive sales', brief: 'Drive Diwali pre-orders for our gift boxes.', aud: 'Families and corporate buyers gifting for the festival.', note: 'Anchored to the India key-dates calendar.' },
 retention: { label: 'Re-engagement · Pro', goal: 'Re-engagement', brief: 'Bring back customers who have not ordered in 90 days.', aud: 'Lapsed customers in our CRM.', note: 'Email and WhatsApp first, offer ladder.' },
-scratch: { label: 'Start from scratch', goal: '', brief: '', aud: '', note: 'Blank brief. Use Write it for me to draft one.' }
+scratch: { label: 'Blank brief', goal: '', brief: '', aud: '', note: 'Blank brief. Use Draft with AI to draft one.' }
 };
 var templates = Object.keys(T).map(function (k) { return { label: T[k].label, cls: self.state.tpl === k ? 'pill on' : 'pill', pick: function () { self.setState({ tpl: k }); } }; });
 var CH = ['Instagram', 'LinkedIn', 'X', 'Facebook', 'TikTok', 'YouTube', 'Email', 'Blog', 'Google Ads', 'WhatsApp'];
@@ -180,7 +180,7 @@ templates: templates, channels: channels,
 goal: cur.goal, brief: cur.brief, audience: cur.aud, tplName: cur.label, tplNote: cur.note,
 postCount: 16,
 editing: !this.state.gen, generating: this.state.gen, ready: step >= 4,
-genLabel: step >= 4 ? 'Plan ready' : 'LIVE · Generating plan…',
+genLabel: step >= 4 ? 'Plan built' : 'Building your plan…',
 weeks: weeks,
 generate: function () {
 self.setState({ gen: true, step: 0 });
