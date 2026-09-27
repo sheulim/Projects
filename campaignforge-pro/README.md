@@ -33,6 +33,14 @@ Channels covered: Instagram, Facebook, YouTube, X, LinkedIn, TikTok (non-India m
 2. **Phase 2:** auto-posting through connected accounts (after each platform's app approval), portfolio timeline and tasks, prioritisation, risks, executive report.
 3. **Phase 3:** full video generation at scale and live spend feeds from ad platforms (paid APIs; cost before committing).
 
+## Working site
+
+`site/index.html` is a standalone, clickable version of all 14 screens (no build tools or server needed; open it in a browser or host it on GitHub Pages). It reuses the design files directly: `site/build.py` reads `design/*.dc.html` and regenerates `site/index.html`, so after editing a screen run:
+
+```
+cd campaignforge-pro/site && python3 build.py
+```
+
 ## About the files
 
 The `.dc.html` files are Design Component source for the Claude Design canvas; `design/canvas.json` holds the board layout. They render inside the design canvas (linked above), not as standalone web pages.

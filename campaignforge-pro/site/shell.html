@@ -1,0 +1,154 @@
+<title>CampaignForge Pro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=DM+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root{color-scheme:dark;--ground:#14161c;--ink:#eceef2;--muted:#a3a9b5;--line:#2a2e38;--accent:#f2a93b}
+html,body{background:var(--ground)}
+body{margin:0;color:var(--ink);font-family:'DM Sans',system-ui,sans-serif}
+#stage{width:1440px;margin:0 auto;background:var(--ground)}
+#narrow{display:none;padding:10px 16px;font-size:13px;color:var(--muted);border-bottom:1px solid var(--line);background:#101218}
+@media (max-width:1000px){#narrow{display:block}}
+#err{padding:40px 16px;color:var(--ink)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+</style>
+<style id="screen-css"></style>
+<div id="narrow">CampaignForge Pro is built for laptop and desktop screens. On a phone the screens are scaled down; pinch to zoom.</div>
+<div id="stage" aria-live="polite"></div>
+<script>
+var SCREENS = /*SCREENS*/;
+var DC = {};
+function DCLogic(props) { this.props = props || {}; this.state = {}; }
+DCLogic.prototype.setState = function (p) {
+  var next = typeof p === 'function' ? p(this.state, this.props) : p;
+  this.state = Object.assign({}, this.state, next);
+  App.schedule();
+};
+DCLogic.prototype.forceUpdate = function () { App.schedule(); };
+</script>
+<script>
+/*COMPONENTS*/
+</script>
+<script>
+var App = (function () {
+  var stage = document.getElementById('stage');
+  var cssEl = document.getElementById('screen-css');
+  var HOLE = /\{\{\s*([^}]+?)\s*\}\}/g;
+  var WHOLE = /^\{\{\s*([^}]+?)\s*\}\}$/;
+  var SVG = 'http://www.w3.org/2000/svg';
+  var parsed = {}, current = null, inst = null, pending = false, baseHeight = 0;
+
+  function lookup(path, scope) {
+    path = path.trim();
+    if (path === 'true') return true;
+    if (path === 'false') return false;
+    if (/^-?\d+(\.\d+)?$/.test(path)) return Number(path);
+    var parts = path.split('.'), v = scope[parts[0]];
+    for (var i = 1; i < parts.length && v != null; i++) v = v[parts[i]];
+    return v;
+  }
+  function show(v) { return v == null || v === false ? '' : String(v); }
+  function interp(s, scope) { return s.replace(HOLE, function (m, p) { return show(lookup(p, scope)); }); }
+
+  function render(nodes, scope, out) {
+    for (var i = 0; i < nodes.length; i++) {
+      var n = nodes[i];
+      if (n.nodeType === 3) { out.appendChild(document.createTextNode(interp(n.nodeValue, scope))); continue; }
+      if (n.nodeType !== 1) continue;
+      if (n.tagName === 'TEMPLATE' && n.hasAttribute('data-sc-for')) {
+        var m = WHOLE.exec(n.getAttribute('list') || ''), list = m ? lookup(m[1], scope) : null;
+        var as = n.getAttribute('as') || 'item';
+        (list || []).forEach(function (item, idx) {
+          var s = Object.create(scope); s[as] = item; s.$index = idx;
+          render(n.content.childNodes, s, out);
+        });
+        continue;
+      }
+      if (n.tagName === 'TEMPLATE' && n.hasAttribute('data-sc-if')) {
+        var c = WHOLE.exec(n.getAttribute('value') || '');
+        if (c && lookup(c[1], scope)) render(n.content.childNodes, scope, out);
+        continue;
+      }
+      var el = n.namespaceURI === SVG ? document.createElementNS(SVG, n.localName) : document.createElement(n.localName);
+      for (var a = 0; a < n.attributes.length; a++) {
+        var name = n.attributes[a].name, val = n.attributes[a].value;
+        if (name.indexOf('hint-') === 0) continue;
+        var w = WHOLE.exec(val);
+        if (name.indexOf('on') === 0 && w) {
+          var fn = lookup(w[1], scope);
+          if (typeof fn === 'function') el.addEventListener(name.slice(2), fn);
+          continue;
+        }
+        el.setAttribute(name, interp(val, scope));
+      }
+      render((n.content || n).childNodes, scope, el);
+      if (el.tagName === 'TEXTAREA') el.value = el.textContent;
+      out.appendChild(el);
+    }
+  }
+
+  function template(name) {
+    if (!parsed[name]) {
+      var doc = new DOMParser().parseFromString('<body>' + SCREENS[name].html + '</body>', 'text/html');
+      parsed[name] = doc.body;
+    }
+    return parsed[name];
+  }
+
+  function fit() {
+    var z = Math.min(1, window.innerWidth / 1440);
+    stage.style.zoom = z;
+    var root = stage.firstElementChild;
+    if (root) root.style.minHeight = Math.max(baseHeight, Math.ceil(window.innerHeight / z)) + 'px';
+  }
+
+  function paint() {
+    pending = false;
+    if (!inst) return;
+    var y = window.scrollY;
+    var frag = document.createDocumentFragment();
+    render(template(current).childNodes, inst.renderVals() || {}, frag);
+    stage.replaceChildren(frag);
+    var root = stage.firstElementChild;
+    if (root) {
+      if (!baseHeight) baseHeight = parseInt(root.style.height, 10) || 0;
+      root.style.height = 'auto';
+    }
+    fit();
+    window.scrollTo(0, y);
+  }
+
+  function go(name, push) {
+    if (!SCREENS[name]) name = 'Main';
+    if (inst && inst.componentWillUnmount) inst.componentWillUnmount();
+    current = name; baseHeight = 0;
+    cssEl.textContent = SCREENS[name].css;
+    document.title = SCREENS[name].title + ' · CampaignForge Pro';
+    inst = new DC[name]({});
+    if (push && location.hash !== '#' + name) {
+      try { history.pushState(null, '', '#' + name); } catch (e) { location.hash = name; }
+    }
+    paint();
+    window.scrollTo(0, 0);
+    if (inst.componentDidMount) inst.componentDidMount();
+  }
+
+  stage.addEventListener('click', function (e) {
+    var a = e.target.closest('a[href]');
+    if (!a) return;
+    var m = /^\/?([A-Za-z0-9_-]+)\.dc\.html$/.exec(a.getAttribute('href'));
+    if (m) { e.preventDefault(); go(m[1], true); }
+  });
+  window.addEventListener('popstate', function () { go(location.hash.slice(1) || 'Main', false); });
+  window.addEventListener('hashchange', function () { var h = location.hash.slice(1); if (h && h !== current) go(h, false); });
+  window.addEventListener('resize', fit);
+
+  return {
+    schedule: function () { if (!pending) { pending = true; requestAnimationFrame(paint); } },
+    start: function () {
+      try { go(location.hash.slice(1) || 'Main', false); }
+      catch (err) { stage.innerHTML = '<p id="err">This screen could not load. Reload the page to try again.</p>'; console.error(err); }
+    }
+  };
+})();
+App.start();
+</script>
