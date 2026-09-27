@@ -1,0 +1,4 @@
+# Netlify: serve the CampaignForge Pro site as-is (index.html is prebuilt).
+[build]
+  publish = "campaignforge-pro/site"
+  command = ""

@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Portfolio command centre</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=DM+Sans:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap">
+<style>
+body{margin:0;background:#14161c;color:#eceef2;font-family:'DM Sans',system-ui,sans-serif}
+a{color:#f2a93b}a:hover{color:#ffc46b}
+.nav{display:flex;align-items:center;gap:10px;min-height:40px;padding:0 12px;border-radius:8px;color:#b4b9c4;text-decoration:none;font-size:14px}
+.nav:hover{background:#1b1e26;color:#eceef2}
+.nav.on{background:#2e2514;color:#f2a93b;font-weight:600}
+.num{font-family:'JetBrains Mono',monospace;font-size:11px;color:#7d8391;width:18px}
+.panel{background:#1b1e26;border:1px solid #2a2e38;border-radius:12px}
+.eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#a3a9b5}
+.disp{font-family:'Space Grotesk',sans-serif}
+.mono{font-family:'JetBrains Mono',monospace}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:0 16px;border-radius:8px;font:600 14px 'DM Sans',sans-serif;border:1px solid #343945;background:#1f232c;color:#eceef2;cursor:pointer}
+.btn.pri{background:#f2a93b;border-color:#f2a93b;color:#1a1305}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:600}
+.g{background:#123a33;color:#5ee0c9}.a{background:#3d2f12;color:#f7be5f}.r{background:#44191b;color:#ff8a8e}.n{background:#262a33;color:#c3c8d2}
+.th{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#a3a9b5;text-align:left;padding:10px 12px;border-bottom:1px solid #2a2e38;font-weight:500}
+.td{padding:12px;border-bottom:1px solid #23262f;font-size:14px}
+</style>
+</helmet>
+<div style="width: 1440px; height: 1540px; display: flex; background: #14161c">
+<nav style="width: 232px; flex-shrink: 0; background: #101218; border-right: 1px solid #262a33; padding: 24px 14px; box-sizing: border-box; display: flex; flex-direction: column; gap: 4px">
+<div style="display: flex; align-items: center; gap: 10px; padding: 0 10px 20px">
+<div style="width: 30px; height: 30px; border-radius: 8px; background: #f2a93b; display: flex; align-items: center; justify-content: center; color: #1a1305; font: 700 15px 'Space Grotesk',sans-serif">CF</div>
+<div class="disp" style="font-size: 17px; font-weight: 600">CampaignForge <span style="color: #f2a93b">Pro</span></div>
+</div>
+<a class="nav on" href="Main.dc.html"><span class="num">01</span>Portfolio</a>
+<a class="nav" href="Brand.dc.html"><span class="num">02</span>Company DNA</a>
+<a class="nav" href="Dates.dc.html"><span class="num">2b</span>Moments calendar</a>
+<div class="eyebrow" style="padding: 14px 12px 4px">Create</div>
+<a class="nav" href="New.dc.html"><span class="num">+</span>New campaign</a>
+<a class="nav" href="Plan.dc.html"><span class="num">03</span>Plan workspace</a>
+<a class="nav" href="Score.dc.html"><span class="num">04</span>Readiness score</a>
+<a class="nav" href="Studio.dc.html"><span class="num">05</span>Post studio</a>
+<a class="nav" href="Brief.dc.html"><span class="num">5b</span>Creative brief</a>
+<a class="nav" href="Reel.dc.html"><span class="num">06</span>Video studio</a>
+<a class="nav" href="Publish.dc.html"><span class="num">6b</span>Publish hub</a>
+<div class="eyebrow" style="padding: 14px 12px 4px">Manage</div>
+<a class="nav" href="Budget.dc.html"><span class="num">07</span>Budget &amp; ROI</a>
+<a class="nav" href="Timeline.dc.html"><span class="num">08</span>Timeline &amp; tasks</a>
+<a class="nav" href="Prioritise.dc.html"><span class="num">09</span>Prioritise &amp; risks</a>
+<a class="nav" href="Report.dc.html"><span class="num">10</span>Exec report</a>
+<div style="flex-grow: 1"></div>
+<div class="panel" style="padding: 14px; font-size: 13px; color: #b4b9c4">Brand: Kesar &amp; Co. (sample)<br>Workspace: Marketing</div>
+</nav>
+<main style="flex-grow: 1; padding: 32px 40px; box-sizing: border-box; display: flex; flex-direction: column; gap: 22px">
+<header style="display: flex; align-items: flex-end; justify-content: space-between">
+<div>
+<div class="eyebrow">Portfolio · Q4 FY27 · Sample data</div>
+<h1 class="disp" style="margin: 6px 0 0; font-size: 32px; font-weight: 600">Portfolio command centre</h1>
+</div>
+<div style="display: flex; gap: 10px">
+<button class="btn" type="button">Filter: All brands</button>
+<button class="btn" type="button">Export</button>
+<button class="btn" type="button">Explore demo campaign</button>
+<a class="btn pri" href="New.dc.html" style="text-decoration: none">New campaign</a>
+</div>
+</header>
+<section class="panel" style="padding: 14px 18px; display: flex; align-items: center; gap: 14px; border-color: #6b4a14; background: #221b10">
+<span class="chip a">Pacing alert</span>
+<span style="font-size: 14px; flex-grow: 1">Diwali Festive Push has used 70% of its budget before the peak fortnight. At the current burn rate it will overspend by ₹1.2 L.</span>
+<a href="Budget.dc.html" style="font-weight: 600; font-size: 14px">Reallocate budget</a>
+</section>
+<section style="display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 14px">
+<div class="panel" style="padding: 16px"><div class="eyebrow">Active campaigns</div><div class="disp" style="font-size: 30px; font-weight: 600; margin-top: 8px">6</div><div style="font-size: 13px; color: #a3a9b5">2 launching this month</div></div>
+<div class="panel" style="padding: 16px"><div class="eyebrow">Portfolio budget</div><div class="disp" style="font-size: 30px; font-weight: 600; margin-top: 8px">₹48.0 L</div><div style="font-size: 13px; color: #a3a9b5">Approved envelope</div></div>
+<div class="panel" style="padding: 16px"><div class="eyebrow">Spent to date</div><div class="disp" style="font-size: 30px; font-weight: 600; margin-top: 8px">₹21.6 L</div><div style="font-size: 13px; color: #a3a9b5">45% of budget</div></div>
+<div class="panel" style="padding: 16px"><div class="eyebrow">Forecast revenue</div><div class="disp" style="font-size: 30px; font-weight: 600; margin-top: 8px">₹1.62 Cr</div><div style="font-size: 13px; color: #a3a9b5">Sum of expected return</div></div>
+<div class="panel" style="padding: 16px"><div class="eyebrow">Return multiple</div><div class="disp" style="font-size: 30px; font-weight: 600; margin-top: 8px; color: #5ee0c9">3.4×</div><div style="font-size: 13px; color: #a3a9b5">Revenue ÷ budget</div></div>
+<div class="panel" style="padding: 16px"><div class="eyebrow">Needs attention</div><div class="disp" style="font-size: 30px; font-weight: 600; margin-top: 8px; color: #ff8a8e">2</div><div style="font-size: 13px; color: #a3a9b5">Red or amber health</div></div>
+</section>
+<section class="panel" style="padding: 6px 8px 8px">
+<div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 12px 6px">
+<h2 class="disp" style="margin: 0; font-size: 18px; font-weight: 600">Campaigns</h2>
+<div style="display: flex; gap: 8px"><span class="chip n">Table</span><a href="Timeline.dc.html" class="chip n" style="text-decoration: none">Timeline</a><a href="Plan.dc.html" class="chip n" style="text-decoration: none">Open Diwali plan</a></div>
+</div>
+<table style="width: 100%; border-collapse: collapse">
+<thead><tr><th class="th">Campaign</th><th class="th">Stage</th><th class="th">Health</th><th class="th">Progress</th><th class="th">Budget used</th><th class="th">Owner</th><th class="th">Next milestone</th></tr></thead>
+<tbody>
+<tr><td class="td" style="font-weight: 600">Diwali Festive Push</td><td class="td">In flight</td><td class="td"><span class="chip a">Amber · pacing</span></td><td class="td"><div style="width: 120px; height: 6px; background: #2a2e38; border-radius: 3px"><div style="width: 55%; height: 6px; background: #f2a93b; border-radius: 3px"></div></div></td><td class="td mono">₹9.8 / 14.0 L</td><td class="td">Ananya R.</td><td class="td">Peak-week creatives · 12 Oct</td></tr>
+<tr><td class="td" style="font-weight: 600">Monsoon App Re-engagement</td><td class="td">In flight</td><td class="td"><span class="chip r">Red · CPL high</span></td><td class="td"><div style="width: 120px; height: 6px; background: #2a2e38; border-radius: 3px"><div style="width: 72%; height: 6px; background: #ff8a8e; border-radius: 3px"></div></div></td><td class="td mono">₹5.9 / 8.5 L</td><td class="td">Rohan D.</td><td class="td">Mid-flight review · 3 Oct</td></tr>
+<tr><td class="td" style="font-weight: 600">New Store Launch – Pune</td><td class="td">Build</td><td class="td"><span class="chip g">Green</span></td><td class="td"><div style="width: 120px; height: 6px; background: #2a2e38; border-radius: 3px"><div style="width: 30%; height: 6px; background: #5ee0c9; border-radius: 3px"></div></div></td><td class="td mono">₹1.2 / 9.0 L</td><td class="td">Meera P.</td><td class="td">OOH sites booked · 10 Oct</td></tr>
+<tr><td class="td" style="font-weight: 600">Q4 B2B Webinar Series</td><td class="td">In review</td><td class="td"><span class="chip g">Green</span></td><td class="td"><div style="width: 120px; height: 6px; background: #2a2e38; border-radius: 3px"><div style="width: 40%; height: 6px; background: #5ee0c9; border-radius: 3px"></div></div></td><td class="td mono">₹2.1 / 6.0 L</td><td class="td">Karthik S.</td><td class="td">Speaker sign-off · 6 Oct</td></tr>
+<tr><td class="td" style="font-weight: 600">Loyalty Tier Relaunch</td><td class="td">Planning</td><td class="td"><span class="chip g">Green</span></td><td class="td"><div style="width: 120px; height: 6px; background: #2a2e38; border-radius: 3px"><div style="width: 15%; height: 6px; background: #5ee0c9; border-radius: 3px"></div></div></td><td class="td mono">₹1.6 / 5.5 L</td><td class="td">Meera P.</td><td class="td">Brief approval · 8 Oct</td></tr>
+<tr><td class="td" style="font-weight: 600">Year-end Clearance</td><td class="td">Planning</td><td class="td"><span class="chip n">Not started</span></td><td class="td"><div style="width: 120px; height: 6px; background: #2a2e38; border-radius: 3px"><div style="width: 5%; height: 6px; background: #7d8391; border-radius: 3px"></div></div></td><td class="td mono">₹1.0 / 5.0 L</td><td class="td">Karthik S.</td><td class="td">Go / no-go gate · 1 Nov</td></tr>
+</tbody>
+</table>
+</section>
+<section style="display: grid; grid-template-columns: minmax(0, 1.2fr) repeat(3, minmax(0, 1fr)); gap: 14px">
+<div class="panel" style="padding: 18px">
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px"><h3 class="disp" style="margin: 0; font-size: 16px; font-weight: 600">This week</h3><span class="mono" style="font-size: 11px; color: #a3a9b5">28 Sep – 4 Oct</span></div>
+<div style="display: flex; flex-direction: column; gap: 6px; font-size: 13px">
+<div style="display: flex; gap: 10px; padding: 7px 10px; background: #171a21; border-radius: 8px"><span class="mono" style="width: 52px; color: #a3a9b5">Mon 28</span><span>Webinar teaser · LinkedIn</span></div>
+<div style="display: flex; gap: 10px; padding: 7px 10px; background: #171a21; border-radius: 8px"><span class="mono" style="width: 52px; color: #a3a9b5">Tue 29</span><span>Monsoon win-back · Email</span></div>
+<div style="display: flex; gap: 10px; padding: 7px 10px; background: #171a21; border-radius: 8px"><span class="mono" style="width: 52px; color: #a3a9b5">Wed 30</span><span style="color: #a3a9b5">Nothing scheduled</span></div>
+<div style="display: flex; gap: 10px; padding: 7px 10px; background: #132724; border: 1px solid #2a5a52; border-radius: 8px"><span class="mono" style="width: 52px; color: #5ee0c9">Fri 2</span><span>★ Gandhi Jayanti · no post yet</span></div>
+<div style="display: flex; gap: 10px; padding: 7px 10px; background: #171a21; border-radius: 8px"><span class="mono" style="width: 52px; color: #a3a9b5">Sat 3</span><span>Pune store reel · Instagram</span></div>
+</div>
+</div>
+<div class="panel" style="padding: 18px">
+<h3 class="disp" style="margin: 0 0 14px; font-size: 16px; font-weight: 600">Content mix by channel</h3>
+<div style="display: grid; grid-template-columns: 76px 1fr 24px; gap: 10px 8px; align-items: center; font-size: 13px">
+<span>Instagram</span><div style="height: 8px; background: #2a2e38; border-radius: 4px"><div style="width: 100%; height: 8px; background: #e8568f; border-radius: 4px"></div></div><span class="mono">18</span>
+<span>LinkedIn</span><div style="height: 8px; background: #2a2e38; border-radius: 4px"><div style="width: 67%; height: 8px; background: #4a90e2; border-radius: 4px"></div></div><span class="mono">12</span>
+<span>Email</span><div style="height: 8px; background: #2a2e38; border-radius: 4px"><div style="width: 50%; height: 8px; background: #3cc4b0; border-radius: 4px"></div></div><span class="mono">9</span>
+<span>Google Ads</span><div style="height: 8px; background: #2a2e38; border-radius: 4px"><div style="width: 28%; height: 8px; background: #b5d33d; border-radius: 4px"></div></div><span class="mono">5</span>
+<span>Blog</span><div style="height: 8px; background: #2a2e38; border-radius: 4px"><div style="width: 22%; height: 8px; background: #e8913a; border-radius: 4px"></div></div><span class="mono">4</span>
+<span>YouTube</span><div style="height: 8px; background: #2a2e38; border-radius: 4px"><div style="width: 11%; height: 8px; background: #ff6b6b; border-radius: 4px"></div></div><span class="mono">2</span>
+</div>
+<p style="margin: 12px 0 0; font-size: 12px; color: #a3a9b5">50 posts across 6 campaigns · 14 approved</p>
+</div>
+<div class="panel" style="padding: 18px">
+<h3 class="disp" style="margin: 0 0 12px; font-size: 16px; font-weight: 600">Upcoming moments</h3>
+<div style="display: flex; flex-direction: column; gap: 10px; font-size: 13px">
+<div style="display: flex; justify-content: space-between; gap: 8px"><span><span style="color: #5ee0c9">★</span> Gandhi Jayanti · 2 Oct</span><a href="Plan.dc.html">Add content</a></div>
+<div style="display: flex; justify-content: space-between; gap: 8px"><span><span style="color: #5ee0c9">★</span> Navratri begins · 11 Oct</span><a href="Plan.dc.html">Add content</a></div>
+<div style="display: flex; justify-content: space-between; gap: 8px"><span><span style="color: #5ee0c9">★</span> Halloween · 31 Oct</span><a href="Plan.dc.html">Add content</a></div>
+<div style="display: flex; justify-content: space-between; gap: 8px"><span><span style="color: #5ee0c9">★</span> Diwali · 8 Nov</span><span style="color: #5ee0c9">✓ Planned</span></div>
+</div>
+<p style="margin: 12px 0 0; font-size: 12px; color: #a3a9b5">Next moment: Gandhi Jayanti in 5 days</p>
+</div>
+<div class="panel" style="padding: 18px">
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px"><h3 class="disp" style="margin: 0; font-size: 16px; font-weight: 600">Setup checklist</h3><span class="mono" style="font-size: 11px; color: #a3a9b5">3 of 6 done</span></div>
+<div style="height: 6px; background: #2a2e38; border-radius: 3px; margin-bottom: 12px"><div style="width: 50%; height: 6px; background: #f2a93b; border-radius: 3px"></div></div>
+<div style="display: flex; flex-direction: column; gap: 8px; font-size: 13px">
+<span style="color: #7d8391; text-decoration: line-through">✓ Set up Company DNA</span>
+<span style="color: #7d8391; text-decoration: line-through">✓ Create a campaign</span>
+<span style="color: #7d8391; text-decoration: line-through">✓ Approve 5 posts</span>
+<a href="Reel.dc.html">○ Make a reel</a>
+<a href="Plan.dc.html">○ Export to calendar</a>
+<a href="Budget.dc.html">○ Set channel budgets</a>
+</div>
+</div>
+</section>
+<section style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px">
+<div class="panel" style="padding: 18px">
+<h3 class="disp" style="margin: 0 0 14px; font-size: 16px; font-weight: 600">Money out vs money in (₹ L)</h3>
+<div style="display: flex; align-items: flex-end; gap: 14px; height: 150px">
+<div style="flex-grow: 1; display: flex; flex-direction: column; align-items: center; gap: 6px"><div style="display: flex; gap: 3px; align-items: flex-end; height: 120px"><div style="width: 12px; height: 40px; background: #f2a93b; border-radius: 3px"></div><div style="width: 12px; height: 60px; background: #3cc4b0; border-radius: 3px"></div></div><span class="mono" style="font-size: 11px; color: #a3a9b5">Jul</span></div>
+<div style="flex-grow: 1; display: flex; flex-direction: column; align-items: center; gap: 6px"><div style="display: flex; gap: 3px; align-items: flex-end; height: 120px"><div style="width: 12px; height: 52px; background: #f2a93b; border-radius: 3px"></div><div style="width: 12px; height: 74px; background: #3cc4b0; border-radius: 3px"></div></div><span class="mono" style="font-size: 11px; color: #a3a9b5">Aug</span></div>
+<div style="flex-grow: 1; display: flex; flex-direction: column; align-items: center; gap: 6px"><div style="display: flex; gap: 3px; align-items: flex-end; height: 120px"><div style="width: 12px; height: 80px; background: #f2a93b; border-radius: 3px"></div><div style="width: 12px; height: 88px; background: #3cc4b0; border-radius: 3px"></div></div><span class="mono" style="font-size: 11px; color: #a3a9b5">Sep</span></div>
+<div style="flex-grow: 1; display: flex; flex-direction: column; align-items: center; gap: 6px"><div style="display: flex; gap: 3px; align-items: flex-end; height: 120px"><div style="width: 12px; height: 110px; background: #f2a93b; opacity: .45; border-radius: 3px"></div><div style="width: 12px; height: 118px; background: #3cc4b0; opacity: .45; border-radius: 3px"></div></div><span class="mono" style="font-size: 11px; color: #a3a9b5">Oct f</span></div>
+</div>
+<div style="display: flex; gap: 16px; margin-top: 12px; font-size: 12px; color: #b4b9c4"><span><span style="display: inline-block; width: 10px; height: 10px; background: #f2a93b; border-radius: 2px"></span> Spend</span><span><span style="display: inline-block; width: 10px; height: 10px; background: #3cc4b0; border-radius: 2px"></span> Attributed revenue</span><span>f = forecast</span></div>
+</div>
+<div class="panel" style="padding: 18px">
+<h3 class="disp" style="margin: 0 0 12px; font-size: 16px; font-weight: 600">Upcoming milestones</h3>
+<div style="display: flex; flex-direction: column; gap: 10px; font-size: 14px">
+<div style="display: flex; justify-content: space-between"><span>Mid-flight review · Monsoon</span><span class="mono" style="color: #a3a9b5">3 Oct</span></div>
+<div style="display: flex; justify-content: space-between"><span>Speaker sign-off · Webinar</span><span class="mono" style="color: #a3a9b5">6 Oct</span></div>
+<div style="display: flex; justify-content: space-between"><span>Brief approval · Loyalty</span><span class="mono" style="color: #a3a9b5">8 Oct</span></div>
+<div style="display: flex; justify-content: space-between"><span>OOH sites booked · Pune</span><span class="mono" style="color: #a3a9b5">10 Oct</span></div>
+<div style="display: flex; justify-content: space-between"><span>Peak-week creatives · Diwali</span><span class="mono" style="color: #a3a9b5">12 Oct</span></div>
+</div>
+</div>
+<div class="panel" style="padding: 18px">
+<h3 class="disp" style="margin: 0 0 12px; font-size: 16px; font-weight: 600">Waiting on you</h3>
+<div style="display: flex; flex-direction: column; gap: 10px; font-size: 14px">
+<div style="display: flex; justify-content: space-between; gap: 8px"><span>3 posts in review · Diwali</span><a href="Studio.dc.html">Review</a></div>
+<div style="display: flex; justify-content: space-between; gap: 8px"><span>Budget move ₹0.8 L request</span><a href="Budget.dc.html">Decide</a></div>
+<div style="display: flex; justify-content: space-between; gap: 8px"><span>High risk: influencer delay</span><a href="Prioritise.dc.html">Open</a></div>
+<div style="display: flex; justify-content: space-between; gap: 8px"><span>Go / no-go: Year-end Clearance</span><a href="Prioritise.dc.html">Score</a></div>
+</div>
+</div>
+</section>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1540}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

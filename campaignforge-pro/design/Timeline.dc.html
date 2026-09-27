@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Timeline and tasks</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=DM+Sans:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap">
+<style>
+body{margin:0;background:#14161c;color:#eceef2;font-family:'DM Sans',system-ui,sans-serif}
+a{color:#f2a93b}a:hover{color:#ffc46b}
+.nav{display:flex;align-items:center;gap:10px;min-height:40px;padding:0 12px;border-radius:8px;color:#b4b9c4;text-decoration:none;font-size:14px}
+.nav:hover{background:#1b1e26;color:#eceef2}
+.nav.on{background:#2e2514;color:#f2a93b;font-weight:600}
+.num{font-family:'JetBrains Mono',monospace;font-size:11px;color:#7d8391;width:18px}
+.panel{background:#1b1e26;border:1px solid #2a2e38;border-radius:12px}
+.eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#a3a9b5}
+.disp{font-family:'Space Grotesk',sans-serif}
+.mono{font-family:'JetBrains Mono',monospace}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:0 16px;border-radius:8px;font:600 14px 'DM Sans',sans-serif;border:1px solid #343945;background:#1f232c;color:#eceef2;cursor:pointer}
+.btn.pri{background:#f2a93b;border-color:#f2a93b;color:#1a1305}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:600}
+.g{background:#123a33;color:#5ee0c9}.a{background:#3d2f12;color:#f7be5f}.r{background:#44191b;color:#ff8a8e}.n{background:#262a33;color:#c3c8d2}
+.gantt{display:grid;grid-template-columns:230px repeat(13, minmax(0, 1fr));row-gap:10px;align-items:center}
+.wk{font-family:'JetBrains Mono',monospace;font-size:10px;color:#a3a9b5;text-align:center}
+.nm{font-size:14px;font-weight:600}
+.ph{height:24px;border-radius:6px;font-size:11px;font-weight:600;display:flex;align-items:center;padding:0 8px;overflow:hidden;white-space:nowrap}
+.plan{background:#3a3f4c;color:#dfe2e8}.build{background:#1f4b7a;color:#e3eefc}.live{background:#f2a93b;color:#1a1305}
+.ms{width:14px;height:14px;background:#5ee0c9;transform:rotate(45deg);justify-self:center}
+.col{background:#171a21;border:1px solid #262a33;border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:8px}
+.card{background:#1f232c;border:1px solid #2f3440;border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:6px;font-size:13px}
+.av{width:22px;height:22px;border-radius:50%;background:#3a3f4c;font-size:10px;font-weight:700;display:inline-flex;align-items:center;justify-content:center}
+</style>
+</helmet>
+<div style="width: 1440px; height: 1200px; display: flex; background: #14161c">
+<nav style="width: 232px; flex-shrink: 0; background: #101218; border-right: 1px solid #262a33; padding: 24px 14px; box-sizing: border-box; display: flex; flex-direction: column; gap: 4px">
+<div style="display: flex; align-items: center; gap: 10px; padding: 0 10px 20px">
+<div style="width: 30px; height: 30px; border-radius: 8px; background: #f2a93b; display: flex; align-items: center; justify-content: center; color: #1a1305; font: 700 15px 'Space Grotesk',sans-serif">CF</div>
+<div class="disp" style="font-size: 17px; font-weight: 600">CampaignForge <span style="color: #f2a93b">Pro</span></div>
+</div>
+<a class="nav" href="Main.dc.html"><span class="num">01</span>Portfolio</a>
+<a class="nav" href="Brand.dc.html"><span class="num">02</span>Company DNA</a>
+<a class="nav" href="Dates.dc.html"><span class="num">2b</span>Moments calendar</a>
+<div class="eyebrow" style="padding: 14px 12px 4px">Create</div>
+<a class="nav" href="New.dc.html"><span class="num">+</span>New campaign</a>
+<a class="nav" href="Plan.dc.html"><span class="num">03</span>Plan workspace</a>
+<a class="nav" href="Score.dc.html"><span class="num">04</span>Readiness score</a>
+<a class="nav" href="Studio.dc.html"><span class="num">05</span>Post studio</a>
+<a class="nav" href="Brief.dc.html"><span class="num">5b</span>Creative brief</a>
+<a class="nav" href="Reel.dc.html"><span class="num">06</span>Video studio</a>
+<a class="nav" href="Publish.dc.html"><span class="num">6b</span>Publish hub</a>
+<div class="eyebrow" style="padding: 14px 12px 4px">Manage</div>
+<a class="nav" href="Budget.dc.html"><span class="num">07</span>Budget &amp; ROI</a>
+<a class="nav on" href="Timeline.dc.html"><span class="num">08</span>Timeline &amp; tasks</a>
+<a class="nav" href="Prioritise.dc.html"><span class="num">09</span>Prioritise &amp; risks</a>
+<a class="nav" href="Report.dc.html"><span class="num">10</span>Exec report</a>
+<div style="flex-grow: 1"></div>
+<div class="panel" style="padding: 14px; font-size: 13px; color: #b4b9c4">Brand: Kesar &amp; Co. (sample)<br>Workspace: Marketing</div>
+</nav>
+<main style="flex-grow: 1; padding: 32px 40px; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px">
+<header style="display: flex; align-items: flex-end; justify-content: space-between">
+<div>
+<div class="eyebrow">All campaigns · 28 Sep – 27 Dec 2026 · Sample data</div>
+<h1 class="disp" style="margin: 6px 0 0; font-size: 32px; font-weight: 600">Timeline &amp; tasks</h1>
+</div>
+<div style="display: flex; gap: 10px">
+<button class="btn" type="button">Week · Month · Quarter</button>
+<button class="btn pri" type="button">Add milestone</button>
+</div>
+</header>
+<section class="panel" style="padding: 20px">
+<div class="gantt">
+<div class="eyebrow">Campaign</div>
+<div class="wk">28 Sep</div><div class="wk">5 Oct</div><div class="wk">12 Oct</div><div class="wk">19 Oct</div><div class="wk">26 Oct</div><div class="wk">2 Nov</div><div class="wk">9 Nov</div><div class="wk">16 Nov</div><div class="wk">23 Nov</div><div class="wk">30 Nov</div><div class="wk">7 Dec</div><div class="wk">14 Dec</div><div class="wk">21 Dec</div>
+
+<div class="nm">Diwali Festive Push</div>
+<div class="ph build" style="grid-column: 2 / 3; grid-row: 2">Build</div>
+<div class="ph live" style="grid-column: 3 / 12; grid-row: 2">Live · peak week of 2 Nov</div>
+
+<div class="nm" style="grid-row: 3">Monsoon Re-engagement</div>
+<div class="ph live" style="grid-column: 2 / 5; grid-row: 3">Live</div>
+<div class="ms" style="grid-column: 2; grid-row: 3" title="Mid-flight review 3 Oct"></div>
+
+<div class="nm" style="grid-row: 4">New Store – Pune</div>
+<div class="ph build" style="grid-column: 2 / 5; grid-row: 4">Build · OOH booking</div>
+<div class="ph live" style="grid-column: 5 / 10; grid-row: 4">Live · store opens</div>
+
+<div class="nm" style="grid-row: 5">Q4 B2B Webinars</div>
+<div class="ph plan" style="grid-column: 2 / 4; grid-row: 5">Review</div>
+<div class="ph live" style="grid-column: 4 / 13; grid-row: 5">Live · 4 sessions</div>
+
+<div class="nm" style="grid-row: 6">Loyalty Tier Relaunch</div>
+<div class="ph plan" style="grid-column: 2 / 4; grid-row: 6">Plan</div>
+<div class="ph build" style="grid-column: 4 / 7; grid-row: 6">Build</div>
+<div class="ph live" style="grid-column: 10 / 15; grid-row: 6">Live</div>
+
+<div class="nm" style="grid-row: 7">Year-end Clearance</div>
+<div class="ph plan" style="grid-column: 2 / 7; grid-row: 7">Plan</div>
+<div class="ms" style="grid-column: 6; grid-row: 7; background: #f7be5f" title="Go / no-go 1 Nov"></div>
+<div class="ph build" style="grid-column: 7 / 11; grid-row: 7">Build</div>
+<div class="ph live" style="grid-column: 11 / 15; grid-row: 7">Live</div>
+</div>
+<div style="display: flex; gap: 18px; margin-top: 16px; font-size: 12px; color: #b4b9c4; align-items: center">
+<span><span class="ph plan" style="display: inline-flex; height: 12px; width: 20px; padding: 0"></span> Plan / review</span>
+<span><span class="ph build" style="display: inline-flex; height: 12px; width: 20px; padding: 0"></span> Build</span>
+<span><span class="ph live" style="display: inline-flex; height: 12px; width: 20px; padding: 0"></span> Live</span>
+<span>Diamond = milestone / stage gate</span>
+<span class="chip a">Dependency: Loyalty live waits on Pune store opening</span>
+</div>
+</section>
+<section style="display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; justify-content: space-between; align-items: center">
+<h2 class="disp" style="margin: 0; font-size: 18px; font-weight: 600">Task board · all campaigns</h2>
+<div style="display: flex; gap: 8px"><span class="chip n">Owner: All</span><span class="chip n">Campaign: All</span><span class="chip n">Due: This fortnight</span></div>
+</div>
+<div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px">
+<div class="col"><div style="display: flex; justify-content: space-between"><span class="eyebrow">Backlog</span><span class="mono" style="font-size: 12px; color: #a3a9b5">6</span></div>
+<div class="card"><span style="font-weight: 600">Shortlist 5 regional influencers</span><span class="chip n" style="align-self: flex-start">Loyalty</span><div style="display: flex; justify-content: space-between; align-items: center"><span class="av">MP</span><span class="mono" style="font-size: 11px; color: #a3a9b5">15 Oct</span></div></div>
+<div class="card"><span style="font-weight: 600">Clearance SKU list from ops</span><span class="chip n" style="align-self: flex-start">Clearance</span><div style="display: flex; justify-content: space-between; align-items: center"><span class="av">KS</span><span class="mono" style="font-size: 11px; color: #a3a9b5">20 Oct</span></div></div>
+</div>
+<div class="col"><div style="display: flex; justify-content: space-between"><span class="eyebrow">To do</span><span class="mono" style="font-size: 12px; color: #a3a9b5">4</span></div>
+<div class="card"><span style="font-weight: 600">Book 12 OOH sites, Hinjewadi</span><span class="chip n" style="align-self: flex-start">Pune</span><div style="display: flex; justify-content: space-between; align-items: center"><span class="av">MP</span><span class="mono" style="font-size: 11px; color: #ff8a8e">10 Oct</span></div></div>
+<div class="card"><span style="font-weight: 600">Webinar speaker briefs</span><span class="chip n" style="align-self: flex-start">Webinars</span><div style="display: flex; justify-content: space-between; align-items: center"><span class="av">KS</span><span class="mono" style="font-size: 11px; color: #a3a9b5">6 Oct</span></div></div>
+</div>
+<div class="col"><div style="display: flex; justify-content: space-between"><span class="eyebrow">In progress · limit 5</span><span class="mono" style="font-size: 12px; color: #a3a9b5">5</span></div>
+<div class="card"><span style="font-weight: 600">Peak-week creatives (8 assets)</span><span class="chip n" style="align-self: flex-start">Diwali</span><div style="font-size: 12px; color: #a3a9b5">Subtasks 5 / 8</div><div style="display: flex; justify-content: space-between; align-items: center"><span class="av">AR</span><span class="mono" style="font-size: 11px; color: #a3a9b5">12 Oct</span></div></div>
+<div class="card"><span style="font-weight: 600">Fix Monsoon CPL: new audiences</span><span class="chip r" style="align-self: flex-start">Monsoon · blocked</span><div style="display: flex; justify-content: space-between; align-items: center"><span class="av">RD</span><span class="mono" style="font-size: 11px; color: #a3a9b5">3 Oct</span></div></div>
+</div>
+<div class="col"><div style="display: flex; justify-content: space-between"><span class="eyebrow">In review</span><span class="mono" style="font-size: 12px; color: #a3a9b5">3</span></div>
+<div class="card"><span style="font-weight: 600">“Happy Diwali” post</span><span class="chip n" style="align-self: flex-start">Diwali</span><div style="font-size: 12px; color: #a3a9b5">Uses existing approval flow</div><div style="display: flex; justify-content: space-between; align-items: center"><span class="av">AR</span><a href="Studio.dc.html" style="font-size: 12px">Open</a></div></div>
+</div>
+<div class="col"><div style="display: flex; justify-content: space-between"><span class="eyebrow">Done</span><span class="mono" style="font-size: 12px; color: #a3a9b5">21</span></div>
+<div class="card"><span style="font-weight: 600">Diwali plan scored 78</span><span class="chip n" style="align-self: flex-start">Diwali</span><div style="display: flex; justify-content: space-between; align-items: center"><span class="av">AR</span><span class="mono" style="font-size: 11px; color: #a3a9b5">25 Sep</span></div></div>
+<div class="card"><span style="font-weight: 600">Company DNA saved</span><span class="chip n" style="align-self: flex-start">Workspace</span><div style="display: flex; justify-content: space-between; align-items: center"><span class="av">MP</span><span class="mono" style="font-size: 11px; color: #a3a9b5">22 Sep</span></div></div>
+</div>
+</div>
+</section>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1200}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
