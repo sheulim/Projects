@@ -1,18 +1,48 @@
 <title>CampaignForge Pro</title>
+<meta name="description" content="Plan, publish and track every marketing campaign: AI plans shaped by your Company DNA and the moments your customers celebrate, ready-to-post content for ten channels, and budget tracking.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=DM+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>
 :root{color-scheme:dark;--ground:#14161c;--ink:#eceef2;--muted:#a3a9b5;--line:#2a2e38;--accent:#f2a93b}
 html,body{background:var(--ground)}
-body{margin:0;color:var(--ink);font-family:'DM Sans',system-ui,sans-serif}
-#stage{width:1440px;margin:0 auto;background:var(--ground)}
-#narrow{display:none;padding:10px 16px;font-size:13px;color:var(--muted);border-bottom:1px solid var(--line);background:#101218}
-@media (max-width:1000px){#narrow{display:block}}
+body{margin:0;color:var(--ink);font-family:'DM Sans',system-ui,sans-serif;overflow-x:hidden}
+#stage{max-width:1440px;margin:0 auto;background:var(--ground)}
+#stage > :first-child{width:100% !important;height:auto !important;box-sizing:border-box}
 #err{padding:40px 16px;color:var(--ink)}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* App screens: tablet and phone layout */
+@media (max-width:1199px){
+  #stage .app{flex-direction:column}
+  #stage .app > nav{width:100% !important;flex-direction:row !important;align-items:center;overflow-x:auto;padding:10px 12px !important;gap:4px !important;border-right:0 !important;border-bottom:1px solid #262a33;position:sticky;top:env(safe-area-inset-top,0px);z-index:5}
+  #stage .app > nav > div:first-child{padding:0 8px 0 2px !important;flex-shrink:0}
+  #stage .app > nav > div:first-child .disp{display:none}
+  #stage .app > nav .eyebrow, #stage .app > nav > div[style*="height: 1px"], #stage .app > nav > div[style*="flex-grow"]{display:none !important}
+  #stage .app > nav .nav{white-space:nowrap;flex-shrink:0;min-height:40px}
+  #stage .app > nav .num{display:none}
+  #stage .app > nav > .panel{flex-shrink:0;white-space:nowrap;padding:6px 12px !important}
+  #stage .app > nav > .panel br{display:none}
+  #stage .app > main{padding:20px 16px 40px !important;min-width:0;flex-wrap:wrap}
+  #stage .app main *{max-width:100%;min-width:0;box-sizing:border-box}
+  #stage .app main > aside{width:100% !important}
+  #stage .app .rg1{grid-template-columns:1fr !important}
+  #stage .app .rg{grid-template-columns:repeat(2,minmax(0,1fr)) !important}
+  #stage .app table{display:block;overflow-x:auto;white-space:nowrap}
+  #stage .app .scrollx{overflow-x:auto}
+  #stage .app .gantt{min-width:880px}
+  #stage .app section:has(> .gantt){overflow-x:auto}
+  #stage .app header{flex-wrap:wrap;gap:12px}
+  #stage .app .paper{padding:24px 20px !important}
+}
+@media (max-width:699px){
+  #stage .app .rg{grid-template-columns:1fr !important}
+  #stage .app .rg4{grid-template-columns:repeat(2,minmax(0,1fr)) !important}
+  #stage .app main [style*="display: flex"]{flex-wrap:wrap}
+  #stage .app h1{font-size:26px !important}
+  #stage .app main .disp[style*="font-size: 30px"], #stage .app main .disp[style*="font-size: 26px"]{font-size:22px !important}
+}
 </style>
 <style id="screen-css"></style>
-<div id="narrow">CampaignForge Pro is built for laptop and desktop screens. On a phone the screens are scaled down; pinch to zoom.</div>
 <div id="stage" aria-live="polite"></div>
 <script>
 var SCREENS = /*SCREENS*/;
@@ -24,6 +54,20 @@ DCLogic.prototype.setState = function (p) {
   App.schedule();
 };
 DCLogic.prototype.forceUpdate = function () { App.schedule(); };
+
+/* Prototype sign-in: kept in this browser only. */
+var CFP = (function () {
+  var KEY = 'cfp.user', mem = null;
+  return {
+    user: function () {
+      if (mem) return mem;
+      try { var raw = localStorage.getItem(KEY); if (raw) mem = JSON.parse(raw); } catch (e) {}
+      return mem;
+    },
+    signIn: function (u) { mem = u; try { localStorage.setItem(KEY, JSON.stringify(u)); } catch (e) {} },
+    signOut: function () { mem = null; try { localStorage.removeItem(KEY); } catch (e) {} }
+  };
+})();
 </script>
 <script>
 /*COMPONENTS*/
@@ -35,7 +79,8 @@ var App = (function () {
   var HOLE = /\{\{\s*([^}]+?)\s*\}\}/g;
   var WHOLE = /^\{\{\s*([^}]+?)\s*\}\}$/;
   var SVG = 'http://www.w3.org/2000/svg';
-  var parsed = {}, current = null, inst = null, pending = false, baseHeight = 0;
+  var PUBLIC = { Home: 1, Auth: 1 };
+  var parsed = {}, current = null, inst = null, pending = false;
 
   function lookup(path, scope) {
     path = path.trim();
@@ -94,38 +139,53 @@ var App = (function () {
     return parsed[name];
   }
 
-  function fit() {
-    var z = Math.min(1, window.innerWidth / 1440);
-    stage.style.zoom = z;
-    var root = stage.firstElementChild;
-    if (root) root.style.minHeight = Math.max(baseHeight, Math.ceil(window.innerHeight / z)) + 'px';
+  /* Tag layout grids so the responsive CSS can restack them without touching row-level grids. */
+  function tagGrids(root) {
+    var els = root.querySelectorAll('[style*="grid-template-columns"]');
+    for (var i = 0; i < els.length; i++) {
+      var t = els[i].style.gridTemplateColumns || '';
+      var rep = /repeat\((\d+)/.exec(t), count = rep ? +rep[1] : 0;
+      if (count >= 7) { if (count > 7 && els[i].parentElement) els[i].parentElement.classList.add('scrollx'); continue; }
+      var px = (t.match(/(\d+)px/g) || []).map(function (s) { return parseInt(s, 10); }).filter(function (p) { return p > 0; });
+      var big = px.some(function (p) { return p >= 240; });
+      if (big) els[i].classList.add('rg1');
+      else if (!px.length) { els[i].classList.add('rg'); if ((count || (t.match(/fr/g) || []).length) >= 4) els[i].classList.add('rg4'); }
+    }
   }
 
   function paint() {
     pending = false;
     if (!inst) return;
     var y = window.scrollY;
+    var user = CFP.user();
+    var base = { $userName: user ? user.name : 'Guest', $user: user || {} };
+    var scope = Object.assign(Object.create(base), inst.renderVals() || {});
     var frag = document.createDocumentFragment();
-    render(template(current).childNodes, inst.renderVals() || {}, frag);
+    render(template(current).childNodes, scope, frag);
     stage.replaceChildren(frag);
     var root = stage.firstElementChild;
     if (root) {
-      if (!baseHeight) baseHeight = parseInt(root.style.height, 10) || 0;
-      root.style.height = 'auto';
+      root.style.minHeight = window.innerHeight + 'px';
+      if (root.querySelector(':scope > nav')) root.classList.add('app');
+      tagGrids(root);
     }
-    fit();
     window.scrollTo(0, y);
   }
 
   function go(name, push) {
-    if (!SCREENS[name]) name = 'Main';
+    if (name === 'Signout') { CFP.signOut(); name = 'Home'; push = true; }
+    if (!SCREENS[name]) name = 'Home';
+    if (!PUBLIC[name] && !CFP.user()) name = 'Auth';
+    if (name === 'Auth' && CFP.user()) name = 'Main';
     if (inst && inst.componentWillUnmount) inst.componentWillUnmount();
-    current = name; baseHeight = 0;
+    current = name;
     cssEl.textContent = SCREENS[name].css;
-    document.title = SCREENS[name].title + ' · CampaignForge Pro';
+    document.title = name === 'Home' ? 'CampaignForge Pro' : SCREENS[name].title + ' · CampaignForge Pro';
     inst = new DC[name]({});
     if (push && location.hash !== '#' + name) {
       try { history.pushState(null, '', '#' + name); } catch (e) { location.hash = name; }
+    } else if (location.hash && location.hash !== '#' + name) {
+      try { history.replaceState(null, '', '#' + name); } catch (e) {}
     }
     paint();
     window.scrollTo(0, 0);
@@ -135,18 +195,22 @@ var App = (function () {
   stage.addEventListener('click', function (e) {
     var a = e.target.closest('a[href]');
     if (!a) return;
-    var m = /^\/?([A-Za-z0-9_-]+)\.dc\.html$/.exec(a.getAttribute('href'));
-    if (m) { e.preventDefault(); go(m[1], true); }
+    var href = a.getAttribute('href');
+    var m = /^\/?([A-Za-z0-9_-]+)\.dc\.html$/.exec(href);
+    if (m) { e.preventDefault(); go(m[1], true); return; }
+    if (href.charAt(0) === '#' && href.length > 1) {
+      var target = document.getElementById(href.slice(1));
+      if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+    }
   });
-  window.addEventListener('popstate', function () { go(location.hash.slice(1) || 'Main', false); });
-  window.addEventListener('hashchange', function () { var h = location.hash.slice(1); if (h && h !== current) go(h, false); });
-  window.addEventListener('resize', fit);
+  window.addEventListener('popstate', function () { go(location.hash.slice(1) || 'Home', false); });
+  window.addEventListener('hashchange', function () { var h = location.hash.slice(1); if (h && h !== current && (SCREENS[h] || h === 'Signout')) go(h, false); });
 
   return {
     schedule: function () { if (!pending) { pending = true; requestAnimationFrame(paint); } },
     start: function () {
-      try { go(location.hash.slice(1) || 'Main', false); }
-      catch (err) { stage.innerHTML = '<p id="err">This screen could not load. Reload the page to try again.</p>'; console.error(err); }
+      try { go(location.hash.slice(1) || 'Home', false); }
+      catch (err) { stage.innerHTML = '<p id="err">This page could not load. Reload to try again.</p>'; console.error(err); }
     }
   };
 })();
