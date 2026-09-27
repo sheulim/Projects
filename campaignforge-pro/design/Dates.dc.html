@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Key dates library</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=DM+Sans:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap">
+<style>
+body{margin:0;background:#14161c;color:#eceef2;font-family:'DM Sans',system-ui,sans-serif}
+a{color:#f2a93b}a:hover{color:#ffc46b}
+.nav{display:flex;align-items:center;gap:10px;min-height:40px;padding:0 12px;border-radius:8px;color:#b4b9c4;text-decoration:none;font-size:14px}
+.nav:hover{background:#1b1e26;color:#eceef2}
+.nav.on{background:#2e2514;color:#f2a93b;font-weight:600}
+.num{font-family:'JetBrains Mono',monospace;font-size:11px;color:#7d8391;width:18px}
+.panel{background:#1b1e26;border:1px solid #2a2e38;border-radius:12px}
+.eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#a3a9b5}
+.disp{font-family:'Space Grotesk',sans-serif}
+.mono{font-family:'JetBrains Mono',monospace}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;padding:0 16px;border-radius:8px;font-weight:600;font-size:14px;font-family:inherit;border:1px solid #343945;background:#1f232c;color:#eceef2;cursor:pointer;text-decoration:none}
+.btn.pri{background:#f2a93b;border-color:#f2a93b;color:#1a1305}
+.pill{min-height:36px;padding:0 14px;border-radius:999px;border:1px solid #343945;background:transparent;color:#c3c8d2;font-weight:500;font-size:13px;font-family:inherit;cursor:pointer}
+.pill.on{background:#eceef2;color:#14161c;border-color:#eceef2;font-weight:600}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:2px 9px;border-radius:999px;font-size:11px;font-weight:600;white-space:nowrap}
+.hi{background:#123a33;color:#5ee0c9}.md{background:#3d2f12;color:#f7be5f}.lo{background:#262a33;color:#c3c8d2}
+.th{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#a3a9b5;text-align:left;padding:9px 10px;border-bottom:1px solid #2a2e38;font-weight:500}
+.td{padding:9px 10px;border-bottom:1px solid #23262f;font-size:13px}
+.add{min-height:30px;padding:0 10px;border-radius:6px;border:1px solid #2a5a52;background:#132724;color:#5ee0c9;font-weight:600;font-size:12px;font-family:inherit;cursor:pointer}
+</style>
+</helmet>
+<div style="width: 1440px; height: 1400px; display: flex; background: #14161c">
+<nav style="width: 232px; flex-shrink: 0; background: #101218; border-right: 1px solid #262a33; padding: 24px 14px; box-sizing: border-box; display: flex; flex-direction: column; gap: 4px">
+<div style="display: flex; align-items: center; gap: 10px; padding: 0 10px 20px">
+<div style="width: 30px; height: 30px; border-radius: 8px; background: #f2a93b; display: flex; align-items: center; justify-content: center; color: #1a1305; font: 700 15px 'Space Grotesk',sans-serif">CF</div>
+<div class="disp" style="font-size: 17px; font-weight: 600">CampaignForge <span style="color: #f2a93b">Pro</span></div>
+</div>
+<a class="nav" href="Main.dc.html"><span class="num">01</span>Portfolio</a>
+<a class="nav" href="Brand.dc.html"><span class="num">02</span>Brand kit</a>
+<a class="nav on" href="Dates.dc.html"><span class="num">2b</span>Key dates library</a>
+<div class="eyebrow" style="padding: 14px 12px 4px">Create</div>
+<a class="nav" href="New.dc.html"><span class="num">+</span>New campaign</a>
+<a class="nav" href="Plan.dc.html"><span class="num">03</span>Plan workspace</a>
+<a class="nav" href="Score.dc.html"><span class="num">04</span>Strategist score</a>
+<a class="nav" href="Studio.dc.html"><span class="num">05</span>Post studio</a>
+<a class="nav" href="Brief.dc.html"><span class="num">5b</span>Creative brief</a>
+<a class="nav" href="Reel.dc.html"><span class="num">06</span>Video studio</a>
+<a class="nav" href="Publish.dc.html"><span class="num">6b</span>Publish hub</a>
+<div class="eyebrow" style="padding: 14px 12px 4px">Manage</div>
+<a class="nav" href="Budget.dc.html"><span class="num">07</span>Budget &amp; ROI</a>
+<a class="nav" href="Timeline.dc.html"><span class="num">08</span>Timeline &amp; tasks</a>
+<a class="nav" href="Prioritise.dc.html"><span class="num">09</span>Prioritise &amp; risks</a>
+<a class="nav" href="Report.dc.html"><span class="num">10</span>Exec report</a>
+<div style="flex-grow: 1"></div>
+<div class="panel" style="padding: 14px; font-size: 13px; color: #b4b9c4">Brand: Kesar &amp; Co. (sample)<br>Workspace: Marketing</div>
+</nav>
+<main style="flex-grow: 1; padding: 32px 40px; box-sizing: border-box; display: flex; flex-direction: column; gap: 18px">
+<header style="display: flex; align-items: flex-end; justify-content: space-between">
+<div>
+<div class="eyebrow">Festivals, holidays and shopping days · every year, every market · Sample view</div>
+<h1 class="disp" style="margin: 6px 0 0; font-size: 32px; font-weight: 600">Key dates library</h1>
+<p style="margin: 6px 0 0; color: #b4b9c4; font-size: 15px">Pick your target markets once. Every new plan is built around their festivals and holidays, with posts timed before each date.</p>
+</div>
+<div style="display: flex; gap: 10px">
+<button class="btn" type="button">Import .ics</button>
+<button class="btn" type="button">+ Add your own date</button>
+<button class="btn pri" type="button">Save markets</button>
+</div>
+</header>
+<section class="panel" style="padding: 16px 18px; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap"><span class="eyebrow" style="width: 110px">Target markets</span><sc-for list="{{markets}}" as="m" hint-placeholder-count="8"><button type="button" class="{{m.cls}}" onClick="{{m.pick}}" aria-pressed="{{m.on}}">{{m.label}}</button></sc-for><button type="button" class="pill">+ Add country or state</button></div>
+<div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap"><span class="eyebrow" style="width: 110px">Date types</span><span class="pill on" style="display: inline-flex; align-items: center">National holidays</span><span class="pill on" style="display: inline-flex; align-items: center">Religious festivals</span><span class="pill on" style="display: inline-flex; align-items: center">Regional festivals</span><span class="pill on" style="display: inline-flex; align-items: center">Shopping events</span><span class="pill" style="display: inline-flex; align-items: center">Awareness days</span><span class="pill" style="display: inline-flex; align-items: center">Sports &amp; cricket</span><span class="pill on" style="display: inline-flex; align-items: center">Your dates</span></div>
+</section>
+<div style="display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 18px; flex-grow: 1">
+<section class="panel" style="padding: 6px 8px 8px">
+<div style="display: flex; justify-content: space-between; align-items: center; margin: 12px 10px 6px"><h2 class="disp" style="margin: 0; font-size: 18px; font-weight: 600">Oct 2026 – Jan 2027 · {{count}} dates</h2><div style="display: flex; gap: 6px"><span class="pill" style="display: inline-flex; align-items: center">Year</span><span class="pill on" style="display: inline-flex; align-items: center">Quarter</span><span class="pill" style="display: inline-flex; align-items: center">Month</span></div></div>
+<table style="width: 100%; border-collapse: collapse">
+<thead><tr><th class="th">Date</th><th class="th">Occasion</th><th class="th">Market</th><th class="th">Type</th><th class="th">Fit for your brand</th><th class="th">Start posting</th><th class="th"></th></tr></thead>
+<tbody>
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="14">
+<tr><td class="td mono" style="{{r.dateStyle}}">{{r.date}}</td><td class="td" style="font-weight: 600">{{r.name}}</td><td class="td">{{r.market}}</td><td class="td" style="color: #b4b9c4">{{r.type}}</td><td class="td"><span class="{{r.fitCls}}">{{r.fit}}</span></td><td class="td" style="color: #b4b9c4">{{r.lead}}</td><td class="td"><button type="button" class="add">Add to campaign</button></td></tr>
+</sc-for>
+</tbody>
+</table>
+</section>
+<aside style="display: flex; flex-direction: column; gap: 14px">
+<div class="panel" style="padding: 18px">
+<div class="eyebrow">How dates are sourced</div>
+<ul style="margin: 10px 0 0; padding-left: 18px; font-size: 13px; line-height: 1.6; color: #dfe2e8">
+<li>Fixed dates (e.g. 2 Oct, 25 Dec) are loaded for every year.</li>
+<li>Lunar and regional festivals change yearly. They come from a public-holiday data feed and government holiday lists, never from AI guesses.</li>
+<li>A date waiting for its official notice shows “Awaiting feed”.</li>
+<li>Admins can correct any date for the workspace.</li>
+</ul>
+</div>
+<div class="panel" style="padding: 18px">
+<div class="eyebrow">Fit for your brand</div>
+<p style="margin: 10px 0 0; font-size: 13px; line-height: 1.55; color: #dfe2e8">Scored by AI from your brand kit (category: sweets and gifting). High-fit dates are suggested automatically in every new plan.</p>
+</div>
+<div class="panel" style="padding: 18px">
+<div class="eyebrow">International campaigns</div>
+<p style="margin: 10px 0 0; font-size: 13px; line-height: 1.55; color: #dfe2e8">Each market keeps its own time zone, language and currency. Posts are scheduled in local time for that market.</p>
+</div>
+<div class="panel" style="padding: 18px">
+<div class="eyebrow">Sync</div>
+<p style="margin: 10px 0 0; font-size: 13px; color: #dfe2e8">Last synced: [SYNC DATE] · Next year’s dates load automatically.</p>
+</div>
+</aside>
+</div>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1400}}'>
+class Component extends DCLogic {
+constructor(p) { super(p); this.state = { m: { in: 1, ts: 1, gl: 1 } }; }
+renderVals() {
+var self = this;
+var M = [['in', 'India · national'], ['ts', 'India · Telangana'], ['mh', 'India · Maharashtra'], ['ae', 'UAE'], ['uk', 'UK'], ['us', 'USA'], ['gl', 'Global']];
+var markets = M.map(function (m) {
+var on = !!self.state.m[m[0]];
+return { label: m[1], on: on ? 'true' : 'false', cls: on ? 'pill on' : 'pill', pick: function () { var n = Object.assign({}, self.state.m); if (n[m[0]]) delete n[m[0]]; else n[m[0]] = 1; self.setState({ m: n }); } };
+});
+var F = null;
+var D = [
+['2 Oct', 'Gandhi Jayanti', 'India', 'National holiday', 'Medium', '3 days before', ['in', 'ts', 'mh']],
+[F, 'Bathukamma', 'Telangana', 'Regional festival', 'High', '10 days before', ['ts']],
+['11 Oct', 'Navratri begins', 'India', 'Religious festival', 'High', '7 days before', ['in', 'ts', 'mh']],
+[F, 'Dussehra', 'India', 'Religious festival', 'High', '7 days before', ['in', 'ts', 'mh']],
+[F, 'Karwa Chauth', 'India (north)', 'Religious festival', 'Medium', '5 days before', ['in']],
+['31 Oct', 'Halloween', 'USA, UK', 'Cultural', 'Low', '5 days before', ['us', 'uk']],
+['5 Nov', 'Bonfire Night', 'UK', 'Cultural', 'Low', '3 days before', ['uk']],
+['8 Nov', 'Diwali', 'India + diaspora', 'Religious festival', 'High', '21 days before', ['in', 'ts', 'mh', 'ae', 'uk', 'us', 'gl']],
+['11 Nov', "Singles' Day", 'Global', 'Shopping event', 'Low', '5 days before', ['gl']],
+['14 Nov', "Children's Day", 'India', 'Awareness day', 'Medium', '3 days before', ['in', 'ts', 'mh']],
+['26 Nov', 'Thanksgiving', 'USA', 'National holiday', 'Medium', '7 days before', ['us']],
+['27 Nov', 'Black Friday', 'Global', 'Shopping event', 'High', '10 days before', ['gl', 'us', 'uk', 'ae']],
+['30 Nov', 'Cyber Monday', 'Global', 'Shopping event', 'Medium', '5 days before', ['gl', 'us', 'uk']],
+['2 Dec', 'UAE National Day', 'UAE', 'National holiday', 'Medium', '5 days before', ['ae']],
+['25 Dec', 'Christmas', 'Global + India', 'Religious festival', 'High', '14 days before', ['gl', 'in', 'ts', 'mh', 'uk', 'us', 'ae']],
+['31 Dec', "New Year's Eve", 'Global', 'Cultural', 'High', '10 days before', ['gl', 'in', 'ts', 'mh', 'uk', 'us', 'ae']],
+[F, 'Makar Sankranti / Pongal', 'India', 'Harvest festival', 'High', '10 days before', ['in', 'ts', 'mh']],
+['20 Nov', 'Kesar &amp; Co. anniversary', 'Your date', 'Your date', 'High', '7 days before', ['in', 'ts', 'mh', 'ae', 'uk', 'us', 'gl']]
+];
+var sel = this.state.m;
+var rows = D.filter(function (d) { return d[6].some(function (k) { return sel[k]; }); }).map(function (d) {
+return {
+date: d[0] || 'Awaiting feed', dateStyle: d[0] ? '' : 'color: #a3a9b5; font-style: italic',
+name: d[1].replace('&amp;', '&'), market: d[2], type: d[3], fit: d[4], fitCls: d[4] === 'High' ? 'chip hi' : d[4] === 'Medium' ? 'chip md' : 'chip lo', lead: d[5]
+};
+});
+return { markets: markets, rows: rows, count: rows.length };
+}
+}
+</script>
+</body>
+</html>

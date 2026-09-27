@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Prioritise and risks</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=DM+Sans:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap">
+<style>
+body{margin:0;background:#14161c;color:#eceef2;font-family:'DM Sans',system-ui,sans-serif}
+a{color:#f2a93b}a:hover{color:#ffc46b}
+.nav{display:flex;align-items:center;gap:10px;min-height:40px;padding:0 12px;border-radius:8px;color:#b4b9c4;text-decoration:none;font-size:14px}
+.nav:hover{background:#1b1e26;color:#eceef2}
+.nav.on{background:#2e2514;color:#f2a93b;font-weight:600}
+.num{font-family:'JetBrains Mono',monospace;font-size:11px;color:#7d8391;width:18px}
+.panel{background:#1b1e26;border:1px solid #2a2e38;border-radius:12px}
+.eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#a3a9b5}
+.disp{font-family:'Space Grotesk',sans-serif}
+.mono{font-family:'JetBrains Mono',monospace}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:0 16px;border-radius:8px;font:600 14px 'DM Sans',sans-serif;border:1px solid #343945;background:#1f232c;color:#eceef2;cursor:pointer}
+.btn.pri{background:#f2a93b;border-color:#f2a93b;color:#1a1305}
+.btn.sel{border-color:#f2a93b;color:#f2a93b;background:#221b10}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:600}
+.g{background:#123a33;color:#5ee0c9}.a{background:#3d2f12;color:#f7be5f}.r{background:#44191b;color:#ff8a8e}.n{background:#262a33;color:#c3c8d2}
+.th{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#a3a9b5;text-align:left;padding:9px 10px;border-bottom:1px solid #2a2e38;font-weight:500}
+.td{padding:10px;border-bottom:1px solid #23262f;font-size:13px}
+.hm{height:30px;border-radius:5px;display:flex;align-items:center;justify-content:center;font:500 11px 'JetBrains Mono',monospace}
+</style>
+</helmet>
+<div style="width: 1440px; height: 1200px; display: flex; background: #14161c">
+<nav style="width: 232px; flex-shrink: 0; background: #101218; border-right: 1px solid #262a33; padding: 24px 14px; box-sizing: border-box; display: flex; flex-direction: column; gap: 4px">
+<div style="display: flex; align-items: center; gap: 10px; padding: 0 10px 20px">
+<div style="width: 30px; height: 30px; border-radius: 8px; background: #f2a93b; display: flex; align-items: center; justify-content: center; color: #1a1305; font: 700 15px 'Space Grotesk',sans-serif">CF</div>
+<div class="disp" style="font-size: 17px; font-weight: 600">CampaignForge <span style="color: #f2a93b">Pro</span></div>
+</div>
+<a class="nav" href="Main.dc.html"><span class="num">01</span>Portfolio</a>
+<a class="nav" href="Brand.dc.html"><span class="num">02</span>Brand kit</a>
+<a class="nav" href="Dates.dc.html"><span class="num">2b</span>Key dates library</a>
+<div class="eyebrow" style="padding: 14px 12px 4px">Create</div>
+<a class="nav" href="New.dc.html"><span class="num">+</span>New campaign</a>
+<a class="nav" href="Plan.dc.html"><span class="num">03</span>Plan workspace</a>
+<a class="nav" href="Score.dc.html"><span class="num">04</span>Strategist score</a>
+<a class="nav" href="Studio.dc.html"><span class="num">05</span>Post studio</a>
+<a class="nav" href="Brief.dc.html"><span class="num">5b</span>Creative brief</a>
+<a class="nav" href="Reel.dc.html"><span class="num">06</span>Video studio</a>
+<a class="nav" href="Publish.dc.html"><span class="num">6b</span>Publish hub</a>
+<div class="eyebrow" style="padding: 14px 12px 4px">Manage</div>
+<a class="nav" href="Budget.dc.html"><span class="num">07</span>Budget &amp; ROI</a>
+<a class="nav" href="Timeline.dc.html"><span class="num">08</span>Timeline &amp; tasks</a>
+<a class="nav on" href="Prioritise.dc.html"><span class="num">09</span>Prioritise &amp; risks</a>
+<a class="nav" href="Report.dc.html"><span class="num">10</span>Exec report</a>
+<div style="flex-grow: 1"></div>
+<div class="panel" style="padding: 14px; font-size: 13px; color: #b4b9c4">Brand: Kesar &amp; Co. (sample)<br>Workspace: Marketing</div>
+</nav>
+<main style="flex-grow: 1; padding: 32px 40px; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px">
+<header style="display: flex; align-items: flex-end; justify-content: space-between">
+<div>
+<div class="eyebrow">Campaign backlog, risk log and team load · Sample data</div>
+<h1 class="disp" style="margin: 6px 0 0; font-size: 32px; font-weight: 600">Prioritise &amp; risks</h1>
+</div>
+<div style="display: flex; gap: 8px">
+<sc-for list="{{fw}}" as="f" hint-placeholder-count="2"><button type="button" class="{{f.cls}}" onClick="{{f.pick}}">{{f.label}}</button></sc-for>
+</div>
+</header>
+<div style="display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 18px">
+<section class="panel" style="padding: 6px 8px 12px">
+<h2 class="disp" style="margin: 14px 10px 8px; font-size: 18px; font-weight: 600">Campaign ideas ranked by {{fwName}}</h2>
+<table style="width: 100%; border-collapse: collapse">
+<thead><tr><th class="th">#</th><th class="th">Idea</th><sc-for list="{{cols}}" as="c" hint-placeholder-count="4"><th class="th">{{c}}</th></sc-for><th class="th">Score</th></tr></thead>
+<tbody>
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="5">
+<tr><td class="td mono">{{r.rank}}</td><td class="td" style="font-weight: 600">{{r.name}}</td><sc-for list="{{r.vals}}" as="v" hint-placeholder-count="4"><td class="td mono">{{v}}</td></sc-for><td class="td mono" style="color: #f2a93b; font-weight: 600">{{r.score}}</td></tr>
+</sc-for>
+</tbody>
+</table>
+<p style="margin: 10px 10px 0; font-size: 12px; color: #a3a9b5">{{formula}}</p>
+</section>
+<section class="panel" style="padding: 20px">
+<h2 class="disp" style="margin: 0 0 12px; font-size: 18px; font-weight: 600">Impact vs effort</h2>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: 130px 130px; gap: 6px">
+<div style="background: #123a33; border-radius: 8px; padding: 10px; font-size: 12px"><div class="eyebrow" style="color: #5ee0c9">Quick wins</div><div style="margin-top: 8px">B2B case studies</div></div>
+<div style="background: #1f4b7a; border-radius: 8px; padding: 10px; font-size: 12px"><div class="eyebrow" style="color: #cfe0f7">Big bets</div><div style="margin-top: 8px">Referral programme<br>Regional-language ads<br>WhatsApp commerce pilot</div></div>
+<div style="background: #262a33; border-radius: 8px; padding: 10px; font-size: 12px"><div class="eyebrow">Fill-ins</div><div style="margin-top: 8px">Republic Day sale</div></div>
+<div style="background: #44191b; border-radius: 8px; padding: 10px; font-size: 12px"><div class="eyebrow" style="color: #ff8a8e">Avoid for now</div><div style="margin-top: 8px; color: #a3a9b5">None</div></div>
+</div>
+<div style="display: flex; justify-content: space-between; margin-top: 8px; font-size: 11px; color: #a3a9b5" class="mono"><span>Low effort ←</span><span>→ High effort</span></div>
+<p style="margin: 8px 0 0; font-size: 12px; color: #a3a9b5">Top row = impact 2 or more. Left column = effort of 2 person-months or less.</p>
+</section>
+</div>
+<div style="display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 18px">
+<section class="panel" style="padding: 6px 8px 8px">
+<div style="display: flex; justify-content: space-between; align-items: center; margin: 14px 10px 8px"><h2 class="disp" style="margin: 0; font-size: 18px; font-weight: 600">Risk log</h2><button class="btn" type="button" style="min-height: 34px">Add risk</button></div>
+<table style="width: 100%; border-collapse: collapse">
+<thead><tr><th class="th">Risk</th><th class="th">Campaign</th><th class="th">P × I</th><th class="th">Owner</th><th class="th">Mitigation</th><th class="th">Status</th></tr></thead>
+<tbody>
+<tr><td class="td" style="font-weight: 600">Influencer posts slip past Diwali</td><td class="td">Diwali</td><td class="td"><span class="chip r">4 × 5 = 20</span></td><td class="td">Ananya R.</td><td class="td">Contract posting dates; backup creator list</td><td class="td"><span class="chip a">Open</span></td></tr>
+<tr><td class="td" style="font-weight: 600">Budget overrun ₹1.2 L</td><td class="td">Diwali</td><td class="td"><span class="chip r">4 × 4 = 16</span></td><td class="td">Ananya R.</td><td class="td">Move OOH budget to Meta (pending)</td><td class="td"><span class="chip a">Mitigating</span></td></tr>
+<tr><td class="td" style="font-weight: 600">OOH permits delayed</td><td class="td">Pune</td><td class="td"><span class="chip a">3 × 4 = 12</span></td><td class="td">Meera P.</td><td class="td">Digital-only launch fallback</td><td class="td"><span class="chip a">Open</span></td></tr>
+<tr><td class="td" style="font-weight: 600">Speaker drop-out</td><td class="td">Webinars</td><td class="td"><span class="chip g">2 × 3 = 6</span></td><td class="td">Karthik S.</td><td class="td">Two reserve speakers confirmed</td><td class="td"><span class="chip g">Controlled</span></td></tr>
+</tbody>
+</table>
+<p style="margin: 8px 10px 4px; font-size: 12px; color: #a3a9b5">P = probability, I = impact, both 1–5. Scores of 15 or more go on the exec report automatically.</p>
+</section>
+<section class="panel" style="padding: 20px">
+<h2 class="disp" style="margin: 0 0 12px; font-size: 18px; font-weight: 600">Team load (% of week)</h2>
+<div style="display: grid; grid-template-columns: 90px repeat(6, minmax(0, 1fr)); gap: 4px; align-items: center">
+<span></span><span class="mono" style="font-size: 10px; color: #a3a9b5; text-align: center">28 Sep</span><span class="mono" style="font-size: 10px; color: #a3a9b5; text-align: center">5 Oct</span><span class="mono" style="font-size: 10px; color: #a3a9b5; text-align: center">12 Oct</span><span class="mono" style="font-size: 10px; color: #a3a9b5; text-align: center">19 Oct</span><span class="mono" style="font-size: 10px; color: #a3a9b5; text-align: center">26 Oct</span><span class="mono" style="font-size: 10px; color: #a3a9b5; text-align: center">2 Nov</span>
+<sc-for list="{{load}}" as="p" hint-placeholder-count="4">
+<span style="font-size: 13px">{{p.name}}</span>
+<sc-for list="{{p.cells}}" as="c" hint-placeholder-count="6"><div class="hm" style="{{c.style}}">{{c.v}}</div></sc-for>
+</sc-for>
+</div>
+<p style="margin: 12px 0 0; font-size: 12px; color: #a3a9b5">Red = over 100%. Ananya is overbooked in the Diwali peak weeks; reassign 2 creative tasks.</p>
+</section>
+</div>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1200}}'>
+class Component extends DCLogic {
+constructor(p) { super(p); this.state = { fw: 'rice' }; }
+renderVals() {
+var self = this;
+var ideas = [
+{ name: 'Republic Day sale', r: 20000, i: 1, c: 0.9, e: 2, bv: 8, tc: 8, rr: 3, js: 2 },
+{ name: 'Referral programme', r: 12000, i: 2, c: 0.8, e: 3, bv: 8, tc: 3, rr: 8, js: 5 },
+{ name: 'Regional-language ads', r: 15000, i: 2, c: 0.6, e: 3, bv: 5, tc: 5, rr: 5, js: 5 },
+{ name: 'WhatsApp commerce pilot', r: 8000, i: 3, c: 0.5, e: 4, bv: 8, tc: 2, rr: 8, js: 8 },
+{ name: 'B2B case-study series', r: 1500, i: 2, c: 0.8, e: 1, bv: 3, tc: 2, rr: 3, js: 2 }
+];
+var rice = this.state.fw === 'rice';
+var scored = ideas.map(function (x) {
+var s = rice ? Math.round(x.r * x.i * x.c / x.e) : Math.round((x.bv + x.tc + x.rr) / x.js * 10) / 10;
+var vals = rice ? [x.r.toLocaleString('en-IN'), x.i, Math.round(x.c * 100) + '%', x.e] : [x.bv, x.tc, x.rr, x.js];
+return { name: x.name, vals: vals, s: s };
+}).sort(function (a, b) { return b.s - a.s; });
+var rows = scored.map(function (x, i) { return { rank: i + 1, name: x.name, vals: x.vals, score: rice ? x.s.toLocaleString('en-IN') : x.s }; });
+var fw = [['rice', 'RICE'], ['wsjf', 'WSJF']].map(function (f) {
+return { label: f[1], cls: self.state.fw === f[0] ? 'btn sel' : 'btn', pick: function () { self.setState({ fw: f[0] }); } };
+});
+var L = [['Ananya R.', [90, 110, 120, 115, 100, 95]], ['Meera P.', [70, 85, 90, 80, 75, 60]], ['Karthik S.', [60, 80, 85, 90, 70, 50]], ['Rohan D.', [100, 95, 60, 50, 40, 40]]];
+var load = L.map(function (p) {
+return { name: p[0], cells: p[1].map(function (v) {
+var bg = v > 100 ? '#44191b' : v >= 85 ? '#3d2f12' : '#123a33';
+var fg = v > 100 ? '#ff8a8e' : v >= 85 ? '#f7be5f' : '#5ee0c9';
+return { v: v, style: 'background: ' + bg + '; color: ' + fg };
+}) };
+});
+return {
+fw: fw, rows: rows, load: load,
+fwName: rice ? 'RICE' : 'WSJF',
+cols: rice ? ['Reach', 'Impact', 'Confidence', 'Effort'] : ['Business value', 'Time criticality', 'Risk reduction', 'Job size'],
+formula: rice ? 'RICE = Reach × Impact × Confidence ÷ Effort. Reach = customers in the quarter; Impact 0.25–3; Effort in person-months.' : 'WSJF = (Business value + Time criticality + Risk reduction) ÷ Job size, each on a 1–10 scale.'
+};
+}
+}
+</script>
+</body>
+</html>

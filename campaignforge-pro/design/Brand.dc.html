@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Brand kit</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=DM+Sans:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap">
+<style>
+body{margin:0;background:#14161c;color:#eceef2;font-family:'DM Sans',system-ui,sans-serif}
+a{color:#f2a93b}a:hover{color:#ffc46b}
+.nav{display:flex;align-items:center;gap:10px;min-height:40px;padding:0 12px;border-radius:8px;color:#b4b9c4;text-decoration:none;font-size:14px}
+.nav:hover{background:#1b1e26;color:#eceef2}
+.nav.on{background:#2e2514;color:#f2a93b;font-weight:600}
+.num{font-family:'JetBrains Mono',monospace;font-size:11px;color:#7d8391;width:18px}
+.panel{background:#1b1e26;border:1px solid #2a2e38;border-radius:12px}
+.eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#a3a9b5}
+.disp{font-family:'Space Grotesk',sans-serif}
+.mono{font-family:'JetBrains Mono',monospace}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:0 16px;border-radius:8px;font:600 14px 'DM Sans',sans-serif;border:1px solid #343945;background:#1f232c;color:#eceef2;cursor:pointer}
+.btn.pri{background:#f2a93b;border-color:#f2a93b;color:#1a1305}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:600}
+.g{background:#123a33;color:#5ee0c9}.a{background:#3d2f12;color:#f7be5f}.r{background:#44191b;color:#ff8a8e}.n{background:#262a33;color:#c3c8d2}
+.lbl{display:block;font-size:14px;font-weight:600;margin-bottom:8px}
+.fld{width:100%;box-sizing:border-box;background:#14161c;border:1px solid #343945;border-radius:10px;color:#eceef2;font:14px/1.5 'DM Sans',sans-serif;padding:12px 14px;resize:none}
+.hint{font-size:12px;color:#a3a9b5;margin-top:6px}
+</style>
+</helmet>
+<div style="width: 1440px; height: 1200px; display: flex; background: #14161c">
+<nav style="width: 232px; flex-shrink: 0; background: #101218; border-right: 1px solid #262a33; padding: 24px 14px; box-sizing: border-box; display: flex; flex-direction: column; gap: 4px">
+<div style="display: flex; align-items: center; gap: 10px; padding: 0 10px 20px">
+<div style="width: 30px; height: 30px; border-radius: 8px; background: #f2a93b; display: flex; align-items: center; justify-content: center; color: #1a1305; font: 700 15px 'Space Grotesk',sans-serif">CF</div>
+<div class="disp" style="font-size: 17px; font-weight: 600">CampaignForge <span style="color: #f2a93b">Pro</span></div>
+</div>
+<a class="nav" href="Main.dc.html"><span class="num">01</span>Portfolio</a>
+<a class="nav on" href="Brand.dc.html"><span class="num">02</span>Brand kit</a>
+<a class="nav" href="Dates.dc.html"><span class="num">2b</span>Key dates library</a>
+<div class="eyebrow" style="padding: 14px 12px 4px">Create</div>
+<a class="nav" href="New.dc.html"><span class="num">+</span>New campaign</a>
+<a class="nav" href="Plan.dc.html"><span class="num">03</span>Plan workspace</a>
+<a class="nav" href="Score.dc.html"><span class="num">04</span>Strategist score</a>
+<a class="nav" href="Studio.dc.html"><span class="num">05</span>Post studio</a>
+<a class="nav" href="Brief.dc.html"><span class="num">5b</span>Creative brief</a>
+<a class="nav" href="Reel.dc.html"><span class="num">06</span>Video studio</a>
+<a class="nav" href="Publish.dc.html"><span class="num">6b</span>Publish hub</a>
+<div class="eyebrow" style="padding: 14px 12px 4px">Manage</div>
+<a class="nav" href="Budget.dc.html"><span class="num">07</span>Budget &amp; ROI</a>
+<a class="nav" href="Timeline.dc.html"><span class="num">08</span>Timeline &amp; tasks</a>
+<a class="nav" href="Prioritise.dc.html"><span class="num">09</span>Prioritise &amp; risks</a>
+<a class="nav" href="Report.dc.html"><span class="num">10</span>Exec report</a>
+<div style="flex-grow: 1"></div>
+<div class="panel" style="padding: 14px; font-size: 13px; color: #b4b9c4">Brand: Kesar &amp; Co. (sample)<br>Workspace: Marketing</div>
+</nav>
+<main style="flex-grow: 1; padding: 32px 40px; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px">
+<header style="display: flex; align-items: flex-end; justify-content: space-between">
+<div>
+<div class="eyebrow">Brand DNA · applied to every AI output · Sample data</div>
+<h1 class="disp" style="margin: 6px 0 0; font-size: 32px; font-weight: 600">Brand kit</h1>
+<p style="margin: 6px 0 0; color: #b4b9c4; font-size: 15px">Save your brand voice and rules once. Plans, posts, scripts, reels and fixes all follow them.</p>
+</div>
+<div style="display: flex; gap: 10px; align-items: center">
+<label class="lbl" for="brandsel" style="margin: 0; font-weight: 500; color: #b4b9c4">Brand</label>
+<select id="brandsel" class="fld" style="width: 220px; padding: 9px 12px"><option>Kesar &amp; Co.</option><option>Kesar Corporate Gifting</option><option>Add a brand…</option></select>
+<button class="btn pri" type="button">Save brand kit</button>
+</div>
+</header>
+<div style="display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 20px; flex-grow: 1">
+<section class="panel" style="padding: 24px; display: flex; flex-direction: column; gap: 18px">
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px">
+<div><label class="lbl" for="bn">Brand name</label><input id="bn" class="fld" value="Kesar &amp; Co."></div>
+<div><label class="lbl" for="cat">Category</label><input id="cat" class="fld" value="Artisanal Indian sweets · Hyderabad"></div>
+</div>
+<div><label class="lbl" for="bv">Brand voice</label><textarea id="bv" class="fld" rows="2">Warm, celebratory, rooted in family tradition. Witty but never pushy.</textarea></div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px">
+<div><label class="lbl" for="use">Words and phrases to use</label><textarea id="use" class="fld" rows="3">small-batch, pure desi ghee, made this morning, share the sweetness</textarea></div>
+<div><label class="lbl" for="avoid">Words to avoid</label><textarea id="avoid" class="fld" rows="3">cheap, guaranteed, best in the world, sugar-free (unless verified)</textarea></div>
+</div>
+<div><label class="lbl" for="facts">Product facts the AI may use</label><textarea id="facts" class="fld" rows="3">[YOUR PRICES] · [YOUR OFFERS] · Gift boxes of 500 g and 1 kg · Same-day delivery within [CITY LIMITS]</textarea><div class="hint">The AI will not invent prices, offers or claims beyond this list.</div></div>
+<div><label class="lbl" for="aud">Audience persona</label><textarea id="aud" class="fld" rows="2">Urban families and corporate buyers, 28–45, gifting for festivals and milestones.</textarea></div>
+<div><label class="lbl" for="ex">Example post in your voice</label><textarea id="ex" class="fld" rows="3">Some traditions are worth waking up early for. Our kaju katli was rolled at 5 am, so your Diwali table tastes like home.</textarea></div>
+<div class="eyebrow" style="margin-top: 4px">Added in Pro</div>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px">
+<div><span class="lbl">Brand colours</span><div style="display: flex; gap: 8px"><div style="width: 36px; height: 36px; border-radius: 8px; background: #c2410c"></div><div style="width: 36px; height: 36px; border-radius: 8px; background: #f4c542"></div><div style="width: 36px; height: 36px; border-radius: 8px; background: #3b0d0c"></div><button class="btn" type="button" aria-label="Add colour" style="min-height: 36px; width: 36px; padding: 0">+</button></div></div>
+<div><label class="lbl" for="lang">Languages</label><select id="lang" class="fld" style="padding: 9px 12px"><option>English + Hindi + Telugu</option></select></div>
+<div><label class="lbl" for="disc">Mandatory disclaimer</label><input id="disc" class="fld" value="T&amp;C apply. Offer valid till stocks last."></div>
+</div>
+</section>
+<aside style="display: flex; flex-direction: column; gap: 20px">
+<section class="panel" style="padding: 22px">
+<div style="display: flex; justify-content: space-between; align-items: center"><h2 class="disp" style="margin: 0; font-size: 18px; font-weight: 600">How the AI will write</h2><span class="chip g">Live preview</span></div>
+<div style="margin-top: 16px; background: #14161c; border: 1px solid #2a2e38; border-radius: 12px; padding: 16px">
+<div class="eyebrow">Instagram · caption</div>
+<p style="margin: 10px 0 0; font-size: 15px; line-height: 1.6">Diwali mornings smell of ghee and cardamom. This year, share the sweetness with a small-batch box made this morning — delivered before the diyas are lit. [YOUR OFFER]</p>
+<p style="margin: 10px 0 0; font-size: 12px; color: #a3a9b5">T&amp;C apply. Offer valid till stocks last.</p>
+</div>
+</section>
+<section class="panel" style="padding: 22px">
+<h2 class="disp" style="margin: 0 0 14px; font-size: 18px; font-weight: 600">Brand guardrail checks</h2>
+<div style="display: flex; flex-direction: column; gap: 10px; font-size: 14px">
+<div style="display: flex; justify-content: space-between"><span>Avoided words not used</span><span class="chip g">Pass</span></div>
+<div style="display: flex; justify-content: space-between"><span>Only listed product facts</span><span class="chip g">Pass</span></div>
+<div style="display: flex; justify-content: space-between"><span>Disclaimer on offer posts</span><span class="chip g">Pass</span></div>
+<div style="display: flex; justify-content: space-between"><span>Voice match to example post</span><span class="chip a">Review</span></div>
+</div>
+<p style="margin: 14px 0 0; font-size: 13px; color: #a3a9b5">Every generated or refined item runs these checks before it can be submitted for approval.</p>
+</section>
+<section class="panel" style="padding: 22px">
+<h2 class="disp" style="margin: 0 0 10px; font-size: 18px; font-weight: 600">Where this kit is used</h2>
+<div style="display: flex; flex-wrap: wrap; gap: 8px"><span class="chip n">Plan generation</span><span class="chip n">Steer the AI</span><span class="chip n">Copy variants</span><span class="chip n">Ad scripts</span><span class="chip n">Reel voiceover</span><span class="chip n">Strategist fixes</span></div>
+</section>
+</aside>
+</div>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1200}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

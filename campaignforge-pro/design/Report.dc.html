@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Executive status report</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=DM+Sans:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap">
+<style>
+body{margin:0;background:#14161c;color:#eceef2;font-family:'DM Sans',system-ui,sans-serif}
+a{color:#f2a93b}a:hover{color:#ffc46b}
+.nav{display:flex;align-items:center;gap:10px;min-height:40px;padding:0 12px;border-radius:8px;color:#b4b9c4;text-decoration:none;font-size:14px}
+.nav:hover{background:#1b1e26;color:#eceef2}
+.nav.on{background:#2e2514;color:#f2a93b;font-weight:600}
+.num{font-family:'JetBrains Mono',monospace;font-size:11px;color:#7d8391;width:18px}
+.panel{background:#1b1e26;border:1px solid #2a2e38;border-radius:12px}
+.eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#a3a9b5}
+.disp{font-family:'Space Grotesk',sans-serif}
+.mono{font-family:'JetBrains Mono',monospace}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:0 16px;border-radius:8px;font:600 14px 'DM Sans',sans-serif;border:1px solid #343945;background:#1f232c;color:#eceef2;cursor:pointer}
+.btn.pri{background:#f2a93b;border-color:#f2a93b;color:#1a1305}
+.paper{background:#faf8f4;color:#1c1d21;border-radius:10px;padding:40px 48px;box-sizing:border-box}
+.ph{font:600 12px 'JetBrains Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:#6b6f78;margin:0 0 10px}
+.rag{display:inline-block;padding:2px 10px;border-radius:999px;font-size:12px;font-weight:700}
+.rg{background:#d6f2ea;color:#0d5b4c}.ra{background:#fbe9c8;color:#7a4b00}.rr{background:#fbd9da;color:#8d1c22}.rn{background:#e8e8ea;color:#44474f}
+.t th{font:500 11px 'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.05em;color:#6b6f78;text-align:left;padding:7px 8px;border-bottom:1px solid #d9d6cf}
+.t td{padding:8px;border-bottom:1px solid #ebe8e2;font-size:13px}
+</style>
+</helmet>
+<div style="width: 1440px; height: 1200px; display: flex; background: #14161c">
+<nav style="width: 232px; flex-shrink: 0; background: #101218; border-right: 1px solid #262a33; padding: 24px 14px; box-sizing: border-box; display: flex; flex-direction: column; gap: 4px">
+<div style="display: flex; align-items: center; gap: 10px; padding: 0 10px 20px">
+<div style="width: 30px; height: 30px; border-radius: 8px; background: #f2a93b; display: flex; align-items: center; justify-content: center; color: #1a1305; font: 700 15px 'Space Grotesk',sans-serif">CF</div>
+<div class="disp" style="font-size: 17px; font-weight: 600">CampaignForge <span style="color: #f2a93b">Pro</span></div>
+</div>
+<a class="nav" href="Main.dc.html"><span class="num">01</span>Portfolio</a>
+<a class="nav" href="Brand.dc.html"><span class="num">02</span>Brand kit</a>
+<a class="nav" href="Dates.dc.html"><span class="num">2b</span>Key dates library</a>
+<div class="eyebrow" style="padding: 14px 12px 4px">Create</div>
+<a class="nav" href="New.dc.html"><span class="num">+</span>New campaign</a>
+<a class="nav" href="Plan.dc.html"><span class="num">03</span>Plan workspace</a>
+<a class="nav" href="Score.dc.html"><span class="num">04</span>Strategist score</a>
+<a class="nav" href="Studio.dc.html"><span class="num">05</span>Post studio</a>
+<a class="nav" href="Brief.dc.html"><span class="num">5b</span>Creative brief</a>
+<a class="nav" href="Reel.dc.html"><span class="num">06</span>Video studio</a>
+<a class="nav" href="Publish.dc.html"><span class="num">6b</span>Publish hub</a>
+<div class="eyebrow" style="padding: 14px 12px 4px">Manage</div>
+<a class="nav" href="Budget.dc.html"><span class="num">07</span>Budget &amp; ROI</a>
+<a class="nav" href="Timeline.dc.html"><span class="num">08</span>Timeline &amp; tasks</a>
+<a class="nav" href="Prioritise.dc.html"><span class="num">09</span>Prioritise &amp; risks</a>
+<a class="nav on" href="Report.dc.html"><span class="num">10</span>Exec report</a>
+<div style="flex-grow: 1"></div>
+<div class="panel" style="padding: 14px; font-size: 13px; color: #b4b9c4">Brand: Kesar &amp; Co. (sample)<br>Workspace: Marketing</div>
+</nav>
+<main style="flex-grow: 1; padding: 28px 40px; box-sizing: border-box; display: flex; flex-direction: column; gap: 16px">
+<header style="display: flex; align-items: flex-end; justify-content: space-between">
+<div>
+<div class="eyebrow">Auto-built from live campaign data · Sample data</div>
+<h1 class="disp" style="margin: 6px 0 0; font-size: 30px; font-weight: 600">Executive status report</h1>
+</div>
+<div style="display: flex; gap: 10px">
+<button class="btn" type="button">Rewrite summary with AI</button>
+<button class="btn" type="button">Share link</button>
+<button class="btn pri" type="button">Export PDF / PPTX</button>
+</div>
+</header>
+<article class="paper" style="flex-grow: 1; display: flex; flex-direction: column; gap: 22px">
+<div style="display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #1c1d21; padding-bottom: 14px">
+<div><div class="ph" style="margin: 0">Marketing portfolio · week of 28 Sep 2026</div><h2 class="disp" style="margin: 6px 0 0; font-size: 28px; font-weight: 600">Q4 campaign status</h2></div>
+<div style="font-size: 13px; color: #6b6f78; text-align: right">Prepared for: Leadership review<br>Owner: Marketing PMO</div>
+</div>
+<section>
+<p class="ph">Executive summary</p>
+<ul style="margin: 0; padding-left: 20px; font-size: 15px; line-height: 1.65">
+<li>6 campaigns active against a ₹48.0 L budget; ₹21.6 L (45%) spent. Forecast revenue ₹1.62 Cr, a 3.4× return on budget.</li>
+<li>Diwali Festive Push is amber: forecast ₹1.2 L over budget. A ₹0.8 L move from outdoor to Meta ads is awaiting approval.</li>
+<li>Monsoon Re-engagement is red on cost per lead; new audiences are in test, with a decision at the 3 Oct review.</li>
+<li>Diwali plan quality score is 78 / 100 against a launch threshold of 85; three fixes are queued.</li>
+</ul>
+</section>
+<div style="display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 28px">
+<section>
+<p class="ph">Campaign health</p>
+<table class="t" style="width: 100%; border-collapse: collapse">
+<thead><tr><th>Campaign</th><th>Health</th><th>Budget</th><th>Spent</th><th>Exp. revenue</th></tr></thead>
+<tbody>
+<tr><td>Diwali Festive Push</td><td><span class="rag ra">Amber</span></td><td>₹14.0 L</td><td>₹9.8 L</td><td>₹52 L</td></tr>
+<tr><td>Monsoon Re-engagement</td><td><span class="rag rr">Red</span></td><td>₹8.5 L</td><td>₹5.9 L</td><td>₹26 L</td></tr>
+<tr><td>New Store – Pune</td><td><span class="rag rg">Green</span></td><td>₹9.0 L</td><td>₹1.2 L</td><td>₹34 L</td></tr>
+<tr><td>Q4 B2B Webinars</td><td><span class="rag rg">Green</span></td><td>₹6.0 L</td><td>₹2.1 L</td><td>₹18 L</td></tr>
+<tr><td>Loyalty Tier Relaunch</td><td><span class="rag rg">Green</span></td><td>₹5.5 L</td><td>₹1.6 L</td><td>₹20 L</td></tr>
+<tr><td>Year-end Clearance</td><td><span class="rag rn">Not started</span></td><td>₹5.0 L</td><td>₹1.0 L</td><td>₹12 L</td></tr>
+<tr><td style="font-weight: 700">Total</td><td></td><td style="font-weight: 700">₹48.0 L</td><td style="font-weight: 700">₹21.6 L</td><td style="font-weight: 700">₹162 L</td></tr>
+</tbody>
+</table>
+</section>
+<section style="display: flex; flex-direction: column; gap: 20px">
+<div>
+<p class="ph">Decisions needed</p>
+<ol style="margin: 0; padding-left: 20px; font-size: 14px; line-height: 1.6">
+<li>Approve ₹0.8 L reallocation, outdoor → Meta (Diwali).</li>
+<li>Go / no-go on Year-end Clearance by 1 Nov.</li>
+<li>Add Republic Day sale to Q4 backlog? Ranked #1 on RICE.</li>
+</ol>
+</div>
+<div>
+<p class="ph">Top risks</p>
+<ul style="margin: 0; padding-left: 20px; font-size: 14px; line-height: 1.6">
+<li><strong>Influencer posts slip past Diwali</strong> (score 20): posting dates now in contracts.</li>
+<li><strong>Diwali budget overrun</strong> (score 16): reallocation pending.</li>
+</ul>
+</div>
+<div>
+<p class="ph">Next two weeks</p>
+<ul style="margin: 0; padding-left: 20px; font-size: 14px; line-height: 1.6">
+<li>3 Oct: Monsoon mid-flight review</li>
+<li>10 Oct: Pune OOH sites booked</li>
+<li>12 Oct: Diwali peak-week creatives approved</li>
+</ul>
+</div>
+</section>
+</div>
+<div style="margin-top: auto; font-size: 11px; color: #6b6f78; border-top: 1px solid #d9d6cf; padding-top: 10px">Return = expected revenue ÷ budget. Spend synced from Budget &amp; ROI; health from the pacing and KPI rules set per campaign.</div>
+</article>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1200}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

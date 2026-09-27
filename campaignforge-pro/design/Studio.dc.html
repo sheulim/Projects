@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Post studio</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=DM+Sans:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap">
+<style>
+body{margin:0;background:#14161c;color:#eceef2;font-family:'DM Sans',system-ui,sans-serif}
+a{color:#f2a93b}a:hover{color:#ffc46b}
+.nav{display:flex;align-items:center;gap:10px;min-height:40px;padding:0 12px;border-radius:8px;color:#b4b9c4;text-decoration:none;font-size:14px}
+.nav:hover{background:#1b1e26;color:#eceef2}
+.nav.on{background:#2e2514;color:#f2a93b;font-weight:600}
+.num{font-family:'JetBrains Mono',monospace;font-size:11px;color:#7d8391;width:18px}
+.panel{background:#1b1e26;border:1px solid #2a2e38;border-radius:12px}
+.eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#a3a9b5}
+.disp{font-family:'Space Grotesk',sans-serif}
+.mono{font-family:'JetBrains Mono',monospace}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:0 16px;border-radius:8px;font:600 14px 'DM Sans',sans-serif;border:1px solid #343945;background:#1f232c;color:#eceef2;cursor:pointer}
+.btn.pri{background:#f2a93b;border-color:#f2a93b;color:#1a1305}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:600}
+.g{background:#123a33;color:#5ee0c9}.a{background:#3d2f12;color:#f7be5f}.r{background:#44191b;color:#ff8a8e}.n{background:#262a33;color:#c3c8d2}
+.fld{box-sizing:border-box;background:#14161c;border:1px solid #343945;border-radius:10px;color:#eceef2;font:14px/1.55 'DM Sans',sans-serif;padding:11px 14px;resize:none;width:100%}
+.item{display:flex;flex-direction:column;gap:4px;padding:12px;border-radius:10px;border:1px solid transparent;cursor:pointer;background:transparent;color:#eceef2;text-align:left;font:inherit;width:100%}
+.item.on{background:#232733;border-color:#3a3f4c}
+.var{padding:12px 14px;border-radius:10px;border:1px solid #2a2e38;background:#14161c;font-size:13px;line-height:1.5;color:#dfe2e8;text-align:left;font-family:inherit;cursor:pointer;width:100%}
+.var.on{border-color:#f2a93b;background:#221b10}
+.step{flex:1;text-align:center;padding:8px 0;font-size:12px;font-weight:600;border-radius:6px;background:#1f232c;color:#a3a9b5}
+.step.done{background:#123a33;color:#5ee0c9}.step.cur{background:#3d2f12;color:#f7be5f}
+</style>
+</helmet>
+<div style="width: 1440px; height: 1200px; display: flex; background: #14161c">
+<nav style="width: 232px; flex-shrink: 0; background: #101218; border-right: 1px solid #262a33; padding: 24px 14px; box-sizing: border-box; display: flex; flex-direction: column; gap: 4px">
+<div style="display: flex; align-items: center; gap: 10px; padding: 0 10px 20px">
+<div style="width: 30px; height: 30px; border-radius: 8px; background: #f2a93b; display: flex; align-items: center; justify-content: center; color: #1a1305; font: 700 15px 'Space Grotesk',sans-serif">CF</div>
+<div class="disp" style="font-size: 17px; font-weight: 600">CampaignForge <span style="color: #f2a93b">Pro</span></div>
+</div>
+<a class="nav" href="Main.dc.html"><span class="num">01</span>Portfolio</a>
+<a class="nav" href="Brand.dc.html"><span class="num">02</span>Brand kit</a>
+<a class="nav" href="Dates.dc.html"><span class="num">2b</span>Key dates library</a>
+<div class="eyebrow" style="padding: 14px 12px 4px">Create</div>
+<a class="nav" href="New.dc.html"><span class="num">+</span>New campaign</a>
+<a class="nav" href="Plan.dc.html"><span class="num">03</span>Plan workspace</a>
+<a class="nav" href="Score.dc.html"><span class="num">04</span>Strategist score</a>
+<a class="nav on" href="Studio.dc.html"><span class="num">05</span>Post studio</a>
+<a class="nav" href="Brief.dc.html"><span class="num">5b</span>Creative brief</a>
+<a class="nav" href="Reel.dc.html"><span class="num">06</span>Video studio</a>
+<a class="nav" href="Publish.dc.html"><span class="num">6b</span>Publish hub</a>
+<div class="eyebrow" style="padding: 14px 12px 4px">Manage</div>
+<a class="nav" href="Budget.dc.html"><span class="num">07</span>Budget &amp; ROI</a>
+<a class="nav" href="Timeline.dc.html"><span class="num">08</span>Timeline &amp; tasks</a>
+<a class="nav" href="Prioritise.dc.html"><span class="num">09</span>Prioritise &amp; risks</a>
+<a class="nav" href="Report.dc.html"><span class="num">10</span>Exec report</a>
+<div style="flex-grow: 1"></div>
+<div class="panel" style="padding: 14px; font-size: 13px; color: #b4b9c4">Brand: Kesar &amp; Co. (sample)<br>Workspace: Marketing</div>
+</nav>
+<main style="flex-grow: 1; padding: 28px 40px; box-sizing: border-box; display: flex; flex-direction: column; gap: 18px">
+<header style="display: flex; align-items: flex-end; justify-content: space-between">
+<div>
+<div class="eyebrow">Diwali Festive Push · posts, copy variants, previews · Sample data</div>
+<h1 class="disp" style="margin: 6px 0 0; font-size: 30px; font-weight: 600">Post studio</h1>
+</div>
+<div style="display: flex; gap: 10px">
+<button class="btn" type="button">Request changes</button>
+<button class="btn pri" type="button">Approve and schedule</button>
+</div>
+</header>
+<div style="display: grid; grid-template-columns: 250px minmax(0, 1fr) 360px; gap: 18px; flex-grow: 1">
+<section class="panel" style="padding: 10px; display: flex; flex-direction: column; gap: 4px">
+<div class="eyebrow" style="padding: 8px 10px">16 posts</div>
+<button class="item on" type="button"><span class="mono" style="font-size: 11px; color: #a3a9b5">08 NOV · INSTAGRAM</span><span style="font-weight: 600; font-size: 14px">Happy Diwali</span><span class="chip a" style="align-self: flex-start">In review</span></button>
+<button class="item" type="button"><span class="mono" style="font-size: 11px; color: #a3a9b5">07 NOV · INSTAGRAM</span><span style="font-weight: 600; font-size: 14px">Inside our kitchen</span><span class="chip a" style="align-self: flex-start">In review</span></button>
+<button class="item" type="button"><span class="mono" style="font-size: 11px; color: #a3a9b5">05 NOV · LINKEDIN</span><span style="font-weight: 600; font-size: 14px">Corporate gifting</span><span class="chip a" style="align-self: flex-start">In review</span></button>
+<button class="item" type="button"><span class="mono" style="font-size: 11px; color: #a3a9b5">04 NOV · EMAIL</span><span style="font-weight: 600; font-size: 14px">Pre-orders open</span><span class="chip g" style="align-self: flex-start">Scheduled</span></button>
+<button class="item" type="button"><span class="mono" style="font-size: 11px; color: #a3a9b5">02 NOV · INSTAGRAM</span><span style="font-weight: 600; font-size: 14px">Countdown reel</span><span class="chip g" style="align-self: flex-start">Scheduled</span></button>
+<button class="item" type="button"><span class="mono" style="font-size: 11px; color: #a3a9b5">09 NOV · BLOG</span><span style="font-weight: 600; font-size: 14px">Sweets pairing guide</span><span class="chip n" style="align-self: flex-start">Draft</span></button>
+</section>
+<section class="panel" style="padding: 22px; display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; gap: 6px"><span class="step done">Draft</span><span class="step cur">In review</span><span class="step">Approved</span><span class="step">Scheduled</span><span class="step">Published</span></div>
+<div>
+<label for="cap" style="display: block; font-weight: 600; font-size: 14px; margin-bottom: 8px">Caption</label>
+<textarea id="cap" class="fld" rows="5">{{caption}}</textarea>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 8px"><span class="chip g">No avoided words</span><span class="chip g">Facts from brand kit only</span><span class="chip g">Disclaimer present</span><span class="chip n">142 / 2,200 characters</span></div>
+<div>
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px"><span style="font-weight: 600; font-size: 14px">Copy variants</span><button class="btn" type="button" style="min-height: 34px">Generate 3 more</button></div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<sc-for list="{{variants}}" as="v" hint-placeholder-count="3">
+<button type="button" class="{{v.cls}}" onClick="{{v.pick}}"><span class="mono" style="font-size: 11px; color: #a3a9b5">VARIANT {{v.k}} · {{v.angle}}</span><br>{{v.text}}</button>
+</sc-for>
+</div>
+</div>
+<div style="margin-top: auto; display: flex; gap: 10px; align-items: center; background: #14161c; border: 1px solid #3a4a47; border-radius: 10px; padding: 8px 8px 8px 14px">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5ee0c9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"></path></svg>
+<input aria-label="Refine this post" style="flex-grow: 1; background: transparent; border: 0; color: #eceef2; font: 14px 'DM Sans',sans-serif; outline: none" placeholder="Refine this post, e.g. shorter, add a Telugu line, mention same-day delivery">
+<button class="btn pri" type="button">Refine</button>
+</div>
+</section>
+<section style="display: flex; flex-direction: column; gap: 14px">
+<div class="eyebrow">Channel previews</div>
+<div class="panel" style="padding: 14px">
+<div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px"><div style="width: 30px; height: 30px; border-radius: 50%; background: #c2410c"></div><div style="font-size: 13px; font-weight: 600">kesarandco</div><span class="chip n" style="margin-left: auto">Instagram</span></div>
+<div style="height: 250px; border-radius: 8px; background: #2a1a12; display: flex; align-items: center; justify-content: center; color: #c9a37c; font-size: 13px; text-align: center; padding: 20px; box-sizing: border-box">[Creative: gift box on a lit diya table · 1080 × 1350]</div>
+<p style="margin: 10px 0 0; font-size: 13px; line-height: 1.5"><strong>kesarandco</strong> {{caption}}</p>
+</div>
+<div class="panel" style="padding: 14px">
+<div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px"><div style="width: 30px; height: 30px; border-radius: 6px; background: #c2410c"></div><div style="font-size: 13px; font-weight: 600">Kesar &amp; Co.</div><span class="chip n" style="margin-left: auto">LinkedIn</span></div>
+<p style="margin: 0; font-size: 13px; line-height: 1.5; color: #dfe2e8">Gifting your team this Diwali? Small-batch boxes, made the morning they ship. [YOUR CORPORATE OFFER]</p>
+<div style="margin-top: 10px; font-size: 12px; color: #a3a9b5">Preview adapts length, hashtags and image ratio per channel.</div>
+</div>
+<div class="panel" style="padding: 14px; font-size: 13px">
+<div style="font-weight: 600; margin-bottom: 8px">Review thread</div>
+<div style="color: #b4b9c4">Reviewer: “Please add the delivery cut-off date.” · 2 h ago</div>
+</div>
+</section>
+</div>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1200}}'>
+class Component extends DCLogic {
+constructor(p) { super(p); this.state = { pick: 0 }; }
+renderVals() {
+var self = this;
+var V = [
+{ k: 'A', angle: 'NOSTALGIA', text: 'Diwali mornings smell of ghee and cardamom. Share the sweetness with a small-batch box, made this morning. T&C apply.' },
+{ k: 'B', angle: 'URGENCY', text: 'The diyas go up on 8 Nov. Your box should arrive first — pre-order a small-batch box made this morning. T&C apply.' },
+{ k: 'C', angle: 'GIFTING', text: 'The best Diwali gifts are the ones someone made by hand. Ours were rolled at 5 am. Share the sweetness. T&C apply.' }
+];
+var variants = V.map(function (v, i) {
+return Object.assign({}, v, { cls: i === self.state.pick ? 'var on' : 'var', pick: function () { self.setState({ pick: i }); } });
+});
+return { variants: variants, caption: V[this.state.pick].text };
+}
+}
+</script>
+</body>
+</html>

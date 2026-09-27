@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Budget and ROI</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=DM+Sans:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap">
+<style>
+body{margin:0;background:#14161c;color:#eceef2;font-family:'DM Sans',system-ui,sans-serif}
+a{color:#f2a93b}a:hover{color:#ffc46b}
+.nav{display:flex;align-items:center;gap:10px;min-height:40px;padding:0 12px;border-radius:8px;color:#b4b9c4;text-decoration:none;font-size:14px}
+.nav:hover{background:#1b1e26;color:#eceef2}
+.nav.on{background:#2e2514;color:#f2a93b;font-weight:600}
+.num{font-family:'JetBrains Mono',monospace;font-size:11px;color:#7d8391;width:18px}
+.panel{background:#1b1e26;border:1px solid #2a2e38;border-radius:12px}
+.eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#a3a9b5}
+.disp{font-family:'Space Grotesk',sans-serif}
+.mono{font-family:'JetBrains Mono',monospace}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:0 16px;border-radius:8px;font:600 14px 'DM Sans',sans-serif;border:1px solid #343945;background:#1f232c;color:#eceef2;cursor:pointer}
+.btn.pri{background:#f2a93b;border-color:#f2a93b;color:#1a1305}
+.btn.sel{border-color:#f2a93b;color:#f2a93b;background:#221b10}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:600}
+.g{background:#123a33;color:#5ee0c9}.a{background:#3d2f12;color:#f7be5f}.r{background:#44191b;color:#ff8a8e}.n{background:#262a33;color:#c3c8d2}
+.th{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#a3a9b5;text-align:right;padding:10px 12px;border-bottom:1px solid #2a2e38;font-weight:500}
+.th.l{text-align:left}
+.td{padding:12px;border-bottom:1px solid #23262f;font-size:14px;text-align:right;font-family:'JetBrains Mono',monospace}
+.td.l{text-align:left;font-family:'DM Sans',sans-serif;font-weight:600}
+</style>
+</helmet>
+<div style="width: 1440px; height: 1620px; display: flex; background: #14161c">
+<nav style="width: 232px; flex-shrink: 0; background: #101218; border-right: 1px solid #262a33; padding: 24px 14px; box-sizing: border-box; display: flex; flex-direction: column; gap: 4px">
+<div style="display: flex; align-items: center; gap: 10px; padding: 0 10px 20px">
+<div style="width: 30px; height: 30px; border-radius: 8px; background: #f2a93b; display: flex; align-items: center; justify-content: center; color: #1a1305; font: 700 15px 'Space Grotesk',sans-serif">CF</div>
+<div class="disp" style="font-size: 17px; font-weight: 600">CampaignForge <span style="color: #f2a93b">Pro</span></div>
+</div>
+<a class="nav" href="Main.dc.html"><span class="num">01</span>Portfolio</a>
+<a class="nav" href="Brand.dc.html"><span class="num">02</span>Brand kit</a>
+<a class="nav" href="Dates.dc.html"><span class="num">2b</span>Key dates library</a>
+<div class="eyebrow" style="padding: 14px 12px 4px">Create</div>
+<a class="nav" href="New.dc.html"><span class="num">+</span>New campaign</a>
+<a class="nav" href="Plan.dc.html"><span class="num">03</span>Plan workspace</a>
+<a class="nav" href="Score.dc.html"><span class="num">04</span>Strategist score</a>
+<a class="nav" href="Studio.dc.html"><span class="num">05</span>Post studio</a>
+<a class="nav" href="Brief.dc.html"><span class="num">5b</span>Creative brief</a>
+<a class="nav" href="Reel.dc.html"><span class="num">06</span>Video studio</a>
+<a class="nav" href="Publish.dc.html"><span class="num">6b</span>Publish hub</a>
+<div class="eyebrow" style="padding: 14px 12px 4px">Manage</div>
+<a class="nav on" href="Budget.dc.html"><span class="num">07</span>Budget &amp; ROI</a>
+<a class="nav" href="Timeline.dc.html"><span class="num">08</span>Timeline &amp; tasks</a>
+<a class="nav" href="Prioritise.dc.html"><span class="num">09</span>Prioritise &amp; risks</a>
+<a class="nav" href="Report.dc.html"><span class="num">10</span>Exec report</a>
+<div style="flex-grow: 1"></div>
+<div class="panel" style="padding: 14px; font-size: 13px; color: #b4b9c4">Brand: Kesar &amp; Co. (sample)<br>Workspace: Marketing</div>
+</nav>
+<main style="flex-grow: 1; padding: 32px 40px; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px">
+<header style="display: flex; align-items: flex-end; justify-content: space-between">
+<div>
+<div class="eyebrow">Diwali Festive Push · spend, pacing, returns · Sample data</div>
+<h1 class="disp" style="margin: 6px 0 0; font-size: 32px; font-weight: 600">Budget &amp; ROI</h1>
+</div>
+<div style="display: flex; gap: 10px">
+<button class="btn" type="button">Import spend (CSV)</button>
+<button class="btn" type="button">Log an invoice</button>
+</div>
+</header>
+<section style="display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 14px">
+<div class="panel" style="padding: 16px"><div class="eyebrow">Budget</div><div class="disp" style="font-size: 26px; font-weight: 600; margin-top: 8px">₹14.0 L</div></div>
+<div class="panel" style="padding: 16px"><div class="eyebrow">Spent</div><div class="disp" style="font-size: 26px; font-weight: 600; margin-top: 8px">₹9.8 L</div><div style="font-size: 13px; color: #a3a9b5">70% used</div></div>
+<div class="panel" style="padding: 16px"><div class="eyebrow">Remaining</div><div class="disp" style="font-size: 26px; font-weight: 600; margin-top: 8px">₹4.2 L</div></div>
+<div class="panel" style="padding: 16px; border-color: #6b4a14"><div class="eyebrow">Forecast at finish</div><div class="disp" style="font-size: 26px; font-weight: 600; margin-top: 8px; color: #f7be5f">₹15.2 L</div><div style="font-size: 13px; color: #a3a9b5">₹1.2 L over</div></div>
+<div class="panel" style="padding: 16px"><div class="eyebrow">Leads</div><div class="disp" style="font-size: 26px; font-weight: 600; margin-top: 8px">14,800</div></div>
+<div class="panel" style="padding: 16px"><div class="eyebrow">Blended CPL</div><div class="disp" style="font-size: 26px; font-weight: 600; margin-top: 8px">₹66</div><div style="font-size: 13px; color: #a3a9b5">Spent ÷ leads</div></div>
+</section>
+<section class="panel" style="padding: 20px; display: grid; grid-template-columns: 300px minmax(0, 1.25fr) minmax(0, 1fr); gap: 26px">
+<div style="display: flex; flex-direction: column; gap: 14px">
+<h2 class="disp" style="margin: 0; font-size: 18px; font-weight: 600">Plan your budget</h2>
+<div style="display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 10px">
+<div><label for="tb" style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px">Total budget</label><input id="tb" value="14,00,000" style="width: 100%; box-sizing: border-box; background: #14161c; border: 1px solid #343945; border-radius: 10px; color: #eceef2; font-family: inherit; font-size: 14px; padding: 10px 12px"></div>
+<div><label for="cur" style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px">Currency</label><select id="cur" style="width: 100%; box-sizing: border-box; background: #14161c; border: 1px solid #343945; border-radius: 10px; color: #eceef2; font-family: inherit; font-size: 14px; padding: 10px 12px"><option>INR</option><option>USD</option><option>AED</option><option>GBP</option></select></div>
+</div>
+<div><span style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px">Priority</span><div style="display: flex; gap: 6px; flex-wrap: wrap"><sc-for list="{{prio}}" as="p" hint-placeholder-count="3"><button type="button" class="{{p.cls}}" onClick="{{p.pick}}">{{p.label}}</button></sc-for></div></div>
+<div style="display: flex; gap: 8px"><button class="btn pri" type="button">Plan budget</button><button class="btn" type="button">Apply</button></div>
+<p style="margin: 0; font-size: 13px; line-height: 1.5; color: #dfe2e8">{{prioWhy}}</p>
+<div style="border-top: 1px solid #2a2e38; padding-top: 12px"><div class="eyebrow" style="margin-bottom: 6px">Tips</div><div style="font-size: 12px; line-height: 1.55; color: #b4b9c4">{{tip}}</div></div>
+</div>
+<div>
+<div class="eyebrow" style="margin-bottom: 10px">By channel · {{prioName}}</div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<sc-for list="{{split}}" as="s" hint-placeholder-count="6">
+<div style="display: grid; grid-template-columns: minmax(0, 1fr) 76px 40px; gap: 10px; align-items: center; background: #171a21; border-radius: 8px; padding: 8px 12px">
+<div><div style="font-size: 13px; font-weight: 600">{{s.ch}}</div><div style="font-size: 12px; color: #a3a9b5">{{s.why}}</div></div>
+<span class="mono" style="font-size: 13px; text-align: right">{{s.amt}}</span><span class="mono" style="font-size: 12px; color: #a3a9b5; text-align: right">{{s.pct}}</span>
+</div>
+</sc-for>
+</div>
+</div>
+<div>
+<div class="eyebrow" style="margin-bottom: 10px">By week</div>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<sc-for list="{{byWeek}}" as="w" hint-placeholder-count="8">
+<div style="display: grid; grid-template-columns: 34px minmax(0, 1fr) 70px 36px; gap: 8px; align-items: center; font-size: 12px">
+<span class="mono" style="color: #a3a9b5">{{w.k}}</span><div style="height: 8px; background: #2a2e38; border-radius: 4px"><div style="{{w.bar}}"></div></div><span class="mono" style="text-align: right">{{w.amt}}</span><span class="mono" style="color: #a3a9b5; text-align: right">{{w.pct}}</span>
+</div>
+</sc-for>
+</div>
+<p style="margin: 10px 0 0; font-size: 12px; line-height: 1.5; color: #a3a9b5">{{weekWhy}}</p>
+</div>
+</section>
+<section class="panel" style="padding: 6px 8px 8px">
+<h2 class="disp" style="margin: 14px 12px 8px; font-size: 18px; font-weight: 600">By channel</h2>
+<table style="width: 100%; border-collapse: collapse">
+<thead><tr><th class="th l">Channel</th><th class="th">Planned</th><th class="th">Spent</th><th class="th">Remaining</th><th class="th">Leads</th><th class="th">CPL</th><th class="th">Customers</th><th class="th">CAC</th><th class="th l">Pacing</th></tr></thead>
+<tbody>
+<tr><td class="td l">Meta ads</td><td class="td">₹4.0 L</td><td class="td">₹3.1 L</td><td class="td">₹0.9 L</td><td class="td">6,200</td><td class="td">₹50</td><td class="td">620</td><td class="td">₹500</td><td class="td l"><span class="chip a">Fast</span></td></tr>
+<tr><td class="td l">Google search</td><td class="td">₹3.5 L</td><td class="td">₹2.8 L</td><td class="td">₹0.7 L</td><td class="td">4,000</td><td class="td">₹70</td><td class="td">480</td><td class="td">₹583</td><td class="td l"><span class="chip a">Fast</span></td></tr>
+<tr><td class="td l">Influencers</td><td class="td">₹2.5 L</td><td class="td">₹2.0 L</td><td class="td">₹0.5 L</td><td class="td">1,600</td><td class="td">₹125</td><td class="td">128</td><td class="td">₹1,563</td><td class="td l"><span class="chip r">Weak return</span></td></tr>
+<tr><td class="td l">Email / CRM</td><td class="td">₹0.5 L</td><td class="td">₹0.3 L</td><td class="td">₹0.2 L</td><td class="td">3,000</td><td class="td">₹10</td><td class="td">450</td><td class="td">₹67</td><td class="td l"><span class="chip g">On plan</span></td></tr>
+<tr><td class="td l">Outdoor (OOH)</td><td class="td">₹2.5 L</td><td class="td">₹1.2 L</td><td class="td">₹1.3 L</td><td class="td">—</td><td class="td">—</td><td class="td">—</td><td class="td">—</td><td class="td l"><span class="chip n">Awareness</span></td></tr>
+<tr><td class="td l">Content production</td><td class="td">₹1.0 L</td><td class="td">₹0.4 L</td><td class="td">₹0.6 L</td><td class="td">—</td><td class="td">—</td><td class="td">—</td><td class="td">—</td><td class="td l"><span class="chip g">On plan</span></td></tr>
+<tr><td class="td l" style="border-bottom: 0">Total</td><td class="td" style="border-bottom: 0; font-weight: 600">₹14.0 L</td><td class="td" style="border-bottom: 0; font-weight: 600">₹9.8 L</td><td class="td" style="border-bottom: 0; font-weight: 600">₹4.2 L</td><td class="td" style="border-bottom: 0; font-weight: 600">14,800</td><td class="td" style="border-bottom: 0; font-weight: 600">₹66</td><td class="td" style="border-bottom: 0; font-weight: 600">1,678</td><td class="td" style="border-bottom: 0; font-weight: 600">₹584</td><td class="td" style="border-bottom: 0"></td></tr>
+</tbody>
+</table>
+<p style="margin: 8px 12px 6px; font-size: 12px; color: #a3a9b5">Blended CPL and CAC use total spend, including OOH and production. CPL = spent ÷ leads; CAC = spent ÷ customers.</p>
+</section>
+<div style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px">
+<section class="panel" style="padding: 20px">
+<h2 class="disp" style="margin: 0 0 6px; font-size: 18px; font-weight: 600">Reallocate budget</h2>
+<p style="margin: 0 0 14px; font-size: 14px; color: #b4b9c4">Move unspent OOH budget into the channel with the lowest cost per lead. See the effect before you commit.</p>
+<div style="display: flex; gap: 12px; align-items: center; font-size: 14px; margin-bottom: 14px"><span class="chip n">From: Outdoor (₹1.3 L left)</span><span>→</span><span class="chip n">To: Meta ads</span></div>
+<div style="display: flex; gap: 8px; margin-bottom: 16px">
+<sc-for list="{{amounts}}" as="m" hint-placeholder-count="3"><button type="button" class="{{m.cls}}" onClick="{{m.pick}}">{{m.label}}</button></sc-for>
+</div>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px">
+<div style="background: #14161c; border: 1px solid #2a2e38; border-radius: 10px; padding: 12px"><div class="eyebrow">Extra leads</div><div class="disp" style="font-size: 22px; font-weight: 600; margin-top: 6px; color: #5ee0c9">+{{leads}}</div></div>
+<div style="background: #14161c; border: 1px solid #2a2e38; border-radius: 10px; padding: 12px"><div class="eyebrow">OOH left after</div><div class="disp" style="font-size: 22px; font-weight: 600; margin-top: 6px">{{oohLeft}}</div></div>
+<div style="background: #14161c; border: 1px solid #2a2e38; border-radius: 10px; padding: 12px"><div class="eyebrow">Total budget</div><div class="disp" style="font-size: 22px; font-weight: 600; margin-top: 6px">₹14.0 L</div></div>
+</div>
+<p style="margin: 12px 0 14px; font-size: 12px; color: #a3a9b5">Estimate: assumes Meta holds its current ₹50 CPL. Moves over ₹0.5 L go to the campaign approver.</p>
+<button class="btn pri" type="button">Send for approval</button>
+</section>
+<section class="panel" style="padding: 20px">
+<h2 class="disp" style="margin: 0 0 14px; font-size: 18px; font-weight: 600">Weekly spend vs plan (₹ L)</h2>
+<div style="display: flex; align-items: flex-end; gap: 16px; height: 190px">
+<sc-for list="{{weeks}}" as="w" hint-placeholder-count="8">
+<div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px">
+<div style="display: flex; gap: 3px; align-items: flex-end; height: 160px"><div style="{{w.plan}}"></div><div style="{{w.act}}"></div></div>
+<span class="mono" style="font-size: 11px; color: #a3a9b5">{{w.k}}</span>
+</div>
+</sc-for>
+</div>
+<div style="display: flex; gap: 16px; margin-top: 12px; font-size: 12px; color: #b4b9c4"><span><span style="display: inline-block; width: 10px; height: 10px; background: #4a4f5c; border-radius: 2px"></span> Planned</span><span><span style="display: inline-block; width: 10px; height: 10px; background: #f2a93b; border-radius: 2px"></span> Actual</span><span>Alert fires after two consecutive weeks over plan</span></div>
+</section>
+</div>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1620}}'>
+class Component extends DCLogic {
+constructor(p) { super(p); this.state = { amt: 0.8, prio: 'bal' }; }
+renderVals() {
+var self = this;
+var opts = [0.4, 0.8, 1.2];
+var amounts = opts.map(function (a) {
+return { label: '₹' + a.toFixed(1) + ' L', cls: a === self.state.amt ? 'btn sel' : 'btn', pick: function () { self.setState({ amt: a }); } };
+});
+var leads = Math.round(this.state.amt * 100000 / 50);
+var plan = [1.2, 1.4, 1.8, 2.0, 2.2, 1.8, 1.8, 1.8];
+var act = [1.1, 1.5, 1.9, 2.3, 3.0, 0, 0, 0];
+var weeks = plan.map(function (p, i) {
+return {
+k: 'W' + (i + 1),
+plan: 'width: 12px; border-radius: 3px; background: #4a4f5c; height: ' + Math.round(p * 50) + 'px',
+act: 'width: 12px; border-radius: 3px; background: #f2a93b; height: ' + Math.round(act[i] * 50) + 'px'
+};
+});
+var PR = {
+bal: ['Balanced', [28, 25, 18, 4, 18, 7], [9, 10, 13, 14, 16, 13, 13, 12], 'Balanced: spend follows the channel plan, with the peak in the week of Diwali.', 'Steady build to the Diwali week, then hold for post-festival and wedding-season gifting.'],
+aw: ['Awareness', [25, 10, 25, 2, 30, 8], [16, 16, 14, 12, 12, 10, 10, 10], 'Awareness: more on outdoor and influencers to reach new buyers early.', 'Front-loaded so people know the brand before festive buying starts.'],
+cv: ['Conversions', [35, 35, 8, 8, 6, 8], [6, 8, 10, 14, 20, 16, 14, 12], 'Conversions: more on search, Meta and email, where orders come from.', 'Back-loaded to the days buyers are ready to order.']
+};
+var WHY = ['Festive creative and retargeting', 'Catches “Diwali gift box” searches', 'Local reach and trust', 'Cheapest repeat orders', 'Visibility near stores', 'Shoots and edits'];
+var CHN = ['Meta ads', 'Google search', 'Influencers', 'Email / CRM', 'Outdoor (OOH)', 'Content production'];
+var cur = PR[this.state.prio];
+var fmt = function (pc) { return '₹' + (14 * pc / 100).toFixed(2) + ' L'; };
+var split = CHN.map(function (c, i) { var pc = cur[1][i]; return { ch: c, why: WHY[i], pct: pc + '%', amt: fmt(pc) }; });
+var byWeek = cur[2].map(function (pc, i) { return { k: 'W' + (i + 1), pct: pc + '%', amt: fmt(pc), bar: 'height: 8px; border-radius: 4px; background: #5ee0c9; width: ' + Math.round(pc / 20 * 100) + '%' }; });
+var prio = [['bal', 'Balanced'], ['aw', 'Awareness'], ['cv', 'Conversions']].map(function (x) { return { label: x[1], cls: self.state.prio === x[0] ? 'btn sel' : 'btn', pick: function () { self.setState({ prio: x[0] }); } }; });
+return { prio: prio, split: split, byWeek: byWeek, prioName: cur[0], prioWhy: cur[3], weekWhy: cur[4], tip: 'Review CPL weekly and move money to the cheapest channel. Keep the same brand look across every channel. Hold back 5–10% for the best-performing week.', amounts: amounts, leads: leads.toLocaleString('en-IN'), oohLeft: '₹' + (1.3 - this.state.amt).toFixed(1) + ' L', weeks: weeks };
+}
+}
+</script>
+</body>
+</html>

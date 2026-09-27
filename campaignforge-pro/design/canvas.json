@@ -1,0 +1,21 @@
+{"v":3,"attachments":{},"createdOnFiles":{"at":"2026-09-27T17:59:12Z","v":1},"title":"CampaignForge Pro","launch":{"view":"canvas"},"pages":[],"designSystems":[],
+"boards":{
+"Main.dc.html":{"x":0,"y":0,"w":1440,"h":1540,"title":"01 Portfolio command centre","is_interactive":true},
+"Brand.dc.html":{"x":1520,"y":0,"w":1440,"h":1200,"title":"02 Brand kit","is_interactive":true},
+"Dates.dc.html":{"x":3040,"y":0,"w":1440,"h":1400,"title":"2b Key dates library · India & global","is_interactive":true},
+"New.dc.html":{"x":4560,"y":0,"w":1440,"h":1300,"title":"+ New campaign & generating","is_interactive":true},
+"Plan.dc.html":{"x":0,"y":1900,"w":1440,"h":1340,"title":"03 Plan workspace · key dates & target days","is_interactive":true},
+"Score.dc.html":{"x":1520,"y":1900,"w":1440,"h":1200,"title":"04 Strategist score","is_interactive":true},
+"Studio.dc.html":{"x":3040,"y":1900,"w":1440,"h":1200,"title":"05 Post studio","is_interactive":true},
+"Brief.dc.html":{"x":4560,"y":1900,"w":1440,"h":1400,"title":"5b Creative brief · concept images","is_interactive":true},
+"Reel.dc.html":{"x":6080,"y":1900,"w":1440,"h":1200,"title":"06 Video studio · reels, Shorts, YouTube","is_interactive":true},
+"Publish.dc.html":{"x":7600,"y":1900,"w":1440,"h":1400,"title":"6b Publish hub · all channels","is_interactive":true},
+"Budget.dc.html":{"x":0,"y":3680,"w":1440,"h":1620,"title":"07 Budget planner & ROI","is_interactive":true},
+"Timeline.dc.html":{"x":1520,"y":3680,"w":1440,"h":1200,"title":"08 Timeline & tasks","is_interactive":true},
+"Prioritise.dc.html":{"x":3040,"y":3680,"w":1440,"h":1200,"title":"09 Prioritise & risks","is_interactive":true},
+"Report.dc.html":{"x":4560,"y":3680,"w":1440,"h":1200,"title":"10 Executive status report","is_interactive":true}},
+"order":["Main.dc.html","Brand.dc.html","Dates.dc.html","New.dc.html","Plan.dc.html","Score.dc.html","Studio.dc.html","Brief.dc.html","Reel.dc.html","Publish.dc.html","Budget.dc.html","Timeline.dc.html","Prioritise.dc.html","Report.dc.html"],
+"notes":{
+"t1":{"kind":"title1","maxW":6000,"text":"Start here — portfolio, brand kit, key dates, new campaign","w":240,"x":0,"y":-300},
+"t2":{"kind":"title1","maxW":9040,"text":"Create & publish — plan, score, create, and ready-to-post output for every channel","w":240,"x":0,"y":1620},
+"t3":{"kind":"title1","maxW":6000,"text":"Manage — budget planning and portfolio features","w":240,"x":0,"y":3400}}}
