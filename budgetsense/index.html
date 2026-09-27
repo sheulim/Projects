@@ -237,6 +237,24 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--teal);outline-of
 .demo button{background:transparent;border:1px solid rgba(127,127,127,.5);color:inherit;border-radius:10px;padding:5px 11px;font-weight:700;font-size:12px}
 .toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:12px;font-weight:600;font-size:14px;z-index:45;opacity:0;transition:opacity .2s;pointer-events:none;max-width:calc(100% - 32px);text-align:center}
 .toast.on{opacity:1}
+.tourcta{display:flex;gap:12px;align-items:center;width:100%;text-align:left;border:1px solid var(--saffron);background:var(--saffron-soft);border-radius:16px;padding:12px 14px;margin:-8px 0 22px}
+.tourcta b{display:block;font-size:15px}
+.tourcta small{color:var(--muted);font-size:12px}
+.tourcta > span:last-child{margin-left:auto;color:var(--warn);font-size:18px}
+.tour{position:fixed;inset:0;z-index:50}
+.hole{position:fixed;border-radius:18px;box-shadow:0 0 0 200vmax rgba(8,20,28,.64);transition:top .3s,left .3s,width .3s,height .3s;pointer-events:none;outline:2px solid var(--saffron);outline-offset:3px}
+.hole.none{outline:0;width:0!important;height:0!important;top:50%!important;left:50%!important}
+.tcard{position:fixed;left:50%;transform:translateX(-50%);width:calc(100% - 32px);max-width:460px;background:var(--surface);color:var(--ink);border-radius:20px;padding:16px 18px;box-shadow:0 20px 50px rgba(0,0,0,.35)}
+.tcard h2{font-size:19px;font-weight:800;margin:6px 0 4px;text-wrap:balance}
+.tcard p{margin:0;color:var(--muted);font-size:15px}
+.trysay{margin-top:10px;background:var(--teal-soft);border-radius:12px;padding:8px 12px;font-size:14px}
+.trysay b{color:var(--teal)}
+.hist{display:grid;gap:8px}
+.hist button{display:grid;grid-template-columns:1fr auto;gap:2px 10px;text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:14px;padding:12px 14px}
+.hist b{font-size:15px}
+.hist small{color:var(--muted);font-size:12px}
+.hist .kept{font-weight:800;font-variant-numeric:tabular-nums;text-align:right}
+@media (prefers-reduced-motion: reduce){.hole{transition:none}.sheet{animation:none}}
 .sample{background:var(--saffron-soft);border-radius:14px;padding:10px 14px;font-size:13px;margin-bottom:14px}
 @media (max-width:380px){.pulse{grid-template-columns:1fr;justify-items:center}.stats{width:100%}.brow{grid-template-columns:36px 1fr 96px}}
 </style>
@@ -247,6 +265,7 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--teal);outline-of
 <div class="shell hide" id="setup">
   <section id="s-welcome" class="welcome">
     <div class="brand"><i>₹</i>BudgetSense</div>
+    <button class="tourcta" id="tourStart"><span class="ico">🎧</span><span><b>New here? Take the 2-minute voice tour</b><small>I'll talk you through each screen with sample figures. Nothing is saved.</small></span><span aria-hidden="true">▶</span></button>
     <h1>Your money plan, in one voice note.</h1>
     <p class="lead">Talk for about a minute about what comes in, what has to go out, what you enjoy and what you are saving for. I will turn it into a plan you can check before anything is saved.</p>
     <button class="path main" id="goVoiceSetup"><span class="ico">🎙</span><span><b>Speak my plan</b><small>About 60 seconds. Correct anything afterwards.</small></span></button>
@@ -368,12 +387,15 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--teal);outline-of
         <li><span><b>Spoken replies</b><small>BudgetSense talks back</small></span><button class="sw" id="swReplies" aria-label="Spoken replies"></button></li>
         <li><span><b>Quick save</b><small>Save confident AI picks without asking</small></span><button class="sw" id="swQuick" aria-label="Quick save"></button></li>
         <li><span><b>Dark mode</b></span><button class="sw" id="swDark" aria-label="Dark mode"></button></li>
+        <li><span><b>Voice tour</b><small>Screen-by-screen guide with narration</small></span><button class="btn" id="tourReplay">🎧 Start</button></li>
         <li><span><b>Guided voice demo</b><small>Watch setup-to-summary by voice alone</small></span><button class="btn primary" id="demoBtn">▶ Play</button></li>
         <li><span><b>Download voice diary</b><small>Every note, transcript and result (CSV)</small></span><button class="btn" id="exportBtn">⬇ CSV</button></li>
         <li><span><b>Load sample data</b></span><button class="btn" id="sampleBtn">Load</button></li>
         <li><span><b>Wipe everything</b><small>Removes plan, entries and recordings from this device</small></span><button class="btn danger" id="wipeBtn">Wipe</button></li>
       </ul>
     </div>
+    <div class="h2row"><h2>Month by month</h2><small>Tap a month to open it</small></div>
+    <div class="hist" id="history"></div>
     <div class="h2row"><h2>Voice diary</h2><small id="diaryCount"></small></div>
     <p class="hint" style="margin:-4px 0 10px" id="support"></p>
     <ul class="items" id="diary"></ul>
@@ -398,6 +420,21 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--teal);outline-of
       <div class="two"><select id="tfCat" aria-label="Envelope"></select><select id="tfDay"><option value="0">Today</option><option value="1">Yesterday</option><option value="2">2 days ago</option></select></div>
       <button class="btn primary block" type="submit" style="padding:11px">Save entry</button>
     </form>
+  </div>
+</div>
+
+<div class="tour hide" id="tour" role="dialog" aria-modal="true" aria-labelledby="tTitle">
+  <div class="hole" id="tHole"></div>
+  <div class="tcard" id="tCard">
+    <div class="spread"><span class="label" id="tStep"></span><button class="textlink" id="tSkip">Skip tour</button></div>
+    <h2 id="tTitle"></h2>
+    <p id="tBody"></p>
+    <div id="tTry"></div>
+    <div id="tEnd" class="hide" style="display:grid;gap:8px;margin-top:8px"></div>
+    <div class="spread" id="tNav" style="margin-top:12px">
+      <button class="btn" id="tVoice" aria-pressed="true">🔊 Narration on</button>
+      <span class="row"><button class="btn" id="tBack">Back</button><button class="btn primary" id="tNext">Next</button></span>
+    </div>
   </div>
 </div>
 
@@ -695,17 +732,20 @@ const iso = d => d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDa
 const monthKey = d => d.getFullYear() + '-' + pad(d.getMonth()+1);
 function todayIST(){ const [y,m,d] = new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Kolkata'}).split('-').map(Number); return new Date(y, m-1, d); }
 const uid = () => Math.random().toString(36).slice(2,9) + Date.now().toString(36);
-const state = {month: monthKey(todayIST()), profile:null, plan:{}, goals:[], txs:[], recs:[], sample:false, pending:null, pendingNote:null, tab:'pulse', custom:{}, filter:'all', prefs:{replies:true, quick:false}};
+const state = {month: monthKey(todayIST()), profile:null, plan:{}, goals:[], txs:[], recs:[], sample:false, pending:null, pendingNote:null, tab:'pulse', custom:{}, planByMonth:{}, filter:'all', prefs:{replies:true, quick:false}};
 function load(){
   try {
     const s = JSON.parse(localStorage.getItem(LS) || 'null');
     if (!s) return false;
-    Object.assign(state, {profile:s.profile||null, plan:s.plan||{}, goals:s.goals||[], txs:s.txs||[], recs:s.recs||[], sample:!!s.sample, custom:s.custom||{}, prefs:Object.assign(state.prefs, s.prefs||{})});
+    Object.assign(state, {profile:s.profile||null, plan:s.plan||{}, goals:s.goals||[], txs:s.txs||[], recs:s.recs||[], sample:!!s.sample, custom:s.custom||{}, planByMonth:s.planByMonth||{}, prefs:Object.assign(state.prefs, s.prefs||{})});
     for (const [n,c] of Object.entries(state.custom)) addCustom(n, c.kind, c.icon);
     return true;
   } catch(e){ return false; }
 }
-function save(){ try { localStorage.setItem(LS, JSON.stringify({profile:state.profile, plan:state.plan, goals:state.goals, txs:state.txs, recs:state.recs, sample:state.sample, custom:state.custom, prefs:state.prefs})); } catch(e){} }
+function save(){
+  // Snapshot this month's limits so each month is judged against the plan it actually had.
+  if (state.profile && !state.sample) state.planByMonth[monthKey(todayIST())] = {...state.plan};
+  try { localStorage.setItem(LS, JSON.stringify({profile:state.profile, plan:state.plan, goals:state.goals, txs:state.txs, recs:state.recs, sample:state.sample, custom:state.custom, planByMonth:state.planByMonth, prefs:state.prefs})); } catch(e){} }
 
 const memAudio = new Map(); let dbp = null;
 function db(){ if (dbp) return dbp; dbp = new Promise(res => { try { const r = indexedDB.open('budgetsense-voice', 1); r.onupgradeneeded = () => r.result.createObjectStore('notes'); r.onsuccess = () => res(r.result); r.onerror = () => res(null); } catch(e){ res(null); } }); return dbp; }
@@ -734,7 +774,7 @@ function loadSample(){
     {id:uid(), name:'Emergency Fund', icon:'🛟', target:300000, saved:185000, by:monthKey(new Date(y, m + 9, 1))},
     {id:uid(), name:'Goa Trip', icon:'🏖', target:60000, saved:18000, by:monthKey(new Date(y, m + 3, 1))},
   ];
-  state.recs = []; state.sample = true; state.month = monthKey(t);
+  state.recs = []; state.planByMonth = {}; state.sample = true; state.month = monthKey(t);
   save();
 }
 
@@ -771,7 +811,8 @@ function figures(k = state.month){
   const byCat = {}; txs.filter(t => t.type === 'expense').forEach(t => byCat[t.category] = (byCat[t.category]||0) + t.amount);
   const free = income - must - life - saved;
   // Safe to spend today: what's free after still-unpaid must-pay limits, spread over the days left.
-  const unpaidMust = MUST.reduce((a,c) => a + Math.max(0, (state.plan[c]||0) - (byCat[c]||0)), 0);
+  const plan = planFor(k);
+  const unpaidMust = MUST.reduce((a,c) => a + Math.max(0, (plan[c]||0) - (byCat[c]||0)), 0);
   const goalDue = state.goals.reduce((a,g) => {
     const left = Math.max(1, monthsBetween(k, g.by)), need = Math.max(0, (g.target - g.saved) / left);
     const doneNow = txs.filter(t => t.type === 'saving' && t.category === g.name).reduce((x,t) => x + t.amount, 0);
@@ -780,7 +821,13 @@ function figures(k = state.month){
   const t = todayIST(); const isNow = k === monthKey(t);
   const daysLeft = isNow ? new Date(t.getFullYear(), t.getMonth() + 1, 0).getDate() - t.getDate() + 1 : 0;
   const safeToday = isNow ? Math.max(0, (free - unpaidMust - goalDue) / daysLeft) : 0;
-  return {txs, income, salary, extra, expected, salaryPending: salary === 0 && expected > 0, must, life, saved, spent: must + life, free, byCat, unpaidMust, goalDue, daysLeft, safeToday, isNow};
+  return {txs, income, salary, extra, expected, salaryPending: salary === 0 && expected > 0, must, life, saved, spent: must + life, free, byCat, plan, unpaidMust, goalDue, daysLeft, safeToday, isNow};
+}
+function planFor(k){
+  if (k >= monthKey(todayIST()) || state.sample) return state.plan;
+  const keys = Object.keys(state.planByMonth).sort();
+  const earlier = keys.filter(x => x <= k).pop(), later = keys.find(x => x > k);
+  return state.planByMonth[earlier || later] || state.plan;
 }
 function envState(spent, limit){
   if (!limit) return {cls:'t-none', label:'No limit'};
@@ -814,8 +861,8 @@ function readout(){
   const F = figures(), mName = mLong(state.month);
   if (!F.txs.length) return {html:'<p>No money notes for this month yet. Tap <b>Speak a money note</b> and tell me what you spent.</p>', spoken:`No money notes for ${mName} yet.`};
   const life = Object.entries(F.byCat).filter(([c]) => CATS[c]?.kind === 'life').sort((a,b) => b[1] - a[1]);
-  const over = Object.entries(state.plan).filter(([c,l]) => (F.byCat[c]||0) > l).map(([c,l]) => ({c, by:(F.byCat[c]||0) - l}));
-  const watch = Object.entries(state.plan).filter(([c,l]) => { const p = (F.byCat[c]||0) / l; return p >= .75 && p <= 1; }).map(([c]) => c);
+  const over = Object.entries(F.plan).filter(([c,l]) => (F.byCat[c]||0) > l).map(([c,l]) => ({c, by:(F.byCat[c]||0) - l}));
+  const watch = Object.entries(F.plan).filter(([c,l]) => { const p = (F.byCat[c]||0) / l; return p >= .75 && p <= 1; }).map(([c]) => c);
   const regrets = F.txs.filter(t => t.mood === false);
   const keep = F.income ? Math.round((F.income - F.spent) / F.income * 100) : null;
   const p = [];
@@ -823,12 +870,12 @@ function readout(){
   p.push(`Must-pay was ${inr(F.must)}, lifestyle ${inr(F.life)}${life[0] ? `, with ${life[0][0]} the biggest at ${inr(life[0][1])}` : ''}.`);
   if (over.length) p.push(`Overdrawn: ${over.map(o => `${o.c} by ${inr(o.by)}`).join(', ')}.`);
   else if (watch.length) p.push(`${watch.join(' and ')} ${watch.length > 1 ? 'need' : 'needs'} watching.`);
-  else if (Object.keys(state.plan).length) p.push('Every envelope is comfortable.');
+  else if (Object.keys(F.plan).length) p.push('Every envelope is comfortable.');
   if (F.saved) p.push(`${inr(F.saved)} went to milestones.`);
   let tip;
   if (regrets.length) tip = `You regretted ${regrets.map(r => r.description).slice(0,2).join(' and ')}. Next time, wait a day before a similar buy and send that money to a milestone instead.`;
   else if (over.length) tip = `Pause ${over[0].c.toLowerCase()} for the rest of the month, or cover the ${inr(over[0].by)} from an envelope with room.`;
-  else if (watch.length) tip = `Go gently on ${watch[0].toLowerCase()} — ${inr(Math.max(0, state.plan[watch[0]] - (F.byCat[watch[0]]||0)))} left in it.`;
+  else if (watch.length) tip = `Go gently on ${watch[0].toLowerCase()} — ${inr(Math.max(0, F.plan[watch[0]] - (F.byCat[watch[0]]||0)))} left in it.`;
   else if (F.isNow && F.safeToday) tip = `You can spend about ${inr(F.safeToday)} a day for the rest of the month and still cover your must-pays.`;
   else tip = 'Keep the notes coming — five seconds each is enough.';
   return {html: p.map(x => `<p>${esc(x)}</p>`).join('') + `<p class="tip"><b>Next step:</b> ${esc(tip)}</p>`, spoken: p.join(' ') + ' Next step: ' + tip};
@@ -839,7 +886,7 @@ function answer(r){
     case 'safe': return F.isNow ? `You can safely spend about ${inr(F.safeToday)} today, with ${F.daysLeft} days left in the month.` : 'Safe-to-spend works for the current month only.';
     case 'free': return `${inr(F.free)} is still unassigned for ${mLong(state.month)}.`;
     case 'left': {
-      const l = state.plan[r.category];
+      const l = F.plan[r.category];
       if (!l) return `${r.category} has no limit yet. You have spent ${inr(F.byCat[r.category]||0)} on it this month.`;
       const left = l - (F.byCat[r.category]||0);
       return left >= 0 ? `${inr(left)} left in ${r.category}, out of ${inr(l)}.` : `${r.category} is overdrawn by ${inr(-left)}.`;
@@ -940,7 +987,7 @@ function commit(tx){
 }
 function alertFor(tx){
   if (tx.type !== 'expense') return '';
-  const l = state.plan[tx.category]; if (!l) return '';
+  const l = planFor(tx.date.slice(0,7))[tx.category]; if (!l) return '';
   const spent = figures(tx.date.slice(0,7)).byCat[tx.category] || 0, before = spent - tx.amount;
   if (spent > l && before <= l) return ` Heads up: ${tx.category} is now over its limit by ${inr(spent - l)}.`;
   if (spent / l >= .75 && before / l < .75) return ` Heads up: ${tx.category} is at ${Math.round(spent / l * 100)}% — ${inr(l - spent)} left.`;
@@ -953,7 +1000,7 @@ function createEnvelope(name, kind, icon, amount){
 }
 function clearPending(){ state.pending = null; state.pendingNote = null; renderDraft(); }
 async function wipe(){
-  state.profile = null; state.plan = {}; state.goals = []; state.txs = []; state.recs = []; state.sample = false; clearPending();
+  state.profile = null; state.plan = {}; state.goals = []; state.txs = []; state.recs = []; state.planByMonth = {}; state.sample = false; clearPending();
   for (const n of Object.keys(state.custom)){ delete CATS[n]; delete ALIAS[n.toLowerCase()]; } state.custom = {}; refreshCats();
   save(); await clearAudio(); closeSheet(); showSetup('welcome'); toast('Everything wiped from this device');
 }
@@ -1207,7 +1254,7 @@ $('builderSave').onclick = () => {
   const p = readBuilder();
   if (!p.income){ toast('Add your take-home pay first'); $('bIncome').focus(); return; }
   const firstTime = !state.profile || state.sample;
-  if (state.sample){ state.txs = []; state.recs = state.recs.filter(r => r.source === 'setup'); state.goals = []; state.sample = false; }
+  if (state.sample){ state.txs = []; state.recs = state.recs.filter(r => r.source === 'setup'); state.goals = []; state.planByMonth = {}; state.sample = false; }
   state.profile = {name:p.name || 'there', income:p.income, since: state.profile?.since && !firstTime ? state.profile.since : monthKey(todayIST())};
   state.plan = {}; for (const [c,v] of [...Object.entries(p.must), ...Object.entries(p.life)]) if (v > 0) state.plan[c] = v;
   if (p.goal){
@@ -1294,7 +1341,7 @@ function renderPulse(){
     ${F.isNow ? `<div class="safe"><span><small>Safe to spend today</small><b>${inr(F.safeToday)}</b></span><span style="text-align:right"><small>${F.daysLeft} day${F.daysLeft === 1 ? '' : 's'} left · holding ${inr(F.unpaidMust)} for must-pays${F.goalDue ? ' and ' + inr(F.goalDue) + ' for milestones' : ''}</small></span></div>` : ''}
     <div class="chips" style="margin-top:12px">${streak() ? `<span class="chip streak">🔥 ${streak()}-day voice streak</span>` : ''}<span class="chip">${F.txs.length} entries in ${mShort(state.month)}</span></div>`;
 
-  const alerts = Object.entries(state.plan).map(([c,l]) => ({c, l, s:F.byCat[c]||0})).filter(x => x.s / x.l >= .75).sort((a,b) => b.s / b.l - a.s / a.l);
+  const alerts = Object.entries(F.plan).map(([c,l]) => ({c, l, s:F.byCat[c]||0})).filter(x => x.s / x.l >= .75).sort((a,b) => b.s / b.l - a.s / a.l);
   $('alerts').innerHTML = alerts.map(x => x.s > x.l
     ? `<div class="alert">⚠️ <span><b>${x.c}</b> is overdrawn by ${inr(x.s - x.l)}.</span></div>`
     : `<div class="alert soft">👀 <span><b>${x.c}</b> is at ${Math.round(x.s / x.l * 100)}% — ${inr(x.l - x.s)} left.</span></div>`).join('') + (alerts.length ? '<div style="height:14px"></div>' : '');
@@ -1323,14 +1370,14 @@ function renderEnvelopes(){
   $('filters').innerHTML = FILTERS.map(([k,l]) => `<button data-f="${k}" aria-pressed="${state.filter === k}">${l}</button>`).join('');
   document.querySelectorAll('[data-f]').forEach(b => b.onclick = () => { state.filter = b.getAttribute('data-f'); renderEnvelopes(); });
   const tile = c => {
-    const s = F.byCat[c] || 0, l = state.plan[c], st = envState(s, l), p = l ? Math.round(s / l * 100) : null;
+    const s = F.byCat[c] || 0, l = F.plan[c], st = envState(s, l), p = l ? Math.round(s / l * 100) : null;
     return `<div class="card env"><div class="spread"><span class="ico" style="width:34px;height:34px;font-size:16px">${CATS[c].icon}</span><span class="tagx ${st.cls}">${st.label}</span></div>
       <div class="pct">${p === null ? inr(s) : p + '%'}</div><div class="nm">${c}</div>
       <div class="sub">${l ? `${inr(s)} of ${inr(l)} · ${s > l ? inr(s - l) + ' over' : inr(l - s) + ' left'}` : 'spent · no limit set'}</div>
       ${l ? `<div class="meter" style="margin-bottom:0"><i style="width:${Math.min(100, s / l * 100)}%;background:${s > l ? 'var(--danger)' : CATS[c].kind === 'must' ? 'var(--slate)' : 'var(--saffron)'}"></i></div>` : ''}</div>`;
   };
-  const show = list => list.filter(c => state.plan[c] || F.byCat[c]);
-  const sumL = list => list.reduce((a,c) => a + (state.plan[c]||0), 0);
+  const show = list => list.filter(c => F.plan[c] || F.byCat[c]);
+  const sumL = list => list.reduce((a,c) => a + (F.plan[c]||0), 0);
   const f = state.filter, parts = [];
   if (f === 'all' || f === 'goal') parts.push(`<div class="h2row"><h2>Milestones</h2><small>${inr(state.goals.reduce((a,g) => a + g.saved, 0))} put aside</small></div>` +
     (state.goals.length ? state.goals.map(g => { const fc = forecast(g), pct = Math.min(100, g.saved / g.target * 100);
@@ -1389,6 +1436,14 @@ function renderMe(){
   $('meSaved').textContent = inr(state.goals.reduce((a,g) => a + g.saved, 0));
   $('meNotes').textContent = state.recs.filter(r => new Date(r.at).toLocaleDateString('en-CA',{timeZone:'Asia/Kolkata'}).slice(0,7) === monthKey(todayIST())).length;
   $('swReplies').setAttribute('aria-pressed', state.prefs.replies); $('swQuick').setAttribute('aria-pressed', state.prefs.quick); $('swDark').setAttribute('aria-pressed', isDark());
+  const months = [...new Set(state.txs.map(t => t.date.slice(0,7)))].sort().reverse().slice(0,12);
+  $('history').innerHTML = months.length ? months.map(k => {
+    const F = figures(k), kept = F.income ? Math.round((F.income - F.spent) / F.income * 100) : null;
+    const over = Object.entries(F.plan).filter(([c,l]) => (F.byCat[c]||0) > l).length;
+    return `<button data-month="${k}"><b>${mLong(k)}</b><span class="kept ${kept !== null && kept < 20 ? 'short' : 'ok'}">${kept === null ? '—' : kept + '% kept'}</span>
+      <small>In ${inr(F.income)} · out ${inr(F.spent)} · to milestones ${inr(F.saved)}</small><small>${over ? over + ' envelope' + (over > 1 ? 's' : '') + ' overdrawn' : 'All envelopes within limit'}</small></button>`;
+  }).join('') : '<div class="card empty">Your months appear here once you log something.</div>';
+  document.querySelectorAll('[data-month]').forEach(b => b.onclick = () => { state.month = b.getAttribute('data-month'); tab('pulse'); });
   const list = [...state.recs].sort((a,b) => b.at - a.at);
   $('diaryCount').textContent = list.length ? `${list.length} note${list.length === 1 ? '' : 's'}` : '';
   $('diary').innerHTML = list.length ? list.map(r => `<li>
@@ -1484,12 +1539,12 @@ async function runDemo(){
   await typeInto($('setupWords'), setupRec.bars, SETUP_LINE);
   $('setupMic').classList.remove('live');
   renderChecks(setupCoverage(parseSetup(SETUP_LINE)));
-  state.recs.push({id:uid(), at:Date.now(), durationMs:14000, transcript:SETUP_LINE, source:'demo', hasAudio:false, outcome:'Drafted a plan'});
+  state.recs.push({id:uid(), at:Date.now(), durationMs:14000, transcript:SETUP_LINE, source:'setup', hasAudio:false, outcome:'Drafted a plan'});
   await wait(900); if (demoAbort) return endDemo();
   openBuilder(parseSetup(SETUP_LINE), 'voice');
   demoStep(2, total, 'Checking the drafted plan…');
   await wait(2600); if (demoAbort) return endDemo();
-  $('builderSave').click(); state.sample = true; save();
+  state.sample = false; $('builderSave').click(); state.sample = true; save();
   // 2. Everyday notes
   openSheet();
   for (let i = 0; i < SCRIPT.length && !demoAbort; i++){
@@ -1516,6 +1571,91 @@ function endDemo(){
 }
 $('demoBtn').onclick = runDemo;
 $('demoStop').onclick = () => { demoAbort = true; try { speechSynthesis.cancel(); } catch(e){} };
+
+/* =====================================================================
+   Voice tour: narrated, screen-by-screen guide on sample figures.
+   The user's own data is set aside and restored when the tour ends.
+   ===================================================================== */
+const TOUR = [
+  {title:'Welcome to BudgetSense', body:'You run your money here by talking. I will walk you through each screen using sample figures for a person called Asha. Nothing you see now is saved. Tap Next when you are ready.'},
+  {tab:'pulse', target:'#speakBtn', title:'One button does most of the work', body:'Tap Speak a money note, say what happened, then tap again to stop. Say amounts the way you normally would, like four fifty or one point five lakh.', say:'Four fifty at Swiggy'},
+  {tab:'pulse', sheet:true, target:'#draft', title:'Check what I heard', body:'I show the amount and the envelope I picked. Say yes to save it, no to drop it, or name another envelope. If I mishear, tap Fix what I heard. You can also type instead.', say:'Yes  ·  Make it coffee'},
+  {tab:'pulse', target:'#pulseCard', title:'Your month at a glance', body:'The ring splits your income into must-pay bills, lifestyle spends and money sent to milestones. Safe to spend today tells you how much you can use each day and still cover your bills and savings.', say:'Safe to spend today?'},
+  {tab:'pulse', target:'#readout', title:'Your month, explained', body:'This read-out summarises the month and gives one next step. Tap Listen, or say explain my month, and I will read it out.', say:'Explain my month'},
+  {tab:'pulse', target:'#milestones', title:'Milestones', body:'Milestones are what you are saving for. Each one shows whether you will get there on time at your current pace, and how much to add if not.', say:'New goal laptop 80,000 by March  ·  Put 5,000 in laptop'},
+  {tab:'pulse', target:'#askChips', title:'Ask me anything', body:'Ask about your money in plain words: what is left in an envelope, what you spent on something, or whether you can afford a purchase.', say:'Can I afford 3,000 shoes?'},
+  {tab:'envelopes', target:'#envBody', title:'Envelopes', body:'Each envelope is a monthly limit. Green is comfortable, amber means watch it, red means overdrawn. I warn you out loud at 75 percent and when you go over. Use the filters on top, or the New button to add one.', say:'Groceries limit 8,000  ·  Pet care limit 2,000'},
+  {tab:'timeline', target:'#timeline', title:'Timeline', body:'Every entry, day by day. Tap the play button to hear the original voice note. For lifestyle spends, tell me whether you would buy it again, and I will learn from your regrets.', say:'Undo  ·  Move last to shopping  ·  Regret it'},
+  {tab:'me', target:'#history', title:'Your months are kept', body:'Everything you record is saved on this device: your plan, limits, milestones, entries and voice notes. Each month keeps its own limits, so this history shows how every month went. Me also holds the full voice diary, settings and a spreadsheet export.'},
+  {end:true, title:'Ready to set up your own plan?', body:'The quickest way is one voice note of about a minute: your take-home pay, bills, what you enjoy spending on, and one thing you are saving for.'},
+];
+let tourI = 0, tourBackup = undefined, tourVoice = true, tourSheet = false;
+function resetState(){ Object.assign(state, {profile:null, plan:{}, goals:[], txs:[], recs:[], sample:false, planByMonth:{}, pending:null, pendingNote:null, filter:'all', month:monthKey(todayIST())}); }
+function startTour(){
+  try { tourBackup = localStorage.getItem(LS); } catch(e){ tourBackup = null; }
+  try { speechSynthesis.cancel(); } catch(e){}
+  loadSample(); enterApp();
+  $('tour').classList.remove('hide'); tourI = 0; showStep();
+}
+function endTour(next){
+  try { speechSynthesis.cancel(); } catch(e){}
+  $('tour').classList.add('hide'); if (tourSheet){ state.pending = null; $('scrim').classList.add('hide'); tourSheet = false; }
+  if (next === 'sample'){ state.sample = true; save(); enterApp(); return; }
+  resetState();
+  try { if (tourBackup) localStorage.setItem(LS, tourBackup); else localStorage.removeItem(LS); } catch(e){}
+  load();
+  if (next === 'voice'){ $('respeak').onclick(); return; }
+  if (next === 'manual'){ openBuilder(emptyPlan(), 'manual'); return; }
+  if (state.profile) enterApp(); else showSetup('welcome');
+}
+async function showStep(){
+  const st = TOUR[tourI], card = $('tCard'), hole = $('tHole');
+  try { speechSynthesis.cancel(); } catch(e){}
+  if (tourSheet && !st.sheet){ state.pending = null; $('scrim').classList.add('hide'); tourSheet = false; }
+  if (st.tab && state.tab !== st.tab) tab(st.tab);
+  if (st.sheet){
+    tourSheet = true; $('scrim').classList.remove('hide'); $('typeForm').classList.add('hide');
+    $('sheetTitle').textContent = 'Heard you'; $('words').textContent = 'Four fifty at Swiggy'; setStatus('Draft: ₹450 in Eating out. Say “yes”, or name another envelope.');
+    state.pending = {type:'expense', amount:450, description:'Swiggy', category:'Eating out', confidence:'high', date:iso(todayIST())}; renderDraft();
+  }
+  $('tStep').textContent = st.end ? 'All done' : `Step ${tourI + 1} of ${TOUR.length - 1}`;
+  $('tTitle').textContent = st.title; $('tBody').textContent = st.body;
+  $('tTry').innerHTML = st.say ? `<div class="trysay">🎙 Try saying: <b>${esc(st.say)}</b></div>` : '';
+  $('tBack').disabled = tourI === 0;
+  $('tNav').classList.toggle('hide', !!st.end); $('tSkip').classList.toggle('hide', !!st.end);
+  const hadData = (() => { try { return !!JSON.parse(tourBackup || 'null')?.profile; } catch(e){ return false; } })();
+  $('tEnd').classList.toggle('hide', !st.end);
+  $('tEnd').innerHTML = st.end ? (hadData
+      ? `<button class="btn primary block" data-tend="back">Back to my plan</button>`
+      : `<button class="btn primary block" data-tend="voice">🎙 Speak my plan</button><button class="btn block" data-tend="manual">⌨ Build it by hand</button><button class="textlink" data-tend="sample" style="margin-top:4px">Keep exploring the sample</button>`) : '';
+  document.querySelectorAll('[data-tend]').forEach(b => b.onclick = () => endTour(b.getAttribute('data-tend')));
+  // Spotlight: scrolled content gets the card below it; fixed items (the Speak bar, the voice panel) get it above.
+  const el = st.target && document.querySelector(st.target);
+  card.style.top = ''; card.style.bottom = ''; card.style.transform = 'translateX(-50%)';
+  if (!el){
+    hole.classList.add('none'); card.style.top = '50%'; card.style.transform = 'translate(-50%,-50%)';
+  } else {
+    const fixed = !!el.closest('.dock, .scrim');
+    if (!fixed){ el.scrollIntoView({block:'start', behavior:'instant'}); window.scrollBy(0, -16); }
+    await new Promise(r => setTimeout(r, 60));
+    const r = el.getBoundingClientRect(), vh = innerHeight, cardH = card.offsetHeight, pad = 6, gap = 16;
+    let top = r.top - pad, bottom = r.bottom + pad;
+    if (fixed){ card.style.top = 'calc(12px + env(safe-area-inset-top, 0px))'; top = Math.max(top, cardH + 12 + gap); }
+    else { card.style.bottom = 'calc(12px + env(safe-area-inset-bottom, 0px))'; bottom = Math.min(bottom, vh - cardH - 12 - gap); top = Math.max(8, top); }
+    Object.assign(hole.style, {top: top + 'px', left: Math.max(4, r.left - pad) + 'px', width: Math.min(r.width + pad * 2, innerWidth - 8) + 'px', height: Math.max(24, bottom - top) + 'px'});
+    hole.classList.remove('none');
+  }
+  if (tourVoice) speak(st.title + '. ' + st.body + (st.say ? ' Try saying: ' + st.say.replace(/·/g, ', or') : ''));
+  $('tNext').focus({preventScroll:true});
+}
+$('tourStart').onclick = startTour;
+$('tourReplay').onclick = startTour;
+$('tNext').onclick = () => { if (tourI < TOUR.length - 1){ tourI++; showStep(); } };
+$('tBack').onclick = () => { if (tourI > 0){ tourI--; showStep(); } };
+$('tSkip').onclick = () => endTour();
+$('tVoice').onclick = () => { tourVoice = !tourVoice; $('tVoice').textContent = tourVoice ? '🔊 Narration on' : '🔇 Narration off'; $('tVoice').setAttribute('aria-pressed', tourVoice); if (!tourVoice) try { speechSynthesis.cancel(); } catch(e){} else showStep(); };
+addEventListener('resize', () => { if (!$('tour').classList.contains('hide')) showStep(); });
+document.addEventListener('keydown', e => { if ($('tour').classList.contains('hide')) return; if (e.key === 'Escape') endTour(); if (e.key === 'ArrowRight') $('tNext').click(); if (e.key === 'ArrowLeft') $('tBack').click(); });
 
 /* =====================================================================
    Boot
