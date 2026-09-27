@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Plan workspace</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=DM+Sans:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap">
+<style>
+body{margin:0;background:#14161c;color:#eceef2;font-family:'DM Sans',system-ui,sans-serif}
+a{color:#f2a93b}a:hover{color:#ffc46b}
+.nav{display:flex;align-items:center;gap:10px;min-height:40px;padding:0 12px;border-radius:8px;color:#b4b9c4;text-decoration:none;font-size:14px}
+.nav:hover{background:#1b1e26;color:#eceef2}
+.nav.on{background:#2e2514;color:#f2a93b;font-weight:600}
+.num{font-family:'JetBrains Mono',monospace;font-size:11px;color:#7d8391;width:18px}
+.panel{background:#1b1e26;border:1px solid #2a2e38;border-radius:12px}
+.eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#a3a9b5}
+.disp{font-family:'Space Grotesk',sans-serif}
+.mono{font-family:'JetBrains Mono',monospace}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:0 16px;border-radius:8px;font:600 14px 'DM Sans',sans-serif;border:1px solid #343945;background:#1f232c;color:#eceef2;cursor:pointer}
+.btn.pri{background:#f2a93b;border-color:#f2a93b;color:#1a1305}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:600}
+.g{background:#123a33;color:#5ee0c9}.a{background:#3d2f12;color:#f7be5f}.r{background:#44191b;color:#ff8a8e}.n{background:#262a33;color:#c3c8d2}
+.tab{min-height:40px;display:inline-flex;align-items:center;padding:0 14px;border-radius:8px;font-size:14px;color:#b4b9c4;text-decoration:none}
+.tab.on{background:#262a33;color:#eceef2;font-weight:600}
+.fld{box-sizing:border-box;background:#14161c;border:1px solid #343945;border-radius:10px;color:#eceef2;font:14px 'DM Sans',sans-serif;padding:11px 14px}
+.cell{background:#171a21;border:1px solid #262a33;border-radius:8px;padding:6px 7px;height:82px;box-sizing:border-box;display:flex;flex-direction:column;gap:4px;overflow:hidden}
+.post{font-size:11px;line-height:1.25;padding:3px 6px;border-radius:4px;color:#eceef2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%}
+.btnoff{border:0;cursor:pointer;background:transparent;color:#b4b9c4;min-height:30px}
+.btnsel{border:0;cursor:pointer;background:#eceef2;color:#14161c;min-height:30px}
+.wd{min-width:44px;min-height:36px;border-radius:8px;border:1px solid #343945;background:transparent;color:#b4b9c4;font-weight:600;font-size:12px;font-family:inherit;cursor:pointer}
+.wd.on{background:#f2a93b;border-color:#f2a93b;color:#1a1305}
+</style>
+</helmet>
+<div style="width: 1440px; height: 1340px; display: flex; background: #14161c">
+<nav style="width: 232px; flex-shrink: 0; background: #101218; border-right: 1px solid #262a33; padding: 24px 14px; box-sizing: border-box; display: flex; flex-direction: column; gap: 4px">
+<div style="display: flex; align-items: center; gap: 10px; padding: 0 10px 20px">
+<div style="width: 30px; height: 30px; border-radius: 8px; background: #f2a93b; display: flex; align-items: center; justify-content: center; color: #1a1305; font: 700 15px 'Space Grotesk',sans-serif">CF</div>
+<div class="disp" style="font-size: 17px; font-weight: 600">CampaignForge <span style="color: #f2a93b">Pro</span></div>
+</div>
+<a class="nav" href="Main.dc.html"><span class="num">01</span>Portfolio</a>
+<a class="nav" href="Brand.dc.html"><span class="num">02</span>Company DNA</a>
+<a class="nav" href="Dates.dc.html"><span class="num">2b</span>Moments calendar</a>
+<div class="eyebrow" style="padding: 14px 12px 4px">Create</div>
+<a class="nav" href="New.dc.html"><span class="num">+</span>New campaign</a>
+<a class="nav on" href="Plan.dc.html"><span class="num">03</span>Plan workspace</a>
+<a class="nav" href="Score.dc.html"><span class="num">04</span>Readiness score</a>
+<a class="nav" href="Studio.dc.html"><span class="num">05</span>Post studio</a>
+<a class="nav" href="Brief.dc.html"><span class="num">5b</span>Creative brief</a>
+<a class="nav" href="Reel.dc.html"><span class="num">06</span>Video studio</a>
+<a class="nav" href="Publish.dc.html"><span class="num">6b</span>Publish hub</a>
+<div class="eyebrow" style="padding: 14px 12px 4px">Manage</div>
+<a class="nav" href="Budget.dc.html"><span class="num">07</span>Budget &amp; ROI</a>
+<a class="nav" href="Timeline.dc.html"><span class="num">08</span>Timeline &amp; tasks</a>
+<a class="nav" href="Prioritise.dc.html"><span class="num">09</span>Prioritise &amp; risks</a>
+<a class="nav" href="Report.dc.html"><span class="num">10</span>Exec report</a>
+<div style="flex-grow: 1"></div>
+<div class="panel" style="padding: 14px; font-size: 13px; color: #b4b9c4">Brand: Kesar &amp; Co. (sample)<br>Workspace: Marketing</div>
+</nav>
+<main style="flex-grow: 1; padding: 28px 40px; box-sizing: border-box; display: flex; flex-direction: column; gap: 16px">
+<header style="display: flex; align-items: flex-start; justify-content: space-between">
+<div>
+<div class="eyebrow">Campaign · November content calendar · Sample data</div>
+<h1 class="disp" style="margin: 6px 0 0; font-size: 30px; font-weight: 600">Diwali Festive Push</h1>
+<div style="display: flex; gap: 12px; align-items: center; margin-top: 8px; font-size: 13px; color: #b4b9c4"><span>Festive sales</span><span>·</span><span>1 – 30 Nov 2026 (4 weeks)</span><span>·</span><span style="color: #5ee0c9; font-weight: 600">4 of 16 approved</span><span>·</span><a href="Brand.dc.html">Company DNA on</a></div>
+</div>
+<div style="display: flex; gap: 8px; align-items: center">
+<button class="btn" type="button">Ask Forge <span class="mono" style="font-size: 11px; color: #a3a9b5">Ctrl+K</span></button>
+<button class="btn" type="button">Share</button>
+<button class="btn" type="button" aria-label="More: regenerate, refine, change dates, duplicate, export .ics, CSV, PDF">More ▾</button>
+<a class="btn pri" href="Publish.dc.html" style="text-decoration: none">Publish / export</a>
+</div>
+</header>
+<div style="display: flex; gap: 4px; border-bottom: 1px solid #2a2e38; padding-bottom: 8px; flex-wrap: wrap">
+<a class="tab on" href="Plan.dc.html">Calendar</a><a class="tab" href="Studio.dc.html">Posts (16)</a><a class="tab" href="Studio.dc.html">Copy variants (10)</a><a class="tab" href="Studio.dc.html">Ad scripts (3)</a><a class="tab" href="Brief.dc.html">Creative briefs (3)</a><a class="tab" href="Reel.dc.html">Reel (1)</a><a class="tab" href="Score.dc.html">Readiness score</a><a class="tab" href="Budget.dc.html">Budget</a><a class="tab" href="Plan.dc.html">Review &amp; history</a>
+</div>
+<section class="panel" style="padding: 14px 18px; display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 22px">
+<div style="display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; align-items: center; gap: 12px">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="#5ee0c9" aria-hidden="true"><path d="M12 2l2.9 6.9 7.1.6-5.4 4.7 1.7 7-6.3-3.9-6.3 3.9 1.7-7L2 9.5l7.1-.6z"></path></svg>
+<span class="disp" style="font-size: 15px; font-weight: 600">Moments in this campaign ({{keyCount}})</span>
+<div style="display: flex; gap: 4px; margin-left: auto"><sc-for list="{{regions}}" as="r" hint-placeholder-count="4"><button type="button" class="{{r.cls}}" onClick="{{r.pick}}">{{r.label}}</button></sc-for></div>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<sc-for list="{{keys}}" as="k" hint-placeholder-count="5">
+<div style="display: inline-flex; align-items: center; gap: 8px; padding: 6px 8px 6px 12px; border-radius: 999px; border: 1px solid #2a5a52; background: #132724; font-size: 13px">
+<span class="mono" style="font-size: 11px; color: #5ee0c9">{{k.date}}</span><span>{{k.name}}</span><span class="mono" style="font-size: 10px; color: #a3a9b5">{{k.tag}}</span>
+<sc-if value="{{k.done}}" hint-placeholder-val="{{true}}"><span style="color: #5ee0c9; font-weight: 700; padding-right: 6px" aria-label="Post planned">✓</span></sc-if>
+<sc-if value="{{k.open}}" hint-placeholder-val="{{false}}"><button type="button" onClick="{{k.plan}}" style="min-height: 28px; border: 0; border-radius: 999px; background: #5ee0c9; color: #0d2b25; font-weight: 600; font-size: 12px; font-family: inherit; padding: 0 10px; cursor: pointer">Add content</button></sc-if>
+</div>
+</sc-for>
+<button type="button" class="btn" style="min-height: 34px; border-radius: 999px">+ Add your own date</button><a href="Dates.dc.html" style="align-self: center; font-size: 13px">Open Moments calendar</a>
+</div>
+<div style="font-size: 12px; color: #a3a9b5">Suggested because festival and sale days drive higher reach. Your own dates (launches, anniversaries) sit alongside national holidays.</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 10px; border-left: 1px solid #2a2e38; padding-left: 22px">
+<span class="disp" style="font-size: 15px; font-weight: 600">Target days</span>
+<div style="display: flex; gap: 6px"><sc-for list="{{wk}}" as="w" hint-placeholder-count="7"><button type="button" class="{{w.cls}}" onClick="{{w.pick}}" aria-pressed="{{w.on}}">{{w.label}}</button></sc-for></div>
+<div style="display: flex; gap: 8px; flex-wrap: wrap; font-size: 13px"><span class="chip n">Specific dates: 6 Nov, 13 Nov</span><span class="chip r">Blackout: 9 Nov</span></div>
+<div style="display: flex; gap: 8px; align-items: center"><button type="button" class="btn" style="min-height: 34px">Re-plan to these days</button><span style="font-size: 12px; color: #a3a9b5">{{wkNote}}</span></div>
+</div>
+</section>
+<div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap">
+<span class="chip n">All</span><span class="chip n" style="background: #eceef2; color: #14161c">Draft</span><span class="chip n">Approved</span>
+<button class="btn" type="button" style="min-height: 34px">Approve visible</button>
+<span style="width: 1px; height: 22px; background: #2a2e38"></span>
+<span class="chip n">All channels</span><span class="chip n">Instagram</span><span class="chip n">LinkedIn</span><span class="chip n">Blog</span><span class="chip n">Email</span>
+</div>
+<div style="display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 18px">
+<section class="panel" style="padding: 18px">
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px">
+<h2 class="disp" style="margin: 0; font-size: 18px; font-weight: 600">Content calendar · November 2026</h2>
+<div style="display: flex; gap: 6px"><span class="chip n" style="background: #eceef2; color: #14161c">Month</span><span class="chip n">Week</span><span class="chip n">List</span></div>
+</div>
+<div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; margin-bottom: 6px">
+<div class="eyebrow" style="text-align: center">Mon</div><div class="eyebrow" style="text-align: center">Tue</div><div class="eyebrow" style="text-align: center">Wed</div><div class="eyebrow" style="text-align: center">Thu</div><div class="eyebrow" style="text-align: center">Fri</div><div class="eyebrow" style="text-align: center">Sat</div><div class="eyebrow" style="text-align: center">Sun</div>
+</div>
+<div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px">
+<sc-for list="{{days}}" as="day" hint-placeholder-count="42">
+<div class="cell" style="{{day.cellStyle}}">
+<div style="display: flex; justify-content: space-between; align-items: center"><span class="mono" style="font-size: 11px; color: #a3a9b5">{{day.d}}</span><sc-if value="{{day.hasKey}}" hint-placeholder-val="{{false}}"><span style="font-size: 10px; font-weight: 700; color: #5ee0c9; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 110px">★ {{day.key}}</span></sc-if></div>
+<sc-for list="{{day.posts}}" as="p" hint-placeholder-count="1">
+<div class="post" style="{{p.style}}">{{p.t}}</div>
+</sc-for>
+</div>
+</sc-for>
+</div>
+<div style="display: flex; gap: 18px; margin-top: 14px; font-size: 13px; color: #b4b9c4">
+<span><span class="dot" style="background: #e8568f"></span> Instagram</span><span><span class="dot" style="background: #4a90e2"></span> LinkedIn</span><span><span class="dot" style="background: #e8913a"></span> Blog</span><span><span class="dot" style="background: #3cc4b0"></span> Email</span><span style="color: #5ee0c9">★ = moment</span>
+</div>
+</section>
+<aside style="display: flex; flex-direction: column; gap: 16px">
+<section class="panel" style="padding: 18px">
+<h2 class="disp" style="margin: 0 0 14px; font-size: 16px; font-weight: 600">Channel mix</h2>
+<div style="display: flex; gap: 18px; align-items: center">
+<div style="width: 120px; height: 120px; border-radius: 50%; background: conic-gradient(#e8568f 0 43.75%, #4a90e2 43.75% 68.75%, #e8913a 68.75% 81.25%, #3cc4b0 81.25% 100%); display: flex; align-items: center; justify-content: center; flex-shrink: 0">
+<div style="width: 82px; height: 82px; border-radius: 50%; background: #1b1e26; display: flex; flex-direction: column; align-items: center; justify-content: center"><span class="disp" style="font-size: 24px; font-weight: 600">16</span><span style="font-size: 11px; color: #a3a9b5">posts</span></div>
+</div>
+<div style="flex-grow: 1; display: flex; flex-direction: column; gap: 8px; font-size: 14px">
+<div style="display: flex; justify-content: space-between"><span><span class="dot" style="background: #e8568f"></span> Instagram</span><span class="mono">7</span></div>
+<div style="display: flex; justify-content: space-between"><span><span class="dot" style="background: #4a90e2"></span> LinkedIn</span><span class="mono">4</span></div>
+<div style="display: flex; justify-content: space-between"><span><span class="dot" style="background: #e8913a"></span> Blog</span><span class="mono">2</span></div>
+<div style="display: flex; justify-content: space-between"><span><span class="dot" style="background: #3cc4b0"></span> Email</span><span class="mono">3</span></div>
+</div>
+</div>
+<p style="margin: 12px 0 0; font-size: 12px; color: #a3a9b5">AI strategy recommended 40 / 25 / 15 / 20. Actual mix is within 5 points on every channel.</p>
+</section>
+<a href="Score.dc.html" class="panel" style="padding: 18px; display: flex; gap: 16px; align-items: center; text-decoration: none; color: #eceef2">
+<div style="width: 84px; height: 84px; border-radius: 50%; background: conic-gradient(#5ee0c9 0 78%, #2a2e38 78% 100%); display: flex; align-items: center; justify-content: center; flex-shrink: 0"><div style="width: 66px; height: 66px; border-radius: 50%; background: #1b1e26; display: flex; align-items: center; justify-content: center" class="disp"><span style="font-size: 24px; font-weight: 600">78</span></div></div>
+<div><div class="disp" style="font-size: 16px; font-weight: 600">Readiness score</div><div style="font-size: 13px; color: #b4b9c4; margin-top: 4px">3 quick fixes would lift it to about 90. Open review</div></div>
+</a>
+<section class="panel" style="padding: 18px">
+<h2 class="disp" style="margin: 0 0 12px; font-size: 16px; font-weight: 600">Status workflow</h2>
+<div style="display: flex; flex-direction: column; gap: 8px; font-size: 14px">
+<div style="display: flex; justify-content: space-between"><span>Draft</span><span class="mono">5</span></div>
+<div style="display: flex; justify-content: space-between"><span>In review</span><span class="mono">3</span></div>
+<div style="display: flex; justify-content: space-between"><span>Approved</span><span class="mono">4</span></div>
+<div style="display: flex; justify-content: space-between"><span>Scheduled</span><span class="mono">4</span></div>
+<div style="display: flex; justify-content: space-between"><span>Published</span><span class="mono">0</span></div>
+</div>
+</section>
+<section class="panel" style="padding: 18px">
+<h2 class="disp" style="margin: 0 0 10px; font-size: 16px; font-weight: 600">Assets</h2>
+<div style="display: flex; flex-wrap: wrap; gap: 8px"><span class="chip n">3 ad scripts</span><span class="chip n">10 copy variants</span><span class="chip n">3 creative briefs</span><span class="chip n">1 reel</span></div>
+</section>
+</aside>
+</div>
+<section class="panel" style="padding: 16px 18px; display: flex; gap: 12px; align-items: center; border-color: #3a4a47">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#5ee0c9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"></path></svg>
+<label for="steer" class="disp" style="font-weight: 600; font-size: 15px; white-space: nowrap">Refine with AI</label>
+<input id="steer" class="fld" style="flex-grow: 1" placeholder="e.g. Make week 2 more festive and add two LinkedIn posts for corporate gifting">
+<select class="fld" aria-label="Scope" style="width: 190px"><option>Whole plan</option><option>Selected week</option><option>Selected post</option></select>
+<button class="btn pri" type="button">Apply changes</button>
+</section>
+<p style="margin: 0; font-size: 12px; color: #a3a9b5">Refinements keep approved posts locked and show a before / after diff to accept or discard. Company DNA rules are applied automatically.</p>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1340}}'>
+class Component extends DCLogic {
+constructor(p) { super(p); this.state = { region: 'all', planned: {}, wk: { Tue: 1, Thu: 1, Sat: 1 } }; }
+renderVals() {
+var self = this;
+var C = { ig: '#7a2748', li: '#1f4b7a', bl: '#7a4a1c', em: '#17564d' };
+var P = {
+2: [['ig', 'Countdown reel']], 4: [['em', 'Pre-orders open']], 5: [['li', 'Corporate gifting']],
+7: [['ig', 'Inside our kitchen']], 8: [['ig', 'Happy Diwali']], 9: [['bl', 'Sweets pairing guide']],
+11: [['ig', 'Customer stories']], 12: [['li', 'Gifting case study']], 14: [['em', 'Thank-you offer']],
+16: [['ig', 'Wedding season box']], 18: [['bl', 'Our ghee story']], 19: [['li', 'Year-end gifting']],
+21: [['ig', 'Your photos, reposted']], 23: [['em', 'Wedding catalogue']], 25: [['li', 'Client testimonial']],
+28: [['ig', 'Weekend offer']]
+};
+var K = [
+{ d: 8, name: 'Diwali', tag: 'INDIA', region: 'india', covered: true },
+{ d: 14, name: "Children's Day", tag: 'INDIA', region: 'india', post: ['ig', "Kids' mithai box"] },
+{ d: 20, name: 'Kesar & Co. anniversary', tag: 'YOUR DATE', region: 'mine', post: ['ig', 'Anniversary thank-you'] },
+{ d: 27, name: 'Black Friday', tag: 'GLOBAL', region: 'global', post: ['em', 'Black Friday gift offer'] },
+{ d: 30, name: 'Cyber Monday', tag: 'GLOBAL', region: 'global', post: ['li', 'Online-only gift box'] }
+];
+var reg = this.state.region;
+var shown = K.filter(function (k) { return reg === 'all' || k.region === reg; });
+var keyByDay = {};
+shown.forEach(function (k) { keyByDay[k.d] = k; });
+var keys = shown.map(function (k) {
+var done = !!k.covered || !!self.state.planned[k.d];
+return { date: k.d + ' Nov', name: k.name, tag: k.tag, done: done, open: !done, plan: function () { var n = Object.assign({}, self.state.planned); n[k.d] = true; self.setState({ planned: n }); } };
+});
+var regions = [['all', 'All'], ['india', 'India'], ['global', 'Global'], ['mine', 'Mine']].map(function (r) {
+return { label: r[1], cls: reg === r[0] ? 'chip btnsel' : 'chip btnoff', pick: function () { self.setState({ region: r[0] }); } };
+});
+var WD = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+var wk = WD.map(function (w) {
+var on = !!self.state.wk[w];
+return { label: w, on: on ? 'true' : 'false', cls: on ? 'wd on' : 'wd', pick: function () { var n = Object.assign({}, self.state.wk); if (n[w]) delete n[w]; else n[w] = 1; self.setState({ wk: n }); } };
+});
+var onDays = WD.filter(function (w) { return self.state.wk[w]; });
+var days = [];
+[26, 27, 28, 29, 30, 31].forEach(function (d) { days.push({ d: d, posts: [], hasKey: false, key: '', cellStyle: 'opacity: .35' }); });
+for (var d = 1; d <= 30; d++) {
+var list = (P[d] || []).slice();
+var k = keyByDay[d];
+if (k && k.post && self.state.planned[d]) list.push(k.post);
+var posts = list.map(function (p) { return { t: p[1], style: 'background: ' + C[p[0]] }; });
+days.push({ d: d, posts: posts, hasKey: !!k, key: k ? k.name : '', cellStyle: k ? 'border-color: #2a5a52; background: #132724' : '' });
+}
+for (var e = 1; e <= 6; e++) days.push({ d: e, posts: [], hasKey: false, key: '', cellStyle: 'opacity: .35' });
+return {
+days: days, keys: keys, keyCount: shown.length, regions: regions, wk: wk,
+wkNote: onDays.length ? 'New and moved posts land on ' + onDays.join(', ') + '. Moments always keep their post.' : 'No days selected: AI picks the days.'
+};
+}
+}
+</script>
+</body>
+</html>

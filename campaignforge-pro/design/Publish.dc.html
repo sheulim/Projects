@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Publish hub</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=DM+Sans:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap">
+<style>
+body{margin:0;background:#14161c;color:#eceef2;font-family:'DM Sans',system-ui,sans-serif}
+a{color:#f2a93b}a:hover{color:#ffc46b}
+.nav{display:flex;align-items:center;gap:10px;min-height:40px;padding:0 12px;border-radius:8px;color:#b4b9c4;text-decoration:none;font-size:14px}
+.nav:hover{background:#1b1e26;color:#eceef2}
+.nav.on{background:#2e2514;color:#f2a93b;font-weight:600}
+.num{font-family:'JetBrains Mono',monospace;font-size:11px;color:#7d8391;width:18px}
+.panel{background:#1b1e26;border:1px solid #2a2e38;border-radius:12px}
+.eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#a3a9b5}
+.disp{font-family:'Space Grotesk',sans-serif}
+.mono{font-family:'JetBrains Mono',monospace}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;padding:0 16px;border-radius:8px;font-weight:600;font-size:14px;font-family:inherit;border:1px solid #343945;background:#1f232c;color:#eceef2;cursor:pointer;text-decoration:none}
+.btn.pri{background:#f2a93b;border-color:#f2a93b;color:#1a1305}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:2px 9px;border-radius:999px;font-size:11px;font-weight:600;white-space:nowrap}
+.g{background:#123a33;color:#5ee0c9}.a{background:#3d2f12;color:#f7be5f}.n{background:#262a33;color:#c3c8d2}.b{background:#1c3350;color:#9cc5f5}
+.ch{display:flex;align-items:center;gap:10px;width:100%;min-height:56px;padding:8px 12px;border-radius:10px;border:1px solid transparent;background:transparent;color:#eceef2;font-family:inherit;font-size:14px;text-align:left;cursor:pointer}
+.ch.on{background:#232733;border-color:#3a3f4c}
+.th{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#a3a9b5;text-align:left;padding:9px 10px;border-bottom:1px solid #2a2e38;font-weight:500}
+.td{padding:10px;border-bottom:1px solid #23262f;font-size:13px;vertical-align:top}
+.mode{flex:1;min-height:40px;border-radius:8px;border:1px solid #343945;background:transparent;color:#c3c8d2;font-weight:600;font-size:13px;font-family:inherit;cursor:pointer}
+.mode.on{background:#f2a93b;border-color:#f2a93b;color:#1a1305}
+</style>
+</helmet>
+<div style="width: 1440px; height: 1400px; display: flex; background: #14161c">
+<nav style="width: 232px; flex-shrink: 0; background: #101218; border-right: 1px solid #262a33; padding: 24px 14px; box-sizing: border-box; display: flex; flex-direction: column; gap: 4px">
+<div style="display: flex; align-items: center; gap: 10px; padding: 0 10px 20px">
+<div style="width: 30px; height: 30px; border-radius: 8px; background: #f2a93b; display: flex; align-items: center; justify-content: center; color: #1a1305; font: 700 15px 'Space Grotesk',sans-serif">CF</div>
+<div class="disp" style="font-size: 17px; font-weight: 600">CampaignForge <span style="color: #f2a93b">Pro</span></div>
+</div>
+<a class="nav" href="Main.dc.html"><span class="num">01</span>Portfolio</a>
+<a class="nav" href="Brand.dc.html"><span class="num">02</span>Company DNA</a>
+<a class="nav" href="Dates.dc.html"><span class="num">2b</span>Moments calendar</a>
+<div class="eyebrow" style="padding: 14px 12px 4px">Create</div>
+<a class="nav" href="New.dc.html"><span class="num">+</span>New campaign</a>
+<a class="nav" href="Plan.dc.html"><span class="num">03</span>Plan workspace</a>
+<a class="nav" href="Score.dc.html"><span class="num">04</span>Readiness score</a>
+<a class="nav" href="Studio.dc.html"><span class="num">05</span>Post studio</a>
+<a class="nav" href="Brief.dc.html"><span class="num">5b</span>Creative brief</a>
+<a class="nav" href="Reel.dc.html"><span class="num">06</span>Video studio</a>
+<a class="nav on" href="Publish.dc.html"><span class="num">6b</span>Publish hub</a>
+<div class="eyebrow" style="padding: 14px 12px 4px">Manage</div>
+<a class="nav" href="Budget.dc.html"><span class="num">07</span>Budget &amp; ROI</a>
+<a class="nav" href="Timeline.dc.html"><span class="num">08</span>Timeline &amp; tasks</a>
+<a class="nav" href="Prioritise.dc.html"><span class="num">09</span>Prioritise &amp; risks</a>
+<a class="nav" href="Report.dc.html"><span class="num">10</span>Exec report</a>
+<div style="flex-grow: 1"></div>
+<div class="panel" style="padding: 14px; font-size: 13px; color: #b4b9c4">Brand: Kesar &amp; Co. (sample)<br>Workspace: Marketing</div>
+</nav>
+<main style="flex-grow: 1; padding: 32px 40px; box-sizing: border-box; display: flex; flex-direction: column; gap: 18px">
+<header style="display: flex; align-items: flex-end; justify-content: space-between">
+<div>
+<div class="eyebrow">Diwali Festive Push · every channel, ready to post · Sample data</div>
+<h1 class="disp" style="margin: 6px 0 0; font-size: 32px; font-weight: 600">Publish hub</h1>
+<p style="margin: 6px 0 0; color: #b4b9c4; font-size: 15px">Each approved post is generated in the exact format each platform needs, checked against its rules, then auto-posted or exported as a ready-to-upload package.</p>
+</div>
+<div style="display: flex; gap: 10px">
+<button class="btn" type="button">Export all (.zip)</button>
+<button class="btn pri" type="button">Schedule all ready</button>
+</div>
+</header>
+<section style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px">
+<div class="panel" style="padding: 14px"><div class="eyebrow">Assets</div><div class="disp" style="font-size: 26px; font-weight: 600; margin-top: 6px">44</div><div style="font-size: 12px; color: #a3a9b5">from 16 planned posts, 9 channels</div></div>
+<div class="panel" style="padding: 14px"><div class="eyebrow">Ready</div><div class="disp" style="font-size: 26px; font-weight: 600; margin-top: 6px; color: #5ee0c9">30</div><div style="font-size: 12px; color: #a3a9b5">approved + checks passed</div></div>
+<div class="panel" style="padding: 14px"><div class="eyebrow">Needs fix</div><div class="disp" style="font-size: 26px; font-weight: 600; margin-top: 6px; color: #f7be5f">3</div><div style="font-size: 12px; color: #a3a9b5">failed a platform check</div></div>
+<div class="panel" style="padding: 14px"><div class="eyebrow">Scheduled</div><div class="disp" style="font-size: 26px; font-weight: 600; margin-top: 6px">9</div><div style="font-size: 12px; color: #a3a9b5">local time per market</div></div>
+<div class="panel" style="padding: 14px"><div class="eyebrow">Published</div><div class="disp" style="font-size: 26px; font-weight: 600; margin-top: 6px">2</div><div style="font-size: 12px; color: #a3a9b5">results feed Budget &amp; ROI</div></div>
+</section>
+<div style="display: grid; grid-template-columns: 250px minmax(0, 1fr) 330px; gap: 18px; flex-grow: 1">
+<section class="panel" style="padding: 10px; display: flex; flex-direction: column; gap: 4px">
+<div class="eyebrow" style="padding: 8px 10px">Channels</div>
+<sc-for list="{{channels}}" as="c" hint-placeholder-count="10">
+<button type="button" class="{{c.cls}}" onClick="{{c.pick}}"><span style="width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; {{c.dot}}"></span><span style="flex-grow: 1"><span style="display: block; font-weight: 600">{{c.name}}</span><span style="display: block; font-size: 12px; color: #a3a9b5">{{c.conn}}</span></span><span class="mono" style="font-size: 12px; color: #a3a9b5">{{c.count}}</span></button>
+</sc-for>
+<button type="button" class="btn" style="margin: 8px 6px 0">+ Connect a channel</button>
+</section>
+<section style="display: flex; flex-direction: column; gap: 16px">
+<div class="panel" style="padding: 6px 8px 8px">
+<div style="display: flex; justify-content: space-between; align-items: center; margin: 12px 10px 6px"><h2 class="disp" style="margin: 0; font-size: 18px; font-weight: 600">{{sel.name}} formats</h2><span style="font-size: 12px; color: #a3a9b5">Specs from a maintained platform-spec table</span></div>
+<table style="width: 100%; border-collapse: collapse">
+<thead><tr><th class="th">Format</th><th class="th">Spec</th><th class="th">What is generated</th><th class="th">Check</th></tr></thead>
+<tbody>
+<sc-for list="{{sel.formats}}" as="f" hint-placeholder-count="4">
+<tr><td class="td" style="font-weight: 600">{{f.name}}</td><td class="td mono" style="font-size: 12px">{{f.spec}}</td><td class="td" style="color: #b4b9c4">{{f.gen}}</td><td class="td"><span class="{{f.cls}}">{{f.check}}</span></td></tr>
+</sc-for>
+</tbody>
+</table>
+</div>
+<div class="panel" style="padding: 18px; display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; justify-content: space-between; align-items: center"><span class="eyebrow">Preview · {{sel.pvTitle}}</span><a href="{{sel.editLink}}" style="font-size: 13px">Edit</a></div>
+<div style="display: flex; gap: 16px; align-items: flex-start">
+<div style="{{sel.pvMedia}}"><span style="font-size: 12px; color: #f4e3cf; text-align: center; padding: 10px">{{sel.pvMediaLabel}}</span></div>
+<div style="flex-grow: 1; display: flex; flex-direction: column; gap: 8px">
+<p style="margin: 0; font-size: 14px; line-height: 1.55; white-space: pre-line">{{sel.pvText}}</p>
+<span class="mono" style="font-size: 12px; color: #a3a9b5">{{sel.pvMeta}}</span>
+</div>
+</div>
+</div>
+</section>
+<aside style="display: flex; flex-direction: column; gap: 16px">
+<div class="panel" style="padding: 18px; display: flex; flex-direction: column; gap: 12px">
+<span class="disp" style="font-size: 16px; font-weight: 600">How {{sel.name}} posts go out</span>
+<div style="display: flex; gap: 6px"><sc-for list="{{modes}}" as="m" hint-placeholder-count="3"><button type="button" class="{{m.cls}}" onClick="{{m.pick}}">{{m.label}}</button></sc-for></div>
+<p style="margin: 0; font-size: 13px; line-height: 1.55; color: #dfe2e8">{{modeNote}}</p>
+</div>
+<div class="panel" style="padding: 18px">
+<div class="eyebrow" style="margin-bottom: 10px">Export package contains</div>
+<ul style="margin: 0; padding-left: 18px; font-size: 13px; line-height: 1.7; color: #dfe2e8">
+<sc-for list="{{sel.pkg}}" as="p" hint-placeholder-count="5"><li>{{p}}</li></sc-for>
+</ul>
+</div>
+<div class="panel" style="padding: 18px">
+<div class="eyebrow" style="margin-bottom: 10px">Before anything is posted</div>
+<ul style="margin: 0; padding-left: 18px; font-size: 13px; line-height: 1.7; color: #dfe2e8">
+<li>Post is approved by a reviewer</li>
+<li>Company DNA guardrails pass</li>
+<li>Platform size, length and text checks pass</li>
+<li>Tracked link (UTM) added for ROI</li>
+<li>Posted in the market’s local time</li>
+</ul>
+</div>
+</aside>
+</div>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1400}}'>
+class Component extends DCLogic {
+constructor(p) { super(p); this.state = { ch: 'ig', mode: {} }; }
+renderVals() {
+var self = this;
+var ok = 'chip g', warn = 'chip a';
+var CH = {
+ig: { name: 'Instagram', dot: '#e8568f', conn: 'Connected · business account', count: 11, def: 'auto', link: 'Reel.dc.html',
+formats: [['Reel', '9:16 · 1080×1920', 'Video, AI voiceover, burned-in captions, cover frame', ok, 'Pass'], ['Feed post', '4:5 · 1080×1350', 'Image from brief concept, caption, hashtags, alt text', ok, 'Pass'], ['Carousel', '4:5 · multi-slide', 'Slides from post copy, caption', warn, 'Text over 20% on slide 3'], ['Story', '9:16 · 1080×1920', 'Image or clip with sticker text and link', ok, 'Pass']],
+pv: ['Reel · 2 Nov', 'width: 120px; height: 213px; border-radius: 10px; background: #2a1a12; display: flex; align-items: flex-end; flex-shrink: 0', '9:16 reel\n24 s · voiceover', 'Six days to Diwali. Every box rolled by hand at 5 am. Pre-order yours. T&C apply.\n#Diwali #KesarAndCo #HyderabadSweets', 'Caption 88 characters · 3 hashtags · captions on'],
+pkg: ['reel.mp4 (1080×1920) + cover.jpg', 'caption.txt with hashtags', 'captions.srt', 'alt-text.txt', 'post-time.txt (local time)'] },
+fb: { name: 'Facebook', dot: '#4a90e2', conn: 'Connected · page', count: 7, def: 'auto', link: 'Studio.dc.html',
+formats: [['Image post', '4:5 or 1:1', 'Image, caption, link with tracking', ok, 'Pass'], ['Link post', '1.91:1 · 1200×630', 'Link preview image, headline, description', ok, 'Pass'], ['Reel', '9:16 · 1080×1920', 'Same video as Instagram, recaptioned', ok, 'Pass'], ['Event', 'Cover 1920×1005', 'Event title, time, details, cover', ok, 'Pass']],
+pv: ['Image post · 5 Nov', 'width: 170px; height: 170px; border-radius: 10px; background: #33190f; display: flex; align-items: flex-end; flex-shrink: 0', '1:1 image', 'Gift your family something made by hand this Diwali. Small-batch boxes, delivered before the diyas are lit.\nPre-order: [TRACKED LINK]', '152 characters · link tracked'],
+pkg: ['image.jpg (1080×1350)', 'post.txt with link', 'alt-text.txt', 'post-time.txt'] },
+yt: { name: 'YouTube', dot: '#ff6b6b', conn: 'Connected · channel', count: 4, def: 'schedule', link: 'Reel.dc.html',
+formats: [['Long-form video', '16:9 · 1920×1080', 'Script, scenes, AI voiceover, music, chapters', ok, 'Pass'], ['Shorts', '9:16 · 1080×1920', 'Cut-down of the video with voiceover', ok, 'Pass'], ['Thumbnail', '16:9 · 1280×720', 'Title text over the key frame', warn, 'Title text too small on mobile'], ['Metadata', 'Title · description · tags', 'SEO title, description with chapters and links', ok, 'Pass']],
+pv: ['Long-form · 6 Nov', 'width: 200px; height: 113px; border-radius: 10px; background: #3b0d0c; display: flex; align-items: flex-end; flex-shrink: 0', '16:9 · 3 min 40 s', 'How we make 1,000 Diwali boxes by hand | Kesar & Co.\n00:00 The 5 am start · 00:45 Pure ghee · 02:10 Packing the boxes', 'Voice: warm female, Indian English · captions in English + Hindi'],
+pkg: ['video.mp4 (1920×1080)', 'thumbnail.jpg (1280×720)', 'title-description-tags.txt', 'captions .srt in each language', 'Uploads as private until approved'] },
+x: { name: 'X', dot: '#c3c8d2', conn: 'Export only · not connected', count: 6, def: 'export', link: 'Studio.dc.html',
+formats: [['Post', 'Up to 280 characters', 'Short copy, 1–2 hashtags, link', ok, 'Pass'], ['Thread', 'Numbered posts', 'Blog or brief turned into a 4–6 post thread', ok, 'Pass'], ['Image', '16:9 · 1600×900', 'Crop of the campaign concept', ok, 'Pass'], ['Video', '16:9 or 1:1', 'Trimmed clip with captions', ok, 'Pass']],
+pv: ['Post · 7 Nov', 'width: 170px; height: 96px; border-radius: 10px; background: #2b1a1f; display: flex; align-items: flex-end; flex-shrink: 0', '16:9 image', 'Rolled at 5 am. On your table by Diwali. Small-batch sweets from Hyderabad. [TRACKED LINK] #Diwali', '94 / 280 characters'],
+pkg: ['post.txt (or thread.txt)', 'image.jpg (1600×900)', 'alt-text.txt', 'post-time.txt'] },
+li: { name: 'LinkedIn', dot: '#1f7ac7', conn: 'Connected · company page', count: 5, def: 'auto', link: 'Studio.dc.html',
+formats: [['Text + image', '1.91:1 · 1200×627', 'Professional copy, image, link', ok, 'Pass'], ['Document carousel', 'PDF · 4:5 pages', 'Corporate gifting guide as slides', ok, 'Pass'], ['Video', '16:9 or 1:1', 'Short cut with captions', ok, 'Pass']],
+pv: ['Text + image · 5 Nov', 'width: 190px; height: 100px; border-radius: 10px; background: #1f2a3a; display: flex; align-items: flex-end; flex-shrink: 0', '1200×627', 'Gifting your team this Diwali? Our small-batch boxes are made the morning they ship. Bulk orders from 50 boxes. [TRACKED LINK]', '139 characters · company page'],
+pkg: ['image.jpg (1200×627) or guide.pdf', 'post.txt', 'post-time.txt'] },
+em: { name: 'Email', dot: '#3cc4b0', conn: 'Export to email tool', count: 3, def: 'export', link: 'Studio.dc.html',
+formats: [['Campaign email', 'Subject + preview text', 'Subject lines (A/B), preview text', ok, 'Pass'], ['Body', 'HTML · 600 px wide', 'Responsive HTML with hero image and CTA', ok, 'Pass'], ['Plain text', '.txt', 'Plain-text version for deliverability', ok, 'Pass']],
+pv: ['Email · 4 Nov', 'width: 150px; height: 110px; border-radius: 10px; background: #17564d; display: flex; align-items: flex-end; flex-shrink: 0', 'Hero 600 px', 'Subject A: Your Diwali box, made this morning\nSubject B: Pre-orders are open, share the sweetness', 'Preview text 62 characters'],
+pkg: ['email.html', 'email.txt', 'subjects.csv (A/B)', 'hero.jpg'] }
+};
+CH.tt = { name: 'TikTok', dot: '#f2a93b', conn: 'Non-India markets only', count: 0, def: 'export', link: 'Reel.dc.html',
+formats: [['Video', '9:16 · 1080×1920', 'Vertical cut with voiceover, on-screen text, captions', ok, 'Pass'], ['Caption', 'Text + hashtags', 'Short hook caption and hashtags', ok, 'Pass']],
+pv: ['Not in this campaign', 'width: 120px; height: 213px; border-radius: 10px; background: #262a33; display: flex; align-items: flex-end; flex-shrink: 0', '9:16 video', 'TikTok is switched off for India targeting. Add a UAE, UK or US market to generate TikTok versions of the reel.', 'Enabled per market'],
+pkg: ['video.mp4 (1080×1920)', 'caption.txt', 'captions.srt', 'post-time.txt'] };
+CH.bl = { name: 'Blog', dot: '#e8913a', conn: 'Export · website CMS', count: 2, def: 'export', link: 'Studio.dc.html',
+formats: [['Article', '800–1,200 words', 'SEO title, headings, body, internal links', ok, 'Pass'], ['Meta', 'Title + description', 'Meta title, meta description, URL slug', ok, 'Pass'], ['Header image', '16:9 · 1600×900', 'From the brief concept, with alt text', ok, 'Pass']],
+pv: ['Article · 9 Nov', 'width: 190px; height: 107px; border-radius: 10px; background: #7a4a1c; display: flex; align-items: flex-end; flex-shrink: 0', '16:9 header', 'The Diwali sweets pairing guide: what to serve with chai, coffee and after dinner', '1,050 words · meta description 148 characters'],
+pkg: ['article.html and article.md', 'meta.txt (title, description, slug)', 'header.jpg + alt text'] };
+CH.ga = { name: 'Google Ads', dot: '#b5d33d', conn: 'Export · bulk upload file', count: 4, def: 'export', link: 'Budget.dc.html',
+formats: [['Responsive search ad', 'Headlines 30 · descriptions 90 characters', 'Up to 15 headlines, 4 descriptions, keywords', ok, 'Pass'], ['Display ad', 'Landscape + square images', 'Images, logo, short and long headlines', warn, 'Missing square logo'], ['YouTube ad', '16:9 video', 'Cut from the YouTube video with CTA', ok, 'Pass']],
+pv: ['Search ad · 1 Nov', 'width: 0; height: 0; display: none', '', 'Diwali Gift Boxes | Made This Morning | Kesar & Co.\nSmall-batch sweets in pure ghee. Same-day delivery in [CITY]. Pre-order today.', 'Headline 30 / 30 · description 83 / 90 · budget from Budget planner'],
+pkg: ['ads.csv for bulk upload', 'keywords.csv', 'images (landscape, square)', 'budget split from the Budget planner'] };
+CH.wa = { name: 'WhatsApp', dot: '#3cc47a', conn: 'Export · business messaging tool', count: 2, def: 'export', link: 'Studio.dc.html',
+formats: [['Broadcast message', 'Template text + image', 'Opt-in customers only; approved template wording', ok, 'Pass'], ['Status', '9:16 image or clip', 'Same as Instagram story', ok, 'Pass']],
+pv: ['Broadcast · 4 Nov', 'width: 120px; height: 120px; border-radius: 10px; background: #17564d; display: flex; align-items: flex-end; flex-shrink: 0', 'Image', 'Hi [NAME], Diwali pre-orders are open. Your box is made the morning it ships. Reply 1 to order.', 'Sent only to customers who opted in'],
+pkg: ['message.txt (template)', 'image.jpg', 'audience.csv (opted-in only)'] };
+var keys = ['ig', 'fb', 'yt', 'x', 'li', 'tt', 'bl', 'ga', 'em', 'wa'];
+var channels = keys.map(function (k) { var c = CH[k]; return { name: c.name, conn: c.conn, count: c.count, dot: 'background: ' + c.dot, cls: self.state.ch === k ? 'ch on' : 'ch', pick: function () { self.setState({ ch: k }); } }; });
+var c = CH[this.state.ch];
+var mode = this.state.mode[this.state.ch] || c.def;
+var notes = { auto: 'Auto-post: goes out through the connected account at the scheduled local time, only after approval.', schedule: 'Schedule for review: uploaded as private or draft on the platform; a person makes it live.', export: 'Export package: download a ready-to-upload folder for this post, or send it to your scheduling tool.' };
+var modes = [['auto', 'Auto-post'], ['schedule', 'Draft on platform'], ['export', 'Export']].map(function (m) { return { label: m[1], cls: mode === m[0] ? 'mode on' : 'mode', pick: function () { var n = Object.assign({}, self.state.mode); n[self.state.ch] = m[0]; self.setState({ mode: n }); } }; });
+return {
+channels: channels, modes: modes, modeNote: notes[mode],
+sel: {
+name: c.name, editLink: c.link,
+formats: c.formats.map(function (f) { return { name: f[0], spec: f[1], gen: f[2], cls: f[3], check: f[4] }; }),
+pvTitle: c.pv[0], pvMedia: c.pv[1], pvMediaLabel: c.pv[2], pvText: c.pv[3], pvMeta: c.pv[4], pkg: c.pkg
+}
+};
+}
+}
+</script>
+</body>
+</html>

@@ -1,10 +1,11 @@
-# BudgetSense Voice is a single static page; no build step is needed.
+# Netlify: serve the CampaignForge Pro site as-is at the root (index.html is prebuilt),
+# and the BudgetSense Voice prototype at /budgetsense/.
 [build]
-  publish = "budgetsense"
-  command = "echo 'Static site: nothing to build'"
+  publish = "_site"
+  command = "rm -rf _site && mkdir -p _site/budgetsense && cp -R campaignforge-pro/site/. _site/ && cp budgetsense/index.html _site/budgetsense/index.html"
 
-# Allow the microphone on the deployed page.
+# BudgetSense records voice notes, so allow the microphone on its pages.
 [[headers]]
-  for = "/*"
+  for = "/budgetsense/*"
   [headers.values]
     Permissions-Policy = "microphone=(self)"

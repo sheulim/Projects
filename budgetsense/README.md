@@ -8,7 +8,7 @@ A voice-first version of the BudgetSense MVP (see *05_BudgetSense_MVP_Playbook*)
 2. Allow microphone access when asked.
 3. New users: start with **Take the 2-minute voice tour**. It narrates each screen on sample figures and saves nothing. Then choose **Speak my plan** or **Build it by hand**. **Me → Guided voice demo** plays a full month by voice without a microphone.
 
-To share it with others, host the single file on any static host (Netlify, GitHub Pages). The microphone needs an `https://` address or a local file.
+On this repo's Netlify site, BudgetSense is served at `/budgetsense/` (CampaignForge Pro stays at the root). To share it elsewhere, host the single file on any static host (Netlify, GitHub Pages). The microphone needs an `https://` address or a local file.
 
 ## What it does
 

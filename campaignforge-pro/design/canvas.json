@@ -1,0 +1,170 @@
+{
+ "v": 3,
+ "attachments": {},
+ "boards": {
+  "Brand.dc.html": {
+   "h": 1200,
+   "is_interactive": true,
+   "title": "02 Company DNA",
+   "w": 1440,
+   "x": 1520,
+   "y": 0
+  },
+  "Brief.dc.html": {
+   "h": 1400,
+   "is_interactive": true,
+   "title": "5b Creative brief · concept images",
+   "w": 1440,
+   "x": 4560,
+   "y": 1900
+  },
+  "Budget.dc.html": {
+   "h": 1620,
+   "is_interactive": true,
+   "title": "07 Budget planner & ROI",
+   "w": 1440,
+   "x": 0,
+   "y": 3680
+  },
+  "Dates.dc.html": {
+   "h": 1400,
+   "is_interactive": true,
+   "title": "2b Moments calendar · India & global",
+   "w": 1440,
+   "x": 3040,
+   "y": 0
+  },
+  "Main.dc.html": {
+   "h": 1540,
+   "is_interactive": true,
+   "title": "01 Portfolio command centre",
+   "w": 1440,
+   "x": 0,
+   "y": 0
+  },
+  "New.dc.html": {
+   "h": 1300,
+   "is_interactive": true,
+   "title": "+ New campaign & plan build",
+   "w": 1440,
+   "x": 4560,
+   "y": 0
+  },
+  "Plan.dc.html": {
+   "h": 1340,
+   "is_interactive": true,
+   "title": "03 Plan workspace · moments & target days",
+   "w": 1440,
+   "x": 0,
+   "y": 1900
+  },
+  "Prioritise.dc.html": {
+   "h": 1200,
+   "is_interactive": true,
+   "title": "09 Prioritise & risks",
+   "w": 1440,
+   "x": 3040,
+   "y": 3680
+  },
+  "Publish.dc.html": {
+   "h": 1400,
+   "is_interactive": true,
+   "title": "6b Publish hub · all channels",
+   "w": 1440,
+   "x": 7600,
+   "y": 1900
+  },
+  "Reel.dc.html": {
+   "h": 1200,
+   "is_interactive": true,
+   "title": "06 Video studio · reels, Shorts, YouTube",
+   "w": 1440,
+   "x": 6080,
+   "y": 1900
+  },
+  "Report.dc.html": {
+   "h": 1200,
+   "is_interactive": true,
+   "title": "10 Executive status report",
+   "w": 1440,
+   "x": 4560,
+   "y": 3680
+  },
+  "Score.dc.html": {
+   "h": 1200,
+   "is_interactive": true,
+   "title": "04 Readiness score",
+   "w": 1440,
+   "x": 1520,
+   "y": 1900
+  },
+  "Studio.dc.html": {
+   "h": 1200,
+   "is_interactive": true,
+   "title": "05 Post studio",
+   "w": 1440,
+   "x": 3040,
+   "y": 1900
+  },
+  "Timeline.dc.html": {
+   "h": 1200,
+   "is_interactive": true,
+   "title": "08 Timeline & tasks",
+   "w": 1440,
+   "x": 1520,
+   "y": 3680
+  }
+ },
+ "createdOnFiles": {
+  "at": "2026-09-27T17:59:12Z",
+  "v": 1
+ },
+ "designSystems": [],
+ "launch": {
+  "view": "canvas"
+ },
+ "notes": {
+  "t1": {
+   "kind": "title1",
+   "maxW": 6000,
+   "text": "Start here — portfolio, Company DNA, moments, new campaign",
+   "w": 240,
+   "x": 0,
+   "y": -300
+  },
+  "t2": {
+   "kind": "title1",
+   "maxW": 8000,
+   "text": "Create & publish — plan, readiness, create, and ready-to-post output for every channel",
+   "w": 240,
+   "x": 0,
+   "y": 1620
+  },
+  "t3": {
+   "kind": "title1",
+   "maxW": 6000,
+   "text": "Manage — budget planning and portfolio features",
+   "w": 240,
+   "x": 0,
+   "y": 3400
+  }
+ },
+ "order": [
+  "Main.dc.html",
+  "Brand.dc.html",
+  "Dates.dc.html",
+  "New.dc.html",
+  "Plan.dc.html",
+  "Score.dc.html",
+  "Studio.dc.html",
+  "Brief.dc.html",
+  "Reel.dc.html",
+  "Publish.dc.html",
+  "Budget.dc.html",
+  "Timeline.dc.html",
+  "Prioritise.dc.html",
+  "Report.dc.html"
+ ],
+ "pages": [],
+ "title": "CampaignForge Pro"
+}
