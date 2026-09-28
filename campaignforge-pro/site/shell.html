@@ -41,6 +41,27 @@ body{margin:0;color:var(--ink);font-family:'DM Sans',system-ui,sans-serif;overfl
   #stage .app h1{font-size:26px !important}
   #stage .app main .disp[style*="font-size: 30px"], #stage .app main .disp[style*="font-size: 26px"]{font-size:22px !important}
 }
+/* Voice-guided tour */
+.tour-hl{outline:3px solid #f2a93b !important;outline-offset:4px;border-radius:12px;box-shadow:0 0 0 9999px rgba(8,9,12,.55) !important;position:relative;z-index:40;transition:outline-color .2s}
+#tour{position:fixed;z-index:60;right:20px;bottom:calc(20px + env(safe-area-inset-bottom,0px));width:380px;max-width:calc(100vw - 32px);background:#1b1e26;border:1px solid #3a3f4c;border-radius:16px;box-shadow:0 18px 50px rgba(0,0,0,.5);padding:18px;color:#eceef2;font-family:'DM Sans',system-ui,sans-serif}
+#tour[hidden]{display:none}
+#tour .t-top{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+#tour .t-dot{width:10px;height:10px;border-radius:50%;background:#5ee0c9;flex-shrink:0}
+#tour .t-dot.talk{animation:tpulse 1s ease-in-out infinite}
+@keyframes tpulse{50%{opacity:.3;transform:scale(.8)}}
+@media (prefers-reduced-motion:reduce){#tour .t-dot.talk{animation:none}}
+#tour .t-step{font:500 11px 'JetBrains Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:#a3a9b5}
+#tour .t-title{font:600 17px 'Space Grotesk',sans-serif;margin:0 0 6px}
+#tour .t-text{font-size:14px;line-height:1.55;color:#dfe2e8;margin:0;max-height:34vh;overflow:auto}
+#tour .t-bar{height:4px;border-radius:2px;background:#2a2e38;margin:12px 0}
+#tour .t-bar div{height:4px;border-radius:2px;background:#f2a93b;transition:width .3s}
+#tour .t-ctl{display:flex;gap:6px;flex-wrap:wrap}
+#tour button{min-height:40px;padding:0 12px;border-radius:8px;border:1px solid #343945;background:#1f232c;color:#eceef2;font:600 13px 'DM Sans',sans-serif;cursor:pointer}
+#tour button.pri{background:#f2a93b;border-color:#f2a93b;color:#1a1305;margin-left:auto}
+#tour .t-x{margin-left:auto;min-height:32px;padding:0 10px;background:transparent;border:0;color:#a3a9b5}
+#tour-launch{position:fixed;z-index:55;right:20px;bottom:calc(20px + env(safe-area-inset-bottom,0px));min-height:44px;padding:0 16px;border-radius:999px;border:1px solid #f2a93b;background:#221b10;color:#f2a93b;font:600 14px 'DM Sans',sans-serif;cursor:pointer;box-shadow:0 10px 30px rgba(0,0,0,.4)}
+#tour-launch[hidden]{display:none}
+@media (max-width:699px){#tour{left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));width:auto;padding:14px}#tour .t-text{max-height:24vh}}
 </style>
 <style id="screen-css"></style>
 <div id="stage" aria-live="polite"></div>
@@ -170,6 +191,7 @@ var App = (function () {
       tagGrids(root);
     }
     window.scrollTo(0, y);
+    if (window.Tour) Tour.onPaint();
   }
 
   function go(name, push) {
@@ -190,9 +212,12 @@ var App = (function () {
     paint();
     window.scrollTo(0, 0);
     if (inst.componentDidMount) inst.componentDidMount();
+    if (window.CFP_TOUR_PENDING && window.Tour && name !== 'Home' && name !== 'Auth') { window.CFP_TOUR_PENDING = false; setTimeout(function () { Tour.start(); }, 300); }
   }
 
   stage.addEventListener('click', function (e) {
+    var tb = e.target.closest('button');
+    if (tb && /Explore demo campaign/.test(tb.textContent) && window.Tour) { Tour.start(); return; }
     var a = e.target.closest('a[href]');
     if (!a) return;
     var href = a.getAttribute('href');
@@ -207,6 +232,8 @@ var App = (function () {
   window.addEventListener('hashchange', function () { var h = location.hash.slice(1); if (h && h !== current && (SCREENS[h] || h === 'Signout')) go(h, false); });
 
   return {
+    current: function () { return current; },
+    open: function (name) { go(name, true); },
     schedule: function () { if (!pending) { pending = true; requestAnimationFrame(paint); } },
     start: function () {
       try { go(location.hash.slice(1) || 'Home', false); }
@@ -214,5 +241,173 @@ var App = (function () {
     }
   };
 })();
+</script>
+<script>
+/* Voice-guided walkthrough of the sample campaign. Uses the browser's built-in speech; captions always shown. */
+var Tour = (function () {
+  var STEPS = [
+    { s: 'Main', find: ['Campaign dashboard', 'header'], title: 'Welcome',
+      say: 'Welcome to CampaignForge Pro. I will walk you through a sample campaign for a sweet shop called Kesar and Company, getting ready for Diwali. You can pause, go back, or mute me at any time.' },
+    { s: 'Main', find: ['Active campaigns', 'section'], title: 'Your dashboard',
+      say: 'This is your campaign dashboard. These tiles show how many campaigns are running, the total budget, how much has been spent, and the revenue you expect.' },
+    { s: 'Main', find: ['Pacing alert', 'section'], title: 'Early warnings',
+      say: 'When a campaign is spending faster than planned, an alert like this appears, so you can fix it before the money runs out.' },
+    { s: 'Brand', find: ['Brand voice', 'section'], title: 'Company DNA',
+      say: 'Before planning anything, you describe your brand once here: how you sound, words to use, words to avoid, and the facts the AI is allowed to use. Every plan and post follows these rules.' },
+    { s: 'Dates', find: ['Target markets', 'section'], title: 'Moments calendar',
+      say: 'Pick the markets you sell in. The app then lists festivals, holidays and sale days for those markets, and tells you how early to start posting for each one.' },
+    { s: 'New', find: ['Choose a campaign type', 'div'], title: 'Start a campaign',
+      say: 'To start a campaign, choose a type such as lead generation or product launch, and write a short brief about your business, audience and dates. You can type it, dictate it, or let the AI draft it.' },
+    { s: 'New', find: ['Generate plan', 'button'], title: 'Build the plan',
+      say: 'Then press Generate plan. In under a minute the AI writes a complete plan, week by week.' },
+    { s: 'Plan', find: ['Content calendar', 'section'], title: 'Your plan',
+      say: 'Here is the finished plan. Each coloured bar is a post on a channel: pink for Instagram, blue for LinkedIn, orange for blog, green for email.' },
+    { s: 'Plan', find: ['Moments in this campaign', 'section'], title: 'Festivals in your plan',
+      say: 'Festivals that fall inside your campaign are listed here. Press Add content on any of them and a post is added to that day.' },
+    { s: 'Plan', find: ['Refine with AI', 'section'], title: 'Refine with AI',
+      say: 'Want changes? Type them in plain words, for example, make week two more festive, and the AI updates the plan while keeping approved posts untouched.' },
+    { s: 'Score', find: ['Rubric breakdown', 'section'], title: 'Readiness score',
+      say: 'The readiness score checks the plan like a senior strategist would, and gives it a score out of one hundred. Each quick fix below raises the score before you launch.' },
+    { s: 'Studio', find: ['Copy variants', 'section'], title: 'Posts and approvals',
+      say: 'Each post has a few copy options to choose from, a preview for every channel, and an approval step, so nothing goes out without a reviewer saying yes.' },
+    { s: 'Publish', find: ['Channels', 'section'], title: 'Publish everywhere',
+      say: 'The publish hub prepares every approved post in the exact size and length each channel needs: Instagram, YouTube, LinkedIn, X, email and more. Post automatically, or download a ready folder.' },
+    { s: 'Budget', find: ['Budget allocator', 'section'], title: 'Budget and returns',
+      say: 'Finally, the budget allocator splits your money across channels and weeks, and below it you can track spend, cost per lead and return for each channel.' },
+    { s: 'Main', find: ['Campaigns', 'section'], title: 'That is the journey',
+      say: 'That is the whole journey: brief, plan, review, publish and track. Explore any screen from the menu, or create your account to plan your own campaign. Thank you for watching.' }
+  ];
+  var i = 0, on = false, paused = false, muted = false, timer = null, voice = null;
+  var box, launch;
+  var synth = window.speechSynthesis || null;
+
+  function pickVoice() {
+    if (!synth) return null;
+    var vs = synth.getVoices() || [];
+    return vs.find(function (v) { return /en-IN/i.test(v.lang); }) || vs.find(function (v) { return /^en/i.test(v.lang); }) || null;
+  }
+  if (synth && 'onvoiceschanged' in synth) synth.onvoiceschanged = function () { voice = pickVoice(); };
+
+  function el(tag, attrs, text) { var e = document.createElement(tag); for (var k in attrs) e.setAttribute(k, attrs[k]); if (text) e.textContent = text; return e; }
+
+  function build() {
+    box = el('div', { id: 'tour', role: 'dialog', 'aria-label': 'Guided tour', 'aria-live': 'polite' });
+    box.hidden = true;
+    box.innerHTML = '<div class="t-top"><span class="t-dot"></span><span class="t-step"></span><button type="button" class="t-x" data-a="end" aria-label="End tour">End tour</button></div>' +
+      '<h2 class="t-title"></h2><p class="t-text"></p><div class="t-bar"><div></div></div>' +
+      '<div class="t-ctl"><button type="button" data-a="back">Back</button><button type="button" data-a="pause">Pause</button><button type="button" data-a="mute">Mute</button><button type="button" class="pri" data-a="next">Next</button></div>';
+    box.addEventListener('click', function (e) {
+      var a = e.target.closest('button[data-a]'); if (!a) return;
+      var act = a.getAttribute('data-a');
+      if (act === 'next') go(i + 1);
+      else if (act === 'back') go(i - 1);
+      else if (act === 'pause') togglePause();
+      else if (act === 'mute') toggleMute();
+      else if (act === 'end') end();
+    });
+    document.body.appendChild(box);
+    launch = el('button', { id: 'tour-launch', type: 'button' }, '▶ Guided tour');
+    launch.hidden = true;
+    launch.addEventListener('click', function () { start(); });
+    document.body.appendChild(launch);
+  }
+
+  function clearHL() { var o = document.querySelectorAll('.tour-hl'); for (var k = 0; k < o.length; k++) o[k].classList.remove('tour-hl'); }
+
+  function findTarget(spec) {
+    var needle = spec[0], up = spec[1];
+    var all = document.querySelectorAll('#stage *'), best = null;
+    for (var k = 0; k < all.length; k++) {
+      var n = all[k];
+      if (n.children.length > 3) continue;
+      var t = (n.textContent || '').trim();
+      if (t.indexOf(needle) === 0 && (!best || t.length < best.textContent.trim().length)) best = n;
+    }
+    if (!best) return null;
+    return (up && best.closest(up)) || best;
+  }
+
+  function highlight() {
+    clearHL();
+    if (!on) return;
+    var t = findTarget(STEPS[i].find);
+    if (t) { t.classList.add('tour-hl'); t.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+  }
+
+  function stopVoice() { if (synth) synth.cancel(); clearTimeout(timer); }
+
+  function speak() {
+    stopVoice();
+    var dot = box.querySelector('.t-dot');
+    var text = STEPS[i].say;
+    var after = function () { dot.classList.remove('talk'); if (on && !paused) timer = setTimeout(function () { if (i < STEPS.length - 1) go(i + 1); }, 1400); };
+    if (paused) return;
+    if (synth && !muted) {
+      var u = new SpeechSynthesisUtterance(text);
+      voice = voice || pickVoice();
+      if (voice) u.voice = voice;
+      u.lang = voice ? voice.lang : 'en-IN';
+      u.rate = 0.98;
+      u.onstart = function () { dot.classList.add('talk'); };
+      u.onend = after;
+      u.onerror = function () { dot.classList.remove('talk'); timer = setTimeout(after, text.split(' ').length * 380); };
+      synth.speak(u);
+    } else {
+      timer = setTimeout(after, Math.max(4000, text.split(' ').length * 380));
+    }
+  }
+
+  function render() {
+    box.querySelector('.t-step').textContent = 'Step ' + (i + 1) + ' of ' + STEPS.length;
+    box.querySelector('.t-title').textContent = STEPS[i].title;
+    box.querySelector('.t-text').textContent = STEPS[i].say;
+    box.querySelector('.t-bar div').style.width = ((i + 1) / STEPS.length * 100) + '%';
+    box.querySelector('[data-a="back"]').disabled = i === 0;
+    box.querySelector('[data-a="next"]').textContent = i === STEPS.length - 1 ? 'Finish' : 'Next';
+    box.querySelector('[data-a="pause"]').textContent = paused ? 'Resume' : 'Pause';
+    box.querySelector('[data-a="mute"]').textContent = muted ? 'Unmute' : 'Mute';
+  }
+
+  function go(n) {
+    if (n >= STEPS.length) { end(); return; }
+    if (n < 0) n = 0;
+    i = n;
+    render();
+    stopVoice();
+    var target = STEPS[i].s;
+    if (App.current() !== target) App.open(target);
+    setTimeout(function () { highlight(); speak(); }, 350);
+  }
+
+  function togglePause() { paused = !paused; if (paused) stopVoice(); else speak(); render(); }
+  function toggleMute() { muted = !muted; if (muted && synth) synth.cancel(); render(); if (!paused && muted) speak(); if (!muted && !paused) speak(); }
+
+  function start() {
+    if (!box) build();
+    on = true; paused = false; box.hidden = false; launch.hidden = true;
+    go(0);
+  }
+  function end() {
+    on = false; stopVoice(); clearHL();
+    if (box) box.hidden = true;
+    syncLaunch();
+  }
+  function syncLaunch() {
+    if (!launch) return;
+    var inApp = !!document.querySelector('#stage .app');
+    launch.hidden = on || !inApp;
+  }
+
+  return {
+    start: start, end: end,
+    active: function () { return on; },
+    onPaint: function () {
+      if (!box) build();
+      if (on) highlight();
+      syncLaunch();
+    }
+  };
+})();
+
 App.start();
 </script>
