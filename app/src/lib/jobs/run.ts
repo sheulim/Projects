@@ -7,6 +7,7 @@ import { PLAN_SYSTEM, PlanSchema } from "../plan-spec";
 import { STRATEGY_SYSTEM, StrategySchema } from "../strategy-spec";
 import { CHANNELS, CHANNEL_SYSTEM, isChannelId, voiceoverText } from "../channel-specs";
 import { generateImage, generateSpeech } from "./openai";
+import { createVoiceModel, fishConfigured, fishSpeech } from "./fish";
 
 type Db = SupabaseClient<Database>;
 
@@ -160,11 +161,21 @@ async function setMediaState(
 export async function runChannelJob(db: Db, userId: string, assetId: string) {
   const asset = await loadAsset(db, assetId);
   const spec = CHANNELS[asset.channel];
+  // Daily videos carry the creator's own text; the AI must build on it, not replace it.
+  const source = String((asset.content as Content | null)?.["_source"] ?? "").trim();
   try {
     const campaign = await loadCampaign(db, asset.campaign_id);
     const content = await generateStructured({
       system: CHANNEL_SYSTEM + brandDnaPrompt(await loadDna(db, userId)),
-      prompt: `${briefText(campaign)}
+      prompt: source
+        ? `Write the ${spec.label} content from the creator's own material below.
+Keep the creator's meaning, ideas and wording wherever possible; do not add claims that are not in it.
+The narration should sound like the creator speaking in first person.
+What to produce: ${spec.guidance}
+
+CREATOR'S MATERIAL:
+${source}`
+        : `${briefText(campaign)}
 
 Write the ${spec.label} content for this campaign.
 What to produce: ${spec.guidance}`,
@@ -172,14 +183,17 @@ What to produce: ${spec.guidance}`,
       maxTokens: asset.channel === "blog" ? 12000 : 8000,
     });
     await setAsset(db, assetId, {
-      content: content as unknown as Json,
-      title: `${spec.label} content`,
+      content: (source ? { ...content, _source: source } : content) as unknown as Json,
+      title: source ? asset.title || `${spec.label} content` : `${spec.label} content`,
       status: "draft",
     });
   } catch (error) {
     await setAsset(db, assetId, {
       status: "error",
-      content: { _error: error instanceof Error ? error.message : "Generation failed." } as Json,
+      content: {
+        _error: error instanceof Error ? error.message : "Generation failed.",
+        ...(source ? { _source: source } : {}),
+      } as Json,
     });
     throw error;
   }
@@ -220,7 +234,8 @@ export async function runVoiceJob(db: Db, userId: string, assetId: string) {
   if (!text) throw new Error("This item has no narration to voice.");
   await setMediaState(db, assetId, "voice", "generating");
   try {
-    const mp3 = await generateSpeech(text);
+    const voice = await readyVoice(db, userId);
+    const mp3 = voice ? await fishSpeech(text, voice) : await generateSpeech(text);
     const path = `${userId}/${assetId}/voiceover-${Date.now()}.mp3`;
     const { error } = await db.storage
       .from(MEDIA_BUCKET)
@@ -229,6 +244,56 @@ export async function runVoiceJob(db: Db, userId: string, assetId: string) {
     await setMediaState(db, assetId, "voice", "ready", { audio_path: path });
   } catch (error) {
     await setMediaState(db, assetId, "voice", "error");
+    throw error;
+  }
+}
+
+/** The user's cloned voice id, when cloning is set up and the voice is ready. */
+async function readyVoice(db: Db, userId: string): Promise<string | null> {
+  if (!fishConfigured()) return null;
+  const { data } = await db
+    .from("voice_profiles")
+    .select("model_id, status")
+    .eq("user_id", userId)
+    .maybeSingle();
+  return data?.status === "ready" && data.model_id ? data.model_id : null;
+}
+
+const TEST_LINE =
+  "Hello, and welcome. This is my own voice, created for my videos. Thank you for listening.";
+
+/** Clone the user's voice from their consented recording, then record a short test line. */
+export async function runCloneJob(db: Db, userId: string) {
+  const { data: profile } = await db
+    .from("voice_profiles")
+    .select("*")
+    .eq("user_id", userId)
+    .maybeSingle();
+  if (!profile?.sample_path) throw new Error("No voice recording found.");
+  if (!profile.consent_at) throw new Error("Consent is required before cloning a voice.");
+  const update = (patch: Database["public"]["Tables"]["voice_profiles"]["Update"]) =>
+    db
+      .from("voice_profiles")
+      .update({ ...patch, updated_at: new Date().toISOString() })
+      .eq("user_id", userId);
+  try {
+    const { data: sample, error } = await db.storage
+      .from(MEDIA_BUCKET)
+      .download(profile.sample_path);
+    if (error || !sample) throw new Error("Could not read your recording. Upload it again.");
+    const modelId = await createVoiceModel(sample, profile.title || "My voice");
+    const mp3 = await fishSpeech(TEST_LINE, modelId);
+    const path = `${userId}/voice/test-${Date.now()}.mp3`;
+    const up = await db.storage
+      .from(MEDIA_BUCKET)
+      .upload(path, mp3, { contentType: "audio/mpeg", upsert: true });
+    if (up.error) throw new Error(up.error.message);
+    await update({ model_id: modelId, status: "ready", error: null, test_audio_path: path });
+  } catch (error) {
+    await update({
+      status: "error",
+      error: error instanceof Error ? error.message : "Voice cloning failed.",
+    });
     throw error;
   }
 }

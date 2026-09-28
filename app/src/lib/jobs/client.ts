@@ -5,7 +5,8 @@ export type JobRequest =
   | { job: "strategy"; campaignId: string; brief: string }
   | { job: "channel"; assetId: string }
   | { job: "image"; assetId: string }
-  | { job: "voice"; assetId: string };
+  | { job: "voice"; assetId: string }
+  | { job: "clone" };
 
 /** Start a background AI job. Resolves once Netlify has accepted it; results appear in the database. */
 export async function startJob(request: JobRequest): Promise<void> {

@@ -21,6 +21,8 @@ export const Route = createFileRoute("/_authenticated")({
 const LABELS: Record<string, string> = {
   dashboard: "Dashboard",
   "company-dna": "Company DNA",
+  "my-voice": "My voice",
+  "daily-video": "Daily video",
   campaigns: "Campaigns",
   approvals: "Review queue",
   team: "Team & roles",

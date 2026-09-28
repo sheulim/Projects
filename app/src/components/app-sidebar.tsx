@@ -5,6 +5,8 @@ import {
   ChevronsUpDown,
   ClipboardCheck,
   Dna,
+  Mic,
+  Youtube,
   Folder,
   GitCompare,
   LayoutDashboard,
@@ -109,6 +111,22 @@ export function AppSidebar() {
                 <Link to="/company-dna">
                   <Dna />
                   <span>Company DNA</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild tooltip="My voice" isActive={path === "/my-voice"}>
+                <Link to="/my-voice">
+                  <Mic />
+                  <span>My voice</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild tooltip="Daily video" isActive={path === "/daily-video"}>
+                <Link to="/daily-video">
+                  <Youtube />
+                  <span>Daily video</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>

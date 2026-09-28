@@ -6,6 +6,7 @@ import { createClient } from "@supabase/supabase-js";
 import type { Database } from "../../src/integrations/supabase/types";
 import {
   runChannelJob,
+  runCloneJob,
   runImageJob,
   runPlanJob,
   runStrategyJob,
@@ -17,7 +18,8 @@ type Job =
   | { job: "strategy"; campaignId: string; brief: string }
   | { job: "channel"; assetId: string }
   | { job: "image"; assetId: string }
-  | { job: "voice"; assetId: string };
+  | { job: "voice"; assetId: string }
+  | { job: "clone" };
 
 export default async (req: Request) => {
   if (req.method !== "POST") return;
@@ -65,6 +67,9 @@ export default async (req: Request) => {
         break;
       case "voice":
         await runVoiceJob(db, userId, body.assetId);
+        break;
+      case "clone":
+        await runCloneJob(db, userId);
         break;
       default:
         console.error("ai-job: unknown job");
