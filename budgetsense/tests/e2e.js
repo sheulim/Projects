@@ -44,6 +44,14 @@ const FAKE_SR = () => {
   const browser = await chromium.launch({args: ['--use-fake-device-for-media-stream', '--use-fake-ui-for-media-stream', '--autoplay-policy=no-user-gesture-required']});
   const ctx = await browser.newContext({viewport: {width: 390, height: 844}, permissions: ['microphone']});
   await ctx.addInitScript(FAKE_SR);
+  const LIBS = process.env.BS_LIBS || path.resolve(__dirname, '../../..', 'libs');
+  const fs = require('fs');
+  await ctx.route('https://cdnjs.cloudflare.com/**', route => {
+    const u = route.request().url();
+    const f = /pdf\.worker\.min\.js$/.test(u) ? 'pdfjs-dist-3.11.174/build/pdf.worker.min.js' : /pdf\.min\.js$/.test(u) ? 'pdfjs-dist-3.11.174/build/pdf.min.js' : /xlsx\.full\.min\.js$/.test(u) ? 'xlsx-0.18.5/dist/xlsx.full.min.js' : null;
+    if (!f || !fs.existsSync(path.join(LIBS, f))) return route.abort();
+    route.fulfill({path: path.join(LIBS, f), contentType: 'application/javascript'});
+  });
   const page = await ctx.newPage(); page.setDefaultTimeout(5000);
   const errors = [];
   page.on('pageerror', e => errors.push(`[${current}] ${e.message}`));
@@ -487,6 +495,85 @@ const FAKE_SR = () => {
     const p2 = (await st()).plan;
     check(p2.Travel === after.Travel - 400 && p2.Groceries === (after.Groceries || 0) + 400, 'form move wrong: ' + JSON.stringify(p2));
     await noOverflow('move form');
+  });
+
+  await test('Statement upload: CSV, Excel and PDF are read, with debits and credits told apart', async () => {
+    const os = require('os'), fs = require('fs'), dir = fs.mkdtempSync(path.join(os.tmpdir(), 'bs-'));
+    const now = new Date(new Date().toLocaleDateString('en-CA', {timeZone: 'Asia/Kolkata'}));
+    const dd = k => { const d = new Date(now); d.setDate(Math.max(1, now.getDate() - k)); return String(d.getDate()).padStart(2,'0') + '/' + String(d.getMonth() + 1).padStart(2,'0') + '/' + d.getFullYear(); };
+    const csv = [
+      'Account Statement for XX1234,,,,,',
+      'Date,Narration,Chq./Ref.No.,Value Dt,Withdrawal Amt.,Deposit Amt.,Closing Balance',
+      `${dd(3)},UPI-CHAI POINT-chaipoint@ybl-YESB0000001-426577771111-UPI,0000426577771111,${dd(3)},35.00,,50000.00`,
+      `${dd(3)},UPI-RAMU COBBLER-ramu@okaxis-UTIB0000001-426577772222-Payment,0000426577772222,${dd(3)},15.00,,49985.00`,
+      `${dd(2)},ACH D- LINKEDIN SINGAPORE-MANDATE123,0000000000,${dd(2)},"2,400.00",,47585.00`,
+      `${dd(2)},POS 4591XXXXXXXX1234 DECATHLON SPORTS,0000,${dd(2)},"1,299.00",,46286.00`,
+      `${dd(1)},NEFT CR-HDFC0000001-ACME TECHNOLOGIES-SALARY SEP,N123,${dd(1)},,"90,000.00",136286.00`,
+      `${dd(1)},ATW-4591XXXXXX1234-S1ANHY01-HYDERABAD,0000,${dd(1)},"2,000.00",,134286.00`,
+    ].join('\n');
+    fs.writeFileSync(path.join(dir, 'stmt.csv'), csv);
+    await page.click('[data-tab=timeline]'); await page.click('#stmtOpen');
+    await page.setInputFiles('#stmtFile', path.join(dir, 'stmt.csv')); await page.waitForTimeout(400);
+    const rows = await page.$$eval('#stmtResult .found li', els => els.map(e => e.textContent.replace(/\s+/g,' ').trim()));
+    check(rows.length === 6, 'CSV: expected 6 payments, got ' + rows.length + ' ' + JSON.stringify(rows));
+    check(rows.some(r => /Chai Point/.test(r) && /₹35/.test(r)) && rows.some(r => /Ramu Cobbler/.test(r)), 'CSV: UPI payees not named: ' + JSON.stringify(rows));
+    check(rows.some(r => /Linkedin Singapore/i.test(r) && /automatic/.test(r)), 'CSV: ACH mandate not flagged automatic');
+    check(rows.some(r => /Acme Technologies/.test(r) && /\+₹90,000/.test(r)), 'CSV: salary credit not read as income');
+    check(rows.some(r => /Cash withdrawal/.test(r)), 'CSV: ATM withdrawal not recognised');
+    const n = (await st()).txs.length; await page.click('#importAdd'); await page.waitForTimeout(200);
+    check((await st()).txs.length === n + 6 && (await st()).txs.at(-1).source === 'statement', 'CSV entries not added');
+    // Same statement again: everything is already logged.
+    await page.click('#stmtOpen'); await page.setInputFiles('#stmtFile', path.join(dir, 'stmt.csv')); await page.waitForTimeout(400);
+    check(/Add 0 new/.test(await text('#importAdd')), 'CSV re-import not deduplicated');
+    // Excel: write the same rows as .xlsx using the page's SheetJS, then upload it.
+    const xlsxB64 = await page.evaluate(async c => { await new Promise((r, j) => { const s = document.createElement('script'); s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'; s.onload = r; s.onerror = j; document.head.appendChild(s); });
+      const rows = c.split('\n').map(l => l.match(/("[^"]*"|[^,]*)(,|$)/g).map(x => x.replace(/,$/,'').replace(/^"|"$/g,'')));
+      const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(rows.map(r => r.map(v => /^[\d,]+\.\d{2}$/.test(v) ? parseFloat(v.replace(/,/g,'')) : v))), 'S');
+      return XLSX.write(wb, {type:'base64', bookType:'xlsx'}); }, csv.replace('CHAI POINT','BLUE TOKAI').replace('426577771111','426599991111').replace('35.00','85.00'));
+    fs.writeFileSync(path.join(dir, 'stmt.xlsx'), Buffer.from(xlsxB64, 'base64'));
+    await page.setInputFiles('#stmtFile', path.join(dir, 'stmt.xlsx')); await page.waitForTimeout(600);
+    check(/Blue Tokai/.test(await text('#stmtResult')) && /Add 1 new/.test(await text('#importAdd')), 'Excel: statement not read or deduplicated: ' + await text('#stmtResult'));
+    // PDF: render a bank-style statement table to PDF with Chromium, then upload it.
+    const pdfPage = await ctx.newPage();
+    await pdfPage.setContent(`<table style="font:12px Arial;border-collapse:collapse" cellpadding="6"><tr><td>Date</td><td>Narration</td><td>Withdrawal</td><td>Deposit</td><td>Balance</td></tr>
+      <tr><td>${dd(4)}</td><td>Opening Balance</td><td></td><td></td><td>20,000.00</td></tr>
+      <tr><td>${dd(4)}</td><td>UPI/P2M/426511110000/SWIGGY LIMITED</td><td>450.00</td><td></td><td>19,550.00</td></tr>
+      <tr><td>${dd(3)}</td><td>UPI/P2A/426511110001/BEGGAR NAME</td><td>10.00</td><td></td><td>19,540.00</td></tr>
+      <tr><td>${dd(2)}</td><td>IMPS/426511110002/REFUND FLIPKART</td><td></td><td>1,200.00</td><td>20,740.00</td></tr></table>`);
+    fs.writeFileSync(path.join(dir, 'stmt.pdf'), await pdfPage.pdf()); await pdfPage.close();
+    await page.setInputFiles('#stmtFile', path.join(dir, 'stmt.pdf')); await page.waitForTimeout(1500);
+    const pr = await page.$$eval('#stmtResult .found li', els => els.map(e => e.textContent.replace(/\s+/g,' ').trim()));
+    check(pr.length === 3, 'PDF: expected 3 payments, got ' + JSON.stringify(pr) + ' ' + await text('#stmtResult'));
+    check(pr.some(r => /Swiggy/.test(r) && /₹450/.test(r)) && pr.some(r => /\+₹1,200/.test(r)), 'PDF: debit/credit wrong: ' + JSON.stringify(pr));
+    await page.click('#stmtOpen');
+  });
+
+  await test('Connect bank or UPI: consent steps, sample fetch, and an honest "not live" on real data', async () => {
+    await page.click('#connectOpen');
+    check((await page.$$('#connectBody [data-src]')).length === 9, 'source list missing');
+    await page.click('#connectBody [data-src="ICICI Bank"]');
+    check(/Transactions only/.test(await text('#connectBody')) && /OTP/.test(await text('#connectBody')), 'consent summary missing');
+    await page.click('#cOk');
+    check(/Not live yet/.test(await text('#connectBody')) && /Nothing was shared/.test(await text('#connectBody')), 'real-data path should say not live');
+    await page.click('#connectOpen');
+    await noOverflow('connect');
+  });
+
+  await test('Timeline: filter, search, edit and delete entries', async () => {
+    await page.click('[data-tt=income]'); await page.waitForTimeout(100);
+    const kinds = await page.$$eval('#timeline .items .amt small', els => [...new Set(els.map(e => e.textContent))]);
+    check(kinds.length === 1 && kinds[0] === 'In', 'money-in filter shows: ' + kinds);
+    await page.click('[data-tt=all]'); await page.fill('#tlSearch', 'cobbler'); await page.waitForTimeout(100);
+    const names = await page.$$eval('#timeline .items .t b', els => els.map(e => e.textContent));
+    check(names.length >= 1 && names.every(n => /cobbler/i.test(n)), 'search results wrong: ' + names);
+    await page.click('#timeline [data-edit]'); await page.selectOption('#edCat', 'Personal care'.replace('Personal care','Self-care')); await page.fill('#edAmt', '20');
+    const id = await page.$eval('#timeline [data-edsave]', b => b.getAttribute('data-edsave'));
+    await page.click('#timeline [data-edsave]'); await page.waitForTimeout(100);
+    const t = (await st()).txs.find(x => x.id === id);
+    check(t.amount === 20 && t.category === 'Self-care', 'edit not saved: ' + JSON.stringify(t));
+    await page.click('#timeline [data-edit]'); await page.click('#timeline [data-eddel]'); await page.click('#timeline [data-eddel]'); await page.waitForTimeout(100);
+    check(!(await st()).txs.some(x => x.id === id), 'delete failed');
+    await page.fill('#tlSearch', ''); await page.dispatchEvent('#tlSearch', 'input');
   });
 
   await test('Load sample data needs two taps', async () => {

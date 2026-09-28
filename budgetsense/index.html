@@ -141,6 +141,22 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--teal);outline-of
 .checkin{background:linear-gradient(135deg,var(--saffron-soft),var(--surface));border-color:color-mix(in srgb,var(--saffron) 45%,var(--line))}
 .checkin b{font-size:16px}
 .importcard small{font-size:12px}
+.srcs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.src{border:1px solid var(--line);background:var(--sunk);border-radius:14px;padding:10px 8px;text-align:left;display:grid;gap:1px}
+.src span{font-size:18px}.src b{font-size:13px;line-height:1.25}.src small{color:var(--muted);font-size:11px}
+.picks{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;margin-top:8px}
+.picks button{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:10px;text-align:left}
+.picks button b{display:block;font-size:14px}.picks small{color:var(--muted);font-size:11px}
+.consent{width:100%;border-collapse:collapse;font-size:13px;margin:6px 0}
+.consent td{padding:8px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+.consent td:first-child{color:var(--muted);width:32%}
+.visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.tlbar{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 0 6px}
+.tlbar .filters{grid-column:1/-1}
+.edit{display:grid;grid-template-columns:1fr 110px;gap:6px;margin-top:8px}
+.edit .row{grid-column:1/-1}
+.mini{border:0;background:transparent;color:var(--muted);font-size:16px;padding:0 4px;margin-left:4px}
+@media (max-width:380px){.srcs{grid-template-columns:1fr}}
 .importcard textarea{width:100%;background:var(--sunk);border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:14px;resize:vertical}
 .found{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:6px}
 .found li{display:flex;gap:10px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
@@ -433,13 +449,28 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--teal);outline-of
 
   <section id="t-timeline" class="hide">
     <div class="card importcard">
-      <div class="spread"><span><b>📥 Catch what you missed</b><small class="muted" style="display:block">Paste bank, UPI or card alert messages or emails. I add what's missing and skip what's already here.</small></span><button class="btn primary" id="importOpen">Import</button></div>
+      <b>📥 Catch what you missed</b>
+      <small class="muted" style="display:block;margin-top:2px">Bring in payments you did not speak. Nothing is added twice, and bank access is read-only.</small>
+      <div class="srcs">
+        <button class="src" id="connectOpen"><span>🔗</span><b>Connect bank or UPI</b><small>Daily, automatic</small></button>
+        <button class="src" id="stmtOpen"><span>📄</span><b>Upload statement</b><small>PDF, CSV or Excel</small></button>
+        <button class="src" id="importOpen"><span>💬</span><b>Paste alerts</b><small>SMS or email</small></button>
+      </div>
+      <div class="hide" id="connectPanel"><div id="connectBody"></div></div>
+      <div class="hide" id="stmtPanel">
+        <p class="hint">Download this month's statement from your bank's app or net banking, then choose it here. Every UPI payment, however small, is in it. The file is read on this device only.</p>
+        <label class="btn primary" style="cursor:pointer">Choose statement file<input type="file" id="stmtFile" accept=".pdf,.csv,.txt,.xls,.xlsx" class="visually-hidden"></label>
+        <div class="row hide" id="stmtPwWrap" style="margin-top:8px"><input type="password" id="stmtPw" placeholder="Statement password" autocomplete="off"><button type="button" class="btn primary" id="stmtPwGo">Open</button></div>
+        <div id="stmtResult"></div>
+      </div>
       <form class="hide" id="importForm" style="margin-top:12px">
         <textarea id="importText" rows="6" placeholder="Paste one or many alerts, e.g.&#10;Rs.5.00 debited from A/c XX1234 on 28-09-26 to VPA cobbler@ybl UPI Ref 426512345678"></textarea>
         <div class="row" style="margin-top:8px;flex-wrap:wrap"><button type="button" class="btn" id="importClip">📋 Paste from clipboard</button><button type="submit" class="btn primary">Find payments</button></div>
         <div id="importResult"></div>
       </form>
     </div>
+    <div class="tlbar"><div class="filters" id="tlType"><button data-tt="all">All</button><button data-tt="expense">Money out</button><button data-tt="income">Money in</button></div>
+      <select id="tlCat" aria-label="Filter by envelope"></select><input type="search" id="tlSearch" placeholder="Search entries" aria-label="Search entries"></div>
     <div class="card" style="padding:12px 14px"><p class="hint" style="margin:0">🎙 Say <b>“undo”</b>, <b>“move last to shopping”</b>, <b>“happy with it”</b> or <b>“regret it”</b>. Tap ▶ to hear the original note.</p></div>
     <div id="timeline"></div>
   </section>
@@ -841,7 +872,7 @@ const iso = d => d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDa
 const monthKey = d => d.getFullYear() + '-' + pad(d.getMonth()+1);
 function todayIST(){ const [y,m,d] = new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Kolkata'}).split('-').map(Number); return new Date(y, m-1, d); }
 const uid = () => Math.random().toString(36).slice(2,9) + Date.now().toString(36);
-const state = {month: monthKey(todayIST()), profile:null, plan:{}, goals:[], txs:[], recs:[], sample:false, pending:null, pendingNote:null, tab:'pulse', custom:{}, planByMonth:{}, filter:'all', checkins:{}, recurDecisions:{}, alarms:{}, prefs:{replies:true, quick:false, checkin:true, checkinTime:'21:00', alarm:true}};
+const state = {month: monthKey(todayIST()), profile:null, plan:{}, goals:[], txs:[], recs:[], sample:false, pending:null, pendingNote:null, tab:'pulse', custom:{}, planByMonth:{}, filter:'all', tlf:{type:'all', cat:'', q:''}, editing:null, checkins:{}, recurDecisions:{}, alarms:{}, prefs:{replies:true, quick:false, checkin:true, checkinTime:'21:00', alarm:true}};
 function load(){
   try {
     const s = JSON.parse(localStorage.getItem(LS) || 'null');
@@ -1199,25 +1230,191 @@ function isDuplicate(a){
      (payeeKey(t.description) === payeeKey(a.description) || t.source !== 'bank')));
 }
 let importFound = [];
-function runImport(text){
-  importFound = splitAlerts(text).map(parseAlert).filter(Boolean).map(a => Object.assign(a, {dup:isDuplicate(a)}));
-  const box = $('importResult');
-  if (!importFound.length){ box.innerHTML = '<p class="hint">I could not find a debit or credit in that text. Paste the full message, including the amount.</p>'; return; }
+// Shows payments found by any importer; the user unticks anything unwanted, then adds the rest in one go.
+function showFound(items, label, box, source){
+  importFound = items.map(a => Object.assign(a, {dup:isDuplicate(a)}));
+  if (!importFound.length){ box.innerHTML = `<p class="hint">I could not find any payments in that ${label}. Check it includes dates and amounts.</p>`; return; }
   const fresh = importFound.filter(a => !a.dup).length;
-  box.innerHTML = `<ul class="found">${importFound.map((a,i) => `<li class="${a.dup ? 'dup' : ''}"><input type="checkbox" id="imp${i}" ${a.dup ? '' : 'checked'} aria-label="Add ${esc(a.description)}">
+  const out = importFound.filter(a => a.type === 'expense').reduce((x,a) => x + a.amount, 0);
+  box.innerHTML = `<p class="hint" style="margin:10px 0 0">Found ${importFound.length} payment${importFound.length === 1 ? '' : 's'} in your ${label} · ${inr(out)} out${importFound.length - fresh ? ` · ${importFound.length - fresh} already logged` : ''}</p>
+    <ul class="found">${importFound.map((a,i) => `<li class="${a.dup ? 'dup' : ''}"><input type="checkbox" id="imp${i}" ${a.dup ? '' : 'checked'} aria-label="Add ${esc(a.description)}">
     <span class="t"><b>${esc(a.description)}</b><small>${esc(a.category)} · ${dayLabel(a.date)} · ${a.via}${a.acct ? ' ··' + a.acct : ''}${a.autopay ? ' · 🔁 automatic' : ''}${a.dup ? ' · already logged' : ''}</small></span>
     <span class="amt ${a.type === 'income' ? 'in' : ''}">${a.type === 'income' ? '+' : ''}${inr(a.amount)}</span></li>`).join('')}</ul>
     <button type="button" class="btn primary block" id="importAdd" style="margin-top:10px">Add ${fresh} new entr${fresh === 1 ? 'y' : 'ies'}</button>`;
   $('importAdd').onclick = () => {
     let n = 0;
     const before = figures(monthKey(todayIST())).spent;
-    importFound.forEach((a,i) => { if ($('imp' + i).checked){ state.txs.push({id:uid(), date:a.date, amount:a.amount, type:a.type, description:a.description, category:a.category, source:'bank', ref:a.ref, acct:a.acct, autopay:a.autopay, at:Date.now() + i}); n++; } });
-    const id = uid(); state.recs.push({id, at:Date.now(), durationMs:0, transcript:`Imported ${importFound.length} alert${importFound.length === 1 ? '' : 's'}`, source:'import', hasAudio:false, outcome:`Added ${n} from bank alerts`});
-    save(); spendAlarm(monthKey(todayIST()), before); $('importText').value = ''; $('importResult').innerHTML = ''; $('importForm').classList.add('hide');
-    toast(`Added ${n} entr${n === 1 ? 'y' : 'ies'} from bank alerts`); reply(`Added ${n} from your bank alerts.`); render();
+    importFound.forEach((a,i) => { if ($('imp' + i).checked){ state.txs.push({id:uid(), date:a.date, amount:a.amount, type:a.type, description:a.description, category:a.category, source, ref:a.ref, acct:a.acct, autopay:a.autopay, at:Date.now() + i}); n++; } });
+    const id = uid(); state.recs.push({id, at:Date.now(), durationMs:0, transcript:`Imported ${importFound.length} from ${label}`, source:'import', hasAudio:false, outcome:`Added ${n} from ${label}`});
+    save(); spendAlarm(monthKey(todayIST()), before);
+    box.innerHTML = ''; $('importText').value = ''; ['importForm','stmtPanel','connectPanel'].forEach(x => $(x).classList.add('hide'));
+    toast(`Added ${n} entr${n === 1 ? 'y' : 'ies'} from your ${label}`); reply(`Added ${n} from your ${label}.`); render();
   };
 }
-$('importOpen').onclick = () => { $('importForm').classList.toggle('hide'); $('importText').focus(); };
+function runImport(text){ showFound(splitAlerts(text).map(parseAlert).filter(Boolean), 'bank alerts', $('importResult'), 'bank'); }
+
+/* ---------- Bank statement upload: CSV, Excel or PDF (password-protected PDFs supported) ---------- */
+const CDN = {
+  pdf: 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js',
+  pdfWorker: 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js',
+  xlsx: 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js',
+};
+const loaded = {};
+function loadScript(src){
+  if (loaded[src]) return loaded[src];
+  return loaded[src] = new Promise((res, rej) => { const sc = document.createElement('script'); sc.src = src; sc.onload = res; sc.onerror = () => { delete loaded[src]; rej(new Error('Could not load ' + src)); }; document.head.appendChild(sc); });
+}
+function parseCSV(text){
+  const rows = []; let row = [], cur = '', q = false;
+  for (let i = 0; i < text.length; i++){
+    const c = text[i];
+    if (q){ if (c === '"' && text[i+1] === '"'){ cur += '"'; i++; } else if (c === '"') q = false; else cur += c; }
+    else if (c === '"') q = true;
+    else if (c === ',' || c === '\t' || c === ';'){ row.push(cur); cur = ''; }
+    else if (c === '\n' || c === '\r'){ if (c === '\r' && text[i+1] === '\n') i++; row.push(cur); rows.push(row); row = []; cur = ''; }
+    else cur += c;
+  }
+  if (cur || row.length){ row.push(cur); rows.push(row); }
+  return rows.filter(r => r.some(x => String(x).trim()));
+}
+const money = v => { if (v == null) return 0; if (typeof v === 'number') return Math.abs(v); const m = String(v).replace(/[₹,\s]|INR|Rs\.?/gi,'').match(/-?\d+(\.\d+)?/); return m ? Math.abs(parseFloat(m[0])) : 0; };
+function stmtDate(v){
+  if (v == null || v === '') return null;
+  if (typeof v === 'number' && v > 20000 && v < 80000){ const d = new Date(Math.round((v - 25569) * 864e5)); return iso(new Date(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate())); }
+  const t = String(v).trim();
+  let m = t.match(/^(\d{4})-(\d{2})-(\d{2})/); if (m) return `${m[1]}-${m[2]}-${m[3]}`;
+  m = t.match(/^(\d{1,2})[-\/. ](\d{1,2})[-\/. ](\d{2,4})/); if (m){ const y = +m[3] < 100 ? 2000 + +m[3] : +m[3]; return iso(new Date(y, +m[2] - 1, +m[1])); }
+  m = t.match(/^(\d{1,2})[- ]?(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*[-, ]*(\d{2,4})/i); if (m){ const y = +m[3] < 100 ? 2000 + +m[3] : +m[3]; return iso(new Date(y, MON3.indexOf(m[2].toLowerCase()), +m[1])); }
+  return null;
+}
+const NOISE = /^(upi|p2m|p2a|pos|neft|imps|rtgs|ach|nach|ecs|dr|cr|ref|inb|mb|ib|atw|bil|onl|tpt|hdfc|icici|sbi|axis|kotak|bank|payment|to|from|transfer|by|trf|txn|debit|credit|card|ecom|mmt|vps|vpa|ybl|oksbi|okaxis|okicici|okhdfcbank|paytm|d|c)$/i;
+function narrationPayee(n){
+  const t = String(n || '').trim();
+  if (/\b(atm|atw|cash wdl|cash withdrawal|nwd)\b/i.test(t)) return 'Cash withdrawal';
+  const segs = t.split(/[\/|:]+|\s-\s|(?<=\w)-(?=\w)/).map(x => x.trim()).filter(Boolean);
+  for (const sgm of segs){
+    if (sgm.includes('@') || !/[a-z]{3,}/i.test(sgm) || NOISE.test(sgm) || /^\d/.test(sgm) || /^x+\d*$/i.test(sgm) || /^[a-z]{4}0[a-z0-9]{6}$/i.test(sgm)) continue;
+    const cleaned = sgm.replace(/\b[a-z]*\d[a-z\d]*\b/gi,' ').replace(/\b(pos|upi|neft|imps|rtgs|ach|nach|cr|dr|d|c)\b/ig,' ').replace(/\s+/g,' ').trim();
+    if (cleaned.length >= 3) return tidyName(cleaned);
+  }
+  return tidyName(t).slice(0, 40) || 'Bank transaction';
+}
+function statementItems(rows){
+  const hi = rows.findIndex(r => { const j = r.join(' ').toLowerCase(); return /date/.test(j) && /(narration|description|particulars|details|remarks|transaction)/.test(j); });
+  if (hi < 0) return [];
+  const h = rows[hi].map(x => String(x || '').toLowerCase().trim());
+  const col = re => h.findIndex(x => re.test(x));
+  const cDate = col(/(txn|tran|transaction|value)?\s*date/), cDesc = col(/narration|description|particulars|details|remarks/);
+  const cDr = col(/withdraw|debit|\bdr\b|paid out|money out/), cCr = col(/deposit|credit|\bcr\b|paid in|money in/);
+  const cAmt = col(/^amount|amount \(|txn amount/), cType = col(/dr\s*\/\s*cr|cr\s*\/\s*dr|^type$/);
+  const out = [];
+  for (const r of rows.slice(hi + 1)){
+    const date = stmtDate(r[cDate]); if (!date) continue;
+    let dr = cDr >= 0 ? money(r[cDr]) : 0, cr = cCr >= 0 && cCr !== cDr ? money(r[cCr]) : 0;
+    if (!dr && !cr && cAmt >= 0){ const a = money(r[cAmt]), ty = String(r[cType] ?? r[cAmt]).toLowerCase(); if (/cr|credit/.test(ty) && !/dr|debit/.test(ty)) cr = a; else dr = a; }
+    if (!dr && !cr) continue;
+    const narr = String(r[cDesc] ?? '');
+    const type = cr && !dr ? 'income' : 'expense', amount = type === 'income' ? cr : dr;
+    const description = narrationPayee(narr);
+    const category = description === 'Cash withdrawal' ? 'Small cash' : categorise(description + ' ' + narr.toLowerCase(), type).category;
+    out.push({type, amount, description, category, date, ref:(narr.match(/\b(\d{10,})\b/) || [])[1] || '', acct:'', via:/upi/i.test(narr) ? 'UPI' : /pos|card/i.test(narr) ? 'card' : 'bank', autopay:/\b(ach|nach|ecs|si|mandate|autopay|auto pay)\b/i.test(narr)});
+  }
+  return out;
+}
+// PDF statements: rebuild text lines, then use the running balance to tell debits from credits.
+async function pdfRows(buf, password){
+  await loadScript(CDN.pdfWorker); await loadScript(CDN.pdf);
+  pdfjsLib.GlobalWorkerOptions.workerSrc = CDN.pdfWorker;
+  const doc = await pdfjsLib.getDocument({data:buf, password}).promise;
+  const lines = [];
+  for (let p = 1; p <= doc.numPages; p++){
+    const items = (await (await doc.getPage(p)).getTextContent()).items.filter(it => it.str.trim());
+    const byY = {};
+    items.forEach(it => { const y = Math.round(it.transform[5] / 3); (byY[y] = byY[y] || []).push(it); });
+    Object.keys(byY).sort((a,b) => b - a).forEach(y => lines.push(byY[y].sort((a,b) => a.transform[4] - b.transform[4]).map(it => it.str.trim()).join(' ')));
+  }
+  const rows = [['Date','Narration','Withdrawal','Deposit']]; let prevBal = null, last = null;
+  for (const line of lines){
+    const dm = line.match(/^(\d{1,2}[-\/. ](?:\d{1,2}|[A-Za-z]{3})[-\/. ]\d{2,4})\s+(.*)$/);
+    const nums = [...line.matchAll(/(?<![\w.])-?[\d,]+\.\d{2}(?![\d])/g)].map(m => ({v:parseFloat(m[0].replace(/,/g,'')), i:m.index}));
+    if (dm && nums.length >= 2){
+      const bal = nums[nums.length - 1].v, amt = Math.abs(nums[nums.length - 2].v);
+      let desc = dm[2].slice(0, nums[nums.length - 2].i - dm[1].length - 1).replace(/\d{1,2}[-\/. ](?:\d{1,2}|[A-Za-z]{3})[-\/. ]\d{2,4}/g,' ').replace(/\s+/g,' ').trim();
+      let credit;
+      if (prevBal != null && Math.abs(prevBal + amt - bal) < 0.02) credit = true;
+      else if (prevBal != null && Math.abs(prevBal - amt - bal) < 0.02) credit = false;
+      else credit = /\b(cr|credit|salary|refund|interest|by transfer)\b/i.test(line) && !/\bdr\b/i.test(line);
+      last = [dm[1], desc, credit ? '' : amt, credit ? amt : ''];
+      rows.push(last); prevBal = bal;
+    } else if (dm && nums.length === 1 && /opening|balance b\/f|brought forward/i.test(line)){ prevBal = nums[0].v; }
+    else if (/opening balance/i.test(line) && nums.length){ prevBal = nums[nums.length - 1].v; }
+    else if (last && !dm && !nums.length && line.length < 80 && !/page|statement|balance|total/i.test(line)) last[1] += ' ' + line;
+  }
+  return rows;
+}
+let pendingPdf = null;
+async function readStatement(file, password){
+  const box = $('stmtResult'), name = file.name.toLowerCase();
+  box.innerHTML = '<p class="hint">Reading your statement…</p>';
+  try {
+    let rows;
+    if (/\.(csv|txt)$/.test(name)) rows = parseCSV(await file.text());
+    else if (/\.xlsx?$/.test(name)){ await loadScript(CDN.xlsx); const wb = XLSX.read(await file.arrayBuffer(), {type:'array'}); rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {header:1, raw:true}); }
+    else if (/\.pdf$/.test(name)) rows = await pdfRows(new Uint8Array(await file.arrayBuffer()), password);
+    else { box.innerHTML = '<p class="hint">Please choose a PDF, CSV or Excel statement.</p>'; return; }
+    pendingPdf = null; $('stmtPwWrap').classList.add('hide');
+    showFound(statementItems(rows), 'statement', box, 'statement');
+  } catch(e){
+    if (e && e.name === 'PasswordException'){
+      pendingPdf = file; $('stmtPwWrap').classList.remove('hide'); $('stmtPw').focus();
+      box.innerHTML = `<p class="hint">${password ? 'That password did not open it. Try again.' : 'This statement is password-protected. Banks usually use your date of birth, customer ID or a mix of name and birth year.'}</p>`;
+    } else box.innerHTML = `<p class="hint">I could not read that file (${esc(e && e.message || 'unknown error')}). Try the CSV or Excel download from your bank instead.</p>`;
+  }
+}
+$('stmtOpen').onclick = () => { ['importForm','connectPanel'].forEach(x => $(x).classList.add('hide')); $('stmtPanel').classList.toggle('hide'); };
+$('stmtFile').onchange = () => { const f = $('stmtFile').files[0]; if (f) readStatement(f); };
+$('stmtPwGo').onclick = () => { if (pendingPdf) readStatement(pendingPdf, $('stmtPw').value); };
+
+/* ---------- Connect a bank or UPI app (Account Aggregator consent flow) ----------
+   Live bank data needs an RBI-regulated partner, so this runs on sample data only;
+   with a real plan it explains what is coming and offers the options that work today. */
+const SOURCES = {upi:['Google Pay','PhonePe','Paytm','BHIM'], bank:['HDFC Bank','ICICI Bank','SBI','Axis Bank','Kotak']};
+let connectPick = null;
+function connectStep(n){
+  const box = $('connectBody'), t = todayIST(), from = new Date(t.getFullYear(), t.getMonth(), 1);
+  if (n === 1){
+    box.innerHTML = `<p class="label" style="margin:10px 0 6px">1 · Choose where your payments come from</p>
+      <small class="muted">UPI apps share payments made from their linked bank account.</small>
+      <div class="picks">${SOURCES.upi.map(x => `<button data-src="${x}"><b>${x}</b><small>UPI app</small></button>`).join('')}</div>
+      <div class="picks">${SOURCES.bank.map(x => `<button data-src="${x}"><b>${x}</b><small>Savings or current</small></button>`).join('')}</div>`;
+    box.querySelectorAll('[data-src]').forEach(b => b.onclick = () => { connectPick = b.getAttribute('data-src'); connectStep(2); });
+  }
+  if (n === 2){
+    box.innerHTML = `<p class="label" style="margin:10px 0 6px">2 · Check what you are agreeing to share</p>
+      <table class="consent"><tr><td>From</td><td>${esc(connectPick)}</td></tr><tr><td>What</td><td>Transactions only. No balance, no login, no ability to pay</td></tr>
+      <tr><td>Period</td><td>${from.toLocaleDateString('en-IN',{day:'numeric',month:'short'})} – today, then daily</td></tr><tr><td>Purpose</td><td>Budgeting in BudgetSense</td></tr>
+      <tr><td>How long</td><td>Until you switch it off. Stop any time from your Account Aggregator app</td></tr></table>
+      <p class="hint">You confirm once with an OTP from your bank, through an RBI-licensed Account Aggregator.</p>
+      <div class="row"><button class="btn" id="cBack">Back</button><button class="btn primary" id="cOk" style="flex:1">Agree and fetch</button></div>`;
+    $('cBack').onclick = () => connectStep(1); $('cOk').onclick = () => connectStep(3);
+  }
+  if (n === 3){
+    if (!state.sample){
+      box.innerHTML = `<p class="label" style="margin:10px 0 6px">3 · Not live yet</p>
+        <p class="hint">Live bank linking needs an RBI-regulated partner, which is planned once the one-month trial shows results. Nothing was shared. Until then, the fastest options are <b>Upload statement</b> (a PDF or CSV from your bank, which catches every UPI payment) and <b>Paste alerts</b>.</p>
+        <div class="row"><button class="btn" id="cBack">Back</button><button class="btn primary" id="cStmt" style="flex:1">Upload a statement instead</button></div>`;
+      $('cBack').onclick = () => connectStep(2); $('cStmt').onclick = () => { $('connectPanel').classList.add('hide'); $('stmtPanel').classList.remove('hide'); };
+      return;
+    }
+    const d = k => { const x = new Date(t); x.setDate(Math.max(1, t.getDate() - k)); return iso(x); };
+    const acct = String(1000 + (connectPick.length * 137) % 9000);
+    const sample = [[0,20,'Chai Tapri','Coffee & chai'],[0,60,'Rapido Auto','Transport'],[1,10,'Beggar','Gifts & giving'],[1,249,'Jiomart','Groceries'],[2,5,'Cobbler','Small cash'],[3,2400,'LinkedIn Premium','Subscriptions',true],[4,180,'Zomato','Eating out'],[5,499,'Airtel Recharge','Utilities']];
+    showFound(sample.map(([k,amount,description,category,autopay]) => ({type:'expense', amount, description, category, date:d(k), ref:'', acct, via:connectPick, autopay:!!autopay})), `${connectPick} account (sample)`, $('connectBody'), 'sample');
+  }
+}
+$('connectOpen').onclick = () => { ['importForm','stmtPanel'].forEach(x => $(x).classList.add('hide')); $('connectPanel').classList.toggle('hide'); connectStep(1); };
+
+$('importOpen').onclick = () => { ['stmtPanel','connectPanel'].forEach(x => $(x).classList.add('hide')); $('importForm').classList.toggle('hide'); $('importText').focus(); };
 $('importForm').onsubmit = e => { e.preventDefault(); runImport($('importText').value); };
 $('importClip').onclick = async () => {
   try { const t = await navigator.clipboard.readText(); $('importText').value = t; runImport(t); }
@@ -1872,15 +2069,27 @@ function itemRow(t, full){
   const icon = t.type === 'saving' ? (state.goals.find(g => g.name === t.category)?.icon || '🎯') : (CATS[t.category]?.icon || '🧾');
   const kind = t.type === 'income' ? 'In' : t.type === 'saving' ? 'Milestone' : CATS[t.category]?.kind === 'must' ? 'Must-pay' : 'Lifestyle';
   const clip = t.recId && (memAudio.has(t.recId) || state.recs.find(r => r.id === t.recId)?.hasAudio);
-  const src = {sample:'sample', typed:'typed', demo:'demo', bank:'bank alert'}[t.source] || 'voice';
+  const src = {sample:'sample', typed:'typed', demo:'demo', bank:'bank alert', statement:'statement'}[t.source] || 'voice';
   const ask = full && kind === 'Lifestyle' && t.mood == null;
+  const editing = full && state.editing === t.id;
+  const pool = t.type === 'income' ? INCOME : SPEND;
+  const editor = editing ? `<div class="edit"><select id="edCat" aria-label="Envelope">${t.type === 'saving' ? `<option>${esc(t.category)}</option>` : pool.map(c => `<option ${c === t.category ? 'selected' : ''}>${c}</option>`).join('')}</select>
+      <input type="number" id="edAmt" value="${t.amount}" min="0" step="any" aria-label="Amount">
+      <div class="row"><button class="btn primary" data-edsave="${t.id}">Save</button><button class="btn danger" data-eddel="${t.id}">Delete</button><button class="btn" data-edcancel="1">Cancel</button></div></div>` : '';
   return `<li><span class="ico">${icon}</span><span class="t"><b>${esc(t.description)}</b><small>${esc(t.category)} · ${full ? src : dayLabel(t.date)}${t.mood === true ? ' · 😊' : t.mood === false ? ' · 😕' : ''}</small>${clip ? `<button class="playb" data-play="${t.recId}" aria-label="Play the original voice note">▶</button>` : ''}
-    ${ask ? `<div class="again">Buy it again? <button data-mood="${t.id}:1">😊 Yes</button><button data-mood="${t.id}:0">😕 No</button></div>` : ''}</span>
+    ${full && !editing ? `<button class="mini" data-edit="${t.id}" aria-label="Edit ${esc(t.description)}">✎</button>` : ''}
+    ${ask && !editing ? `<div class="again">Buy it again? <button data-mood="${t.id}:1">😊 Yes</button><button data-mood="${t.id}:0">😕 No</button></div>` : ''}${editor}</span>
     <span class="amt ${t.type !== 'expense' ? 'in' : ''}">${t.type === 'income' ? '+' : t.type === 'saving' ? '→' : ''}${inr(t.amount)}<small>${kind}</small></span></li>`;
 }
 function renderTimeline(){
-  const txs = figures().txs.sort((a,b) => b.date.localeCompare(a.date) || b.at - a.at);
-  if (!txs.length){ $('timeline').innerHTML = `<div class="card empty">No entries in ${mLong(state.month)}.</div>`; return; }
+  const f = state.tlf, all = figures().txs;
+  document.querySelectorAll('[data-tt]').forEach(b => b.setAttribute('aria-pressed', b.getAttribute('data-tt') === f.type));
+  const cats = [...new Set(all.map(t => t.category))].sort();
+  $('tlCat').innerHTML = `<option value="">All envelopes</option>` + cats.map(c => `<option ${c === f.cat ? 'selected' : ''}>${esc(c)}</option>`).join('');
+  const q = f.q.toLowerCase();
+  const txs = all.filter(t => (f.type === 'all' || t.type === f.type) && (!f.cat || t.category === f.cat) && (!q || (t.description + ' ' + t.category).toLowerCase().includes(q)))
+                 .sort((a,b) => b.date.localeCompare(a.date) || b.at - a.at);
+  if (!txs.length){ $('timeline').innerHTML = `<div class="card empty">${all.length ? 'No entries match.' : `No entries in ${mLong(state.month)}.`}</div>`; return; }
   const days = {}; txs.forEach(t => (days[t.date] = days[t.date] || []).push(t));
   $('timeline').innerHTML = Object.entries(days).map(([d, list]) => {
     const out = list.filter(t => t.type === 'expense').reduce((a,t) => a + t.amount, 0);
@@ -1923,8 +2132,27 @@ function bind(){
     if (!blob){ toast('The audio for this note is not on this device'); return; }
     const a = new Audio(URL.createObjectURL(blob)), old = b.textContent; b.textContent = '♪'; a.onended = () => b.textContent = old; a.play();
   });
+  document.querySelectorAll('[data-edit]').forEach(b => b.onclick = () => { state.editing = b.getAttribute('data-edit'); renderTimeline(); });
+  document.querySelectorAll('[data-edcancel]').forEach(b => b.onclick = () => { state.editing = null; renderTimeline(); });
+  document.querySelectorAll('[data-edsave]').forEach(b => b.onclick = () => {
+    const t = state.txs.find(x => x.id === b.getAttribute('data-edsave')); if (!t) return;
+    const amt = parseFloat($('edAmt').value);
+    if (t.type === 'saving' && amt > 0){ const g = state.goals.find(g => g.name === t.category); if (g) g.saved += amt - t.amount; }
+    if (amt > 0) t.amount = amt;
+    if (t.type !== 'saving') t.category = $('edCat').value;
+    state.editing = null; save(); toast('Entry updated'); render();
+  });
+  document.querySelectorAll('[data-eddel]').forEach(b => b.onclick = () => {
+    if (!b.dataset.armed){ b.dataset.armed = '1'; b.textContent = 'Tap to delete'; return; }
+    const t = state.txs.find(x => x.id === b.getAttribute('data-eddel')); if (!t) return;
+    if (t.type === 'saving'){ const g = state.goals.find(g => g.name === t.category); if (g) g.saved -= t.amount; }
+    state.txs = state.txs.filter(x => x !== t); state.editing = null; save(); toast('Entry deleted'); render();
+  });
   document.querySelectorAll('[data-mood]').forEach(b => b.onclick = () => { const [id, v] = b.getAttribute('data-mood').split(':'); const t = state.txs.find(x => x.id === id); if (t){ t.mood = v === '1'; save(); render(); } });
 }
+document.querySelectorAll('[data-tt]').forEach(b => b.onclick = () => { state.tlf.type = b.getAttribute('data-tt'); renderTimeline(); });
+$('tlCat').onchange = () => { state.tlf.cat = $('tlCat').value; renderTimeline(); };
+$('tlSearch').oninput = () => { state.tlf.q = $('tlSearch').value; renderTimeline(); };
 $('support').textContent = !navigator.mediaDevices ? 'This browser cannot record audio.' : SR ? 'Notes are recorded and transcribed in your browser (English – India) and stay on this device.' : 'Notes are recorded; live transcription needs Chrome, Edge or Safari.';
 
 /* Me: settings */
@@ -2131,7 +2359,7 @@ document.addEventListener('keydown', e => { if ($('tour').classList.contains('hi
    ===================================================================== */
 load();
 if (state.profile) enterApp(); else { renderChecks({}); showSetup('welcome'); }
-if (location.hash === '#test') window.__bs = {handleCommand, state, uid, interpret, normalise, parseSetup, parseAmount, answer, figures, runDemo, save, parseAlert, splitAlerts, recurring};
+if (location.hash === '#test') window.__bs = {handleCommand, state, uid, interpret, normalise, parseSetup, parseAmount, answer, figures, runDemo, save, parseAlert, splitAlerts, recurring, statementItems, parseCSV, narrationPayee, whatIf};
 })();
 </script>
 </body>
