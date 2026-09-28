@@ -63,6 +63,9 @@ body{margin:0;color:var(--ink);font-family:'DM Sans',system-ui,sans-serif;overfl
 #tour .t-bar{height:4px;border-radius:2px;background:#2a2e38;margin:12px 0}
 #tour .t-bar div{height:4px;border-radius:2px;background:#f2a93b;transition:width .3s}
 #tour .t-ctl{display:flex;gap:6px;flex-wrap:wrap}
+#tour .t-hint{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:10px 0 0;padding:10px;border-radius:10px;background:rgba(255,184,28,.12);border:1px solid rgba(255,184,28,.45);font-size:13px;line-height:1.45;color:#ffe1a1}
+#tour .t-hint[hidden]{display:none}
+#tour .t-hint span{flex:1 1 180px}
 #tour button{min-height:40px;padding:0 12px;border-radius:8px;border:1px solid #343945;background:#1f232c;color:#eceef2;font:600 13px 'DM Sans',sans-serif;cursor:pointer}
 #tour button.pri{background:#f2a93b;border-color:#f2a93b;color:#1a1305;margin-left:auto}
 #tour .t-x{margin-left:auto;min-height:32px;padding:0 10px;background:transparent;border:0;color:#a3a9b5}
@@ -742,7 +745,9 @@ var Tour = (function () {
     box = el('div', { id: 'tour', role: 'dialog', 'aria-label': 'Guided tour', 'aria-live': 'polite' });
     box.hidden = true;
     box.innerHTML = '<div class="t-top"><span class="t-dot"></span><span class="t-step"></span><button type="button" class="t-x" data-a="end" aria-label="End tour">End tour</button></div>' +
-      '<h2 class="t-title"></h2><p class="t-text"></p><div class="t-bar"><div></div></div>' +
+      '<h2 class="t-title"></h2><p class="t-text"></p>' +
+      '<div class="t-hint" hidden><span></span><button type="button" class="pri" data-a="play">\u25B6 Play voice</button></div>' +
+      '<div class="t-bar"><div></div></div>' +
       '<div class="t-ctl"><button type="button" data-a="back">Back</button><button type="button" data-a="pause">Pause</button><button type="button" data-a="mute">Mute</button><button type="button" class="pri" data-a="next">Next</button></div>';
     box.addEventListener('click', function (e) {
       var a = e.target.closest('button[data-a]'); if (!a) return;
@@ -752,6 +757,7 @@ var Tour = (function () {
       else if (act === 'pause') togglePause();
       else if (act === 'mute') toggleMute();
       else if (act === 'end') end();
+      else if (act === 'play') { unlock(); paused = false; muted = false; render(); speakNow(); }
     });
     document.body.appendChild(box);
     launch = el('button', { id: 'tour-launch', type: 'button' }, '▶ Guided tour');
@@ -782,27 +788,79 @@ var Tour = (function () {
     if (t) { t.classList.add('tour-hl'); t.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
   }
 
-  function stopVoice() { if (synth) synth.cancel(); clearTimeout(timer); }
+  var token = 0, keepAlive = null, heard = false;
+  var isAndroid = /android/i.test(navigator.userAgent);
+
+  function stopVoice() {
+    token++;
+    clearTimeout(timer); clearInterval(keepAlive);
+    if (synth && (synth.speaking || synth.pending)) synth.cancel();
+  }
+
+  // Browsers only allow speech that starts from a tap or click. Call this inside the click.
+  function unlock() {
+    if (!synth) return;
+    try {
+      if (synth.speaking || synth.pending) synth.cancel();
+      var u = new SpeechSynthesisUtterance(' ');
+      u.volume = 0;
+      synth.speak(u);
+      synth.resume();
+    } catch (e) {}
+  }
+
+  function hint(msg) {
+    var h = box.querySelector('.t-hint');
+    if (!msg) { h.hidden = true; return; }
+    h.hidden = false;
+    h.querySelector('span').textContent = msg;
+  }
 
   function speak() {
     stopVoice();
+    var my = token;
     var dot = box.querySelector('.t-dot');
     var text = STEPS[i].say;
-    var after = function () { dot.classList.remove('talk'); if (on && !paused) timer = setTimeout(function () { if (i < STEPS.length - 1) go(i + 1); }, 1400); };
+    var readTime = Math.max(4000, text.split(' ').length * 380);
+    var after = function () {
+      if (my !== token) return;
+      clearInterval(keepAlive);
+      dot.classList.remove('talk');
+      if (on && !paused) timer = setTimeout(function () { if (my === token && i < STEPS.length - 1) go(i + 1); }, 1400);
+    };
     if (paused) return;
-    if (synth && !muted) {
-      var u = new SpeechSynthesisUtterance(text);
-      voice = voice || pickVoice();
-      if (voice) u.voice = voice;
-      u.lang = voice ? voice.lang : 'en-IN';
-      u.rate = 0.98;
-      u.onstart = function () { dot.classList.add('talk'); };
-      u.onend = after;
-      u.onerror = function () { dot.classList.remove('talk'); timer = setTimeout(after, text.split(' ').length * 380); };
-      synth.speak(u);
-    } else {
-      timer = setTimeout(after, Math.max(4000, text.split(' ').length * 380));
-    }
+    if (!synth) { hint('This browser cannot play the voice guide. Read along here, or open the demo in Chrome, Edge or Safari.'); timer = setTimeout(after, readTime); return; }
+    if (muted) { timer = setTimeout(after, readTime); return; }
+    var u = new SpeechSynthesisUtterance(text);
+    voice = voice || pickVoice();
+    if (voice) u.voice = voice;
+    u.lang = voice ? voice.lang : 'en-IN';
+    u.rate = 0.98;
+    var started = false;
+    u.onstart = function () {
+      if (my !== token) return;
+      started = true; heard = true; hint(null);
+      dot.classList.add('talk');
+      // Chrome on computers stops speech that runs longer than about 15 seconds; nudge it.
+      if (!isAndroid) keepAlive = setInterval(function () { if (synth.speaking) { synth.pause(); synth.resume(); } }, 9000);
+    };
+    u.onend = after;
+    u.onerror = function (e) {
+      if (my !== token) return;
+      if (e && (e.error === 'interrupted' || e.error === 'canceled')) return;
+      dot.classList.remove('talk');
+      if (e && e.error === 'not-allowed') { hint('Your browser blocked the sound. Press Play voice to hear the guide.'); return; }
+      timer = setTimeout(after, readTime);
+    };
+    synth.speak(u);
+    synth.resume();
+    // If no sound has started after a few seconds, say so instead of moving on in silence.
+    setTimeout(function () {
+      if (my !== token || started || paused || muted) return;
+      hint(heard
+        ? 'The voice stopped. Press Play voice to continue.'
+        : 'Can\'t hear the guide? Turn your volume up (on iPhone, switch off silent mode), then press Play voice.');
+    }, 3000);
   }
 
   function render() {
@@ -824,13 +882,18 @@ var Tour = (function () {
     stopVoice();
     var target = STEPS[i].s;
     if (App.current() !== target) App.open(target);
-    setTimeout(function () { highlight(); speak(); }, 350);
+    setTimeout(highlight, 350);
+    speakNow();
   }
 
-  function togglePause() { paused = !paused; if (paused) stopVoice(); else speak(); render(); }
-  function toggleMute() { muted = !muted; if (muted && synth) synth.cancel(); render(); if (!paused && muted) speak(); if (!muted && !paused) speak(); }
+  // Speak inside the same click that asked for it, so browsers allow the sound.
+  function speakNow() { speak(); }
+
+  function togglePause() { paused = !paused; if (paused) stopVoice(); else { unlock(); speak(); } render(); }
+  function toggleMute() { muted = !muted; if (!muted) unlock(); render(); if (!paused) speak(); }
 
   function start() {
+    unlock();
     if (!box) build();
     on = true; paused = false; box.hidden = false; launch.hidden = true;
     go(0);
@@ -847,7 +910,7 @@ var Tour = (function () {
   }
 
   return {
-    start: start, end: end,
+    start: start, end: end, unlock: unlock,
     active: function () { return on; },
     onPaint: function () {
       if (!box) build();
@@ -856,6 +919,12 @@ var Tour = (function () {
     }
   };
 })();
+
+// Unlock speech inside the tap that asks for the demo, even when the tour starts a moment later.
+document.addEventListener('click', function (e) {
+  var b = e.target.closest && e.target.closest('button, a');
+  if (b && /guided demo|Explore demo/i.test(b.textContent || '') && window.Tour) Tour.unlock();
+}, true);
 
 App.start();
 </script>
