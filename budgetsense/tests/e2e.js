@@ -361,6 +361,58 @@ const FAKE_SR = () => {
     check((await text('#hello')).includes('Sheuli'), 'did not return to own plan');
   });
 
+  await test('Several spends in one voice note are all saved', async () => {
+    await page.click('[data-tab=pulse]'); await page.click('#speakBtn'); await page.waitForTimeout(300); await page.click('#recBtn'); await page.waitForTimeout(600);
+    const n = (await st()).txs.length;
+    await say('10 to a beggar, 5 for the cobbler and 40 on chai');
+    const t = (await st()).txs.slice(n);
+    check(t.length === 3 && t.map(x => x.amount).join() === '10,5,40', 'multi-item note not split: ' + JSON.stringify(t.map(x => [x.amount, x.description])));
+    check(t[0].category === 'Gifts & giving' && t[1].category === 'Small cash', 'multi-item categories wrong');
+    await page.click('#sheetClose'); await page.waitForTimeout(200);
+  });
+
+  await test('Evening check-in appears after its time and can be closed', async () => {
+    await page.evaluate(() => { const s = JSON.parse(localStorage.getItem('budgetsense.v3')); s.prefs.checkin = true; s.prefs.checkinTime = '00:00'; s.checkins = {}; localStorage.setItem('budgetsense.v3', JSON.stringify(s)); });
+    await page.reload(); await page.waitForTimeout(300);
+    check(await page.isVisible('#checkinSlot .checkin'), 'check-in card missing');
+    await page.click('#checkinNone'); await page.waitForTimeout(200);
+    check(!(await page.isVisible('#checkinSlot .checkin')), 'check-in card did not close');
+    check(Object.keys((await st()).checkins).length === 1, 'check-in not recorded');
+  });
+
+  await test('Bank alert import: parses, skips duplicates and OTPs, adds the rest', async () => {
+    await page.click('[data-tab=timeline]'); await page.click('#importOpen');
+    const alerts = [
+      'Rs.5.00 debited from A/c XX1234 on 28-09-26 to VPA cobbler.raju@ybl (UPI Ref No 426512345678). Not you? Call 1800',
+      'INR 1,950.00 spent on ICICI Bank Card XX9876 on 26-Sep-26 at AMAZON PAY INDIA. Avl Lmt: INR 1,20,000.00',
+      'Your OTP for txn of Rs 500 is 123456',
+      'AutoPay: Rs 2,400 debited towards LinkedIn Premium via e-mandate on 12-09-26 from A/c XX1234',
+    ].join('\n\n');
+    await page.fill('#importText', alerts); await page.click('#importForm button[type=submit]'); await page.waitForTimeout(200);
+    check((await page.$$('#importResult .found li')).length === 3, 'expected 3 payments found (OTP skipped)');
+    check((await page.$$('#importResult .found li.dup')).length === 1 && /Cobbler/.test(await text('#importResult .found li.dup')), 'voice-logged cobbler payment not recognised as already logged');
+    const n = (await st()).txs.length;
+    await page.click('#importAdd'); await page.waitForTimeout(200);
+    const added = (await st()).txs.slice(n);
+    // The ₹5 cobbler payment was already logged by voice earlier, so only 2 are new.
+    check(added.length === 2 && added.every(t => t.source === 'bank'), 'imported entries not added: ' + added.length);
+    check(added.find(t => /Linkedin Premium/i.test(t.description)).autopay, 'AutoPay not flagged');
+    await page.click('#importOpen'); await page.fill('#importText', alerts); await page.click('#importForm button[type=submit]'); await page.waitForTimeout(200);
+    check(/Add 0 new/.test(await text('#importAdd')), 'duplicates not detected on second import: ' + await text('#importAdd'));
+    await page.click('#importOpen');
+    await noOverflow('import');
+  });
+
+  await test('Automatic payments are detected and can be marked to cancel', async () => {
+    await page.click('[data-tab=pulse]');
+    check(/Linkedin Premium/i.test(await text('#recurWrap')), 'LinkedIn AutoPay not listed as automatic');
+    await page.click('#recurWrap [data-recur$=":cancel"]'); await page.waitForTimeout(200);
+    check(/Marked to cancel/.test(await text('#recurWrap')), 'cancel decision not shown');
+    await page.click('[data-ask="What are my automatic payments?"]'); await page.waitForTimeout(200);
+    check(/automatic payment/.test(await text('#draft')) && /a year/.test(await text('#draft')), 'automatic payments answer missing: ' + await text('#draft'));
+    await page.click('#sheetClose'); await page.waitForTimeout(200);
+  });
+
   await test('Dark mode toggle', async () => {
     await page.click('[data-tab=me]'); await page.click('#swDark');
     const bg = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
@@ -389,9 +441,25 @@ const FAKE_SR = () => {
     check(s.profile.name === 'Asha' && s.plan.Travel === 3000 && !('Coffee & chai' in s.plan) && s.goals[0].icon === '🛟', 'manual plan wrong: ' + JSON.stringify(s.plan));
   });
 
+  await test('Spending alarm fires when half the month\'s income is spent', async () => {
+    let beeps = 0;
+    await page.exposeFunction('__beeped', () => { beeps++; });
+    await page.evaluate(() => { const O = window.OscillatorNode.prototype.start; window.OscillatorNode.prototype.start = function(...a){ window.__beeped(); return O.apply(this, a); }; });
+    await page.click('[data-tab=pulse]'); await page.click('#speakBtn'); await page.waitForTimeout(300); await page.click('#recBtn'); await page.waitForTimeout(600);
+    await say('rent 46,000'); await say('yes');
+    check(await page.isVisible('#alarm'), 'alarm banner not shown at 50%');
+    check(/Be alert/.test(await text('#alarmText')) && /51%/.test(await text('#alarmText')), 'alarm text wrong: ' + await text('#alarmText'));
+    check(beeps >= 2, 'no alarm sound: ' + beeps);
+    await page.click('#alarmClose');
+    await say('Starbucks 200'); await say('yes');
+    check(!(await page.isVisible('#alarm')), 'alarm repeated for the same threshold');
+    await page.click('#sheetClose'); await page.waitForTimeout(200);
+  });
+
   await test('Load sample data needs two taps', async () => {
     await page.click('[data-tab=me]'); await page.click('#sampleBtn'); await page.click('#sampleBtn'); await page.waitForTimeout(300);
-    check((await st()).sample && (await st()).txs.length === 18, 'sample data not loaded');
+    check((await st()).sample && (await st()).txs.length === 23, 'sample data not loaded: ' + (await st()).txs.length);
+    check(/Netflix/.test(await text('#recurWrap')) && /Linkedin|LinkedIn/.test(await text('#recurWrap')), 'sample automatic payments missing');
   });
 
   await test('Guided demo runs from setup to summary', async () => {

@@ -137,6 +137,28 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--teal);outline-of
 .playb{border:0;background:var(--teal-soft);color:var(--teal);width:26px;height:26px;border-radius:50%;font-size:10px;margin-left:6px;vertical-align:middle}
 .empty{color:var(--muted);text-align:center;padding:22px 10px}
 
+/* ---------- Missed-expense capture ---------- */
+.checkin{background:linear-gradient(135deg,var(--saffron-soft),var(--surface));border-color:color-mix(in srgb,var(--saffron) 45%,var(--line))}
+.checkin b{font-size:16px}
+.importcard small{font-size:12px}
+.importcard textarea{width:100%;background:var(--sunk);border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:14px;resize:vertical}
+.found{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:6px}
+.found li{display:flex;gap:10px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.found li.dup{opacity:.55}
+.found .t{flex:1;min-width:0}
+.found .t b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.found .t small{color:var(--muted);font-size:12px}
+.found input{width:18px;height:18px;flex:none}
+.recur li .amt small{color:var(--warn)}
+
+.alarm{position:fixed;left:50%;transform:translateX(-50%);top:calc(12px + env(safe-area-inset-top, 0px));z-index:45;width:calc(100% - 32px);max-width:528px;display:flex;gap:10px;align-items:center;background:var(--danger);color:#fff;border-radius:16px;padding:12px 14px;font-weight:700;box-shadow:0 12px 30px rgba(0,0,0,.3);animation:shake .5s 2}
+.alarm.warn{background:var(--warn)}
+.alarm span:nth-child(2){flex:1}
+.alarm button{border:0;background:rgba(255,255,255,.2);color:#fff;width:30px;height:30px;border-radius:10px}
+.alarm-ico{font-size:22px}
+@keyframes shake{0%,100%{transform:translateX(-50%)}25%{transform:translateX(calc(-50% - 6px))}75%{transform:translateX(calc(-50% + 6px))}}
+@media (prefers-reduced-motion: reduce){.alarm{animation:none}}
+
 /* ---------- Me ---------- */
 .me{display:flex;gap:14px;align-items:center}
 .avatar{width:60px;height:60px;border-radius:18px;background:var(--teal);color:var(--teal-ink);display:grid;place-items:center;font-weight:800;font-size:24px;flex:none}
@@ -357,11 +379,13 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--teal);outline-of
   <div class="sample hide" id="sampleNote"><b>Sample data.</b> Try your voice on it freely. Say <b>“wipe everything”</b> or go to <b>Me</b> to set up your own plan.</div>
 
   <section id="t-pulse">
+    <div id="checkinSlot"></div>
     <div class="card" id="pulseCard"></div>
     <div id="alerts"></div>
     <div class="card readout" id="readout"></div>
     <div class="h2row"><h2>Milestones</h2><small>Say “put 5,000 in Goa trip”</small></div>
     <div class="hscroll" id="milestones"></div>
+    <div id="recurWrap"></div>
     <div class="h2row"><h2>Ask me</h2><small>Tap one, or just say it</small></div>
     <div class="chips" id="askChips"></div>
     <div class="h2row"><h2>Latest money notes</h2><button class="textlink" data-tabgo="timeline">See all</button></div>
@@ -386,6 +410,14 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--teal);outline-of
   </section>
 
   <section id="t-timeline" class="hide">
+    <div class="card importcard">
+      <div class="spread"><span><b>📥 Catch what you missed</b><small class="muted" style="display:block">Paste bank, UPI or card alert messages or emails. I add what's missing and skip what's already here.</small></span><button class="btn primary" id="importOpen">Import</button></div>
+      <form class="hide" id="importForm" style="margin-top:12px">
+        <textarea id="importText" rows="6" placeholder="Paste one or many alerts, e.g.&#10;Rs.5.00 debited from A/c XX1234 on 28-09-26 to VPA cobbler@ybl UPI Ref 426512345678"></textarea>
+        <div class="row" style="margin-top:8px;flex-wrap:wrap"><button type="button" class="btn" id="importClip">📋 Paste from clipboard</button><button type="submit" class="btn primary">Find payments</button></div>
+        <div id="importResult"></div>
+      </form>
+    </div>
     <div class="card" style="padding:12px 14px"><p class="hint" style="margin:0">🎙 Say <b>“undo”</b>, <b>“move last to shopping”</b>, <b>“happy with it”</b> or <b>“regret it”</b>. Tap ▶ to hear the original note.</p></div>
     <div id="timeline"></div>
   </section>
@@ -400,6 +432,9 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--teal);outline-of
         <li><span><b>Spoken replies</b><small>BudgetSense talks back</small></span><button class="sw" id="swReplies" aria-label="Spoken replies"></button></li>
         <li><span><b>Quick save</b><small>Save confident AI picks without asking</small></span><button class="sw" id="swQuick" aria-label="Quick save"></button></li>
         <li><span><b>Dark mode</b></span><button class="sw" id="swDark" aria-label="Dark mode"></button></li>
+        <li><span><b>Spending alarm</b><small>Beep, vibration and a spoken warning when spending crosses 50%, 75%, 90% and 100% of the month's income</small></span><button class="sw" id="swAlarm" aria-label="Spending alarm"></button></li>
+        <li><span><b>Evening check-in</b><small id="checkinNote">A nudge each evening to add cash spends you forgot</small></span><span class="row"><select id="checkinTime" aria-label="Check-in time" style="width:auto"><option>20:00</option><option>21:00</option><option>22:00</option></select><button class="sw" id="swCheckin" aria-label="Evening check-in"></button></span></li>
+        <li><span><b>Bank alert emails</b><small>Coming with sign-in: a private address you can auto-forward bank alerts to, so they are added without you doing anything</small></span><span class="tagx t-none">Next phase</span></li>
         <li><span><b>Voice tour</b><small>Screen-by-screen guide with narration</small></span><button class="btn" id="tourReplay">🎧 Start</button></li>
         <li><span><b>Guided voice demo</b><small>Watch setup-to-summary by voice alone</small></span><button class="btn primary" id="demoBtn">▶ Play</button></li>
         <li><span><b>Download voice diary</b><small>Every note, transcript and result (CSV)</small></span><button class="btn" id="exportBtn">⬇ CSV</button></li>
@@ -453,6 +488,7 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--teal);outline-of
 </div>
 
 <div class="demo hide" id="demoBar"><div><b id="demoTitle">Guided demo</b><span id="demoText"></span><div class="bar"><i id="demoProg"></i></div></div><button id="demoStop">Stop</button></div>
+<div class="alarm hide" id="alarm" role="alert"><span class="alarm-ico">⏰</span><span id="alarmText"></span><button id="alarmClose" aria-label="Dismiss">✕</button></div>
 <div class="toast" id="toast"></div>
 <div class="notetaker hide ntfloat" id="floatVisual" aria-live="polite"><video muted loop playsinline preload="none" poster="media/notes.jpg" aria-hidden="true"><source src="media/notes.webm" type="video/webm"><source src="media/notes.mp4" type="video/mp4"></video><span class="nt-label"><i></i><b>Taking notes</b></span></div>
 
@@ -475,14 +511,15 @@ const CATS = {
   'Insurance':     {icon:'🛡', kind:'must', hint:'Health, life, vehicle', kw:['insurance','premium','lic','policy']},
   'Health':        {icon:'💊', kind:'must', hint:'Doctor, pharmacy, tests', kw:['apollo','pharmacy','medicine','medical','doctor','hospital','clinic','lab test','dental','health']},
   'Education':     {icon:'📚', kind:'must', hint:'Fees, courses, books', kw:['course','books','book','tuition','school','fees','udemy','coursera','outskill','exam','class','education']},
-  'Subscriptions': {icon:'📺', kind:'must', hint:'OTT, apps, memberships', kw:['netflix','prime','hotstar','spotify','youtube premium','subscription','renewal','icloud','google one','chatgpt']},
+  'Subscriptions': {icon:'📺', kind:'must', hint:'OTT, apps, memberships', kw:['netflix','prime','hotstar','spotify','youtube premium','subscription','renewal','icloud','google one','chatgpt','linkedin','autopay','mandate']},
   'Eating out':    {icon:'🍛', kind:'life', kw:['swiggy','zomato','restaurant','dinner','lunch','breakfast','biryani','pizza','burger','food','meal','dominos','kfc','mcdonald','eating out','takeaway']},
   'Coffee & chai': {icon:'☕', kind:'life', kw:['coffee','starbucks','third wave','blue tokai','chai','tea','cafe','ccd']},
   'Shopping':      {icon:'🛍', kind:'life', kw:['amazon','flipkart','myntra','ajio','shopping','clothes','shoes','shirt','dress','kurta','saree','gadget','headphones','mall']},
   'Entertainment': {icon:'🎬', kind:'life', kw:['movie','movies','pvr','inox','cinema','concert','game','bookmyshow','show','event','entertainment']},
   'Travel':        {icon:'🧳', kind:'life', kw:['flight','hotel','airbnb','trip','holiday','makemytrip','goibibo','irctc','vacation','indigo','travel']},
   'Self-care':     {icon:'💆', kind:'life', kw:['salon','haircut','spa','parlour','grooming','cosmetics','nykaa','gym','cult','yoga']},
-  'Gifts & giving':{icon:'🎁', kind:'life', kw:['gift','gifts','donation','charity','present']},
+  'Gifts & giving':{icon:'🎁', kind:'life', kw:['gift','gifts','donation','charity','present','beggar','alms','temple','mandir','dakshina']},
+  'Small cash':    {icon:'🪙', kind:'life', kw:['cobbler','cash','tip','tips','parking attendant','watchman','porter','coolie','istri','ironing','press wala','dhobi','chaiwala']},
   'Other':         {icon:'🧾', kind:'life', kw:[]},
   'Salary':        {icon:'💼', kind:'income', kw:['salary','payroll','paycheck']},
   'Extra income':  {icon:'💵', kind:'income', kw:['freelance','client','consulting','invoice','bonus','refund','cashback','interest','dividend','side']},
@@ -612,7 +649,7 @@ function cleanDescription(t, amt){
   s = s.replace(/\b(rs\.?|rupees?|inr|bucks)\b/gi,' ')
        .replace(/\b(i\s+)?(just\s+)?(spent|paid|pay|bought|got|received|earned|credited|debited|today|yesterday|day before)\b/gi,' ')
        .replace(/\s+/g,' ').trim()
-       .replace(/^(on|at|for|to|my|a|an|the)\s+/i,'').replace(/\s+(on|at|for|to|of)$/i,'')
+       .replace(/^((on|at|for|to|my|a|an|the)\s+)+/i,'').replace(/\s+(on|at|for|to|of)$/i,'')
        .replace(/[.,!?]+$/,'').trim();
   if (!s) s = t;
   return s.charAt(0).toUpperCase() + s.slice(1);
@@ -722,12 +759,28 @@ function interpret(raw){
     }
     return {kind:'error', msg:'I need an envelope and an amount, for example “groceries limit 8,000”.'};
   }
+  if (/\b(automatic|auto[- ]?debit|recurring|subscriptions?|standing instructions?|mandates?)\b/.test(low) && /\b(what|show|list|how much|which|my)\b/.test(low)) return {kind:'ask', q:'recurring'};
+  if (/^(nothing|no(ne)?|nothing today|nothing else|that'?s all|all done)\b/.test(low) && checkinDue()) return {kind:'checkinDone'};
+  // Several spends in one note: "10 to a beggar, 5 for the cobbler and 40 on chai"
+  const parts = splitItems(t);
+  if (parts.length > 1) return {kind:'multi', txs: parts.map(p => { const pl = p.toLowerCase(), pa = parseAmount(pl), type = INCOME_RE.test(pl) ? 'income' : 'expense';
+    return {type, amount:pa.value, description:cleanDescription(p, pa), category:categorise(pl, type).category, date:parseDate(pl)}; })};
   // Money in / out
   const a = parseAmount(low);
   if (!a) return {kind:'error', msg:'I did not catch an amount. Try “four fifty at Swiggy”.'};
   const type = INCOME_RE.test(low) ? 'income' : 'expense';
   const {category, confidence} = categorise(low, type);
   return {kind:'tx', tx:{type, amount:a.value, description:cleanDescription(t, a), category, confidence, date:parseDate(low)}};
+}
+function splitItems(t){
+  const segs = t.split(/\s*(?:,|;|\band then\b|\band\b|\bplus\b|\balso\b)\s*/i).filter(Boolean);
+  const out = []; let carry = '';
+  for (const seg of segs){
+    const cur = (carry ? carry + ' and ' : '') + seg;
+    if (/\d/.test(seg)){ out.push(cur); carry = ''; } else carry = cur;
+  }
+  if (carry && out.length) out[out.length - 1] += ' and ' + carry;
+  return out.filter(x => parseAmount(x.toLowerCase()));
 }
 function matchGoal(low){
   let best = null, score = 0;
@@ -747,12 +800,12 @@ const iso = d => d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDa
 const monthKey = d => d.getFullYear() + '-' + pad(d.getMonth()+1);
 function todayIST(){ const [y,m,d] = new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Kolkata'}).split('-').map(Number); return new Date(y, m-1, d); }
 const uid = () => Math.random().toString(36).slice(2,9) + Date.now().toString(36);
-const state = {month: monthKey(todayIST()), profile:null, plan:{}, goals:[], txs:[], recs:[], sample:false, pending:null, pendingNote:null, tab:'pulse', custom:{}, planByMonth:{}, filter:'all', prefs:{replies:true, quick:false}};
+const state = {month: monthKey(todayIST()), profile:null, plan:{}, goals:[], txs:[], recs:[], sample:false, pending:null, pendingNote:null, tab:'pulse', custom:{}, planByMonth:{}, filter:'all', checkins:{}, recurDecisions:{}, alarms:{}, prefs:{replies:true, quick:false, checkin:true, checkinTime:'21:00', alarm:true}};
 function load(){
   try {
     const s = JSON.parse(localStorage.getItem(LS) || 'null');
     if (!s) return false;
-    Object.assign(state, {profile:s.profile||null, plan:s.plan||{}, goals:s.goals||[], txs:s.txs||[], recs:s.recs||[], sample:!!s.sample, custom:s.custom||{}, planByMonth:s.planByMonth||{}, prefs:Object.assign(state.prefs, s.prefs||{})});
+    Object.assign(state, {profile:s.profile||null, plan:s.plan||{}, goals:s.goals||[], txs:s.txs||[], recs:s.recs||[], sample:!!s.sample, custom:s.custom||{}, planByMonth:s.planByMonth||{}, checkins:s.checkins||{}, recurDecisions:s.recurDecisions||{}, alarms:s.alarms||{}, prefs:Object.assign(state.prefs, s.prefs||{})});
     for (const [n,c] of Object.entries(state.custom)) addCustom(n, c.kind, c.icon);
     return true;
   } catch(e){ return false; }
@@ -760,7 +813,7 @@ function load(){
 function save(){
   // Snapshot this month's limits so each month is judged against the plan it actually had.
   if (state.profile && !state.sample) state.planByMonth[monthKey(todayIST())] = {...state.plan};
-  try { localStorage.setItem(LS, JSON.stringify({profile:state.profile, plan:state.plan, goals:state.goals, txs:state.txs, recs:state.recs, sample:state.sample, custom:state.custom, planByMonth:state.planByMonth, prefs:state.prefs})); } catch(e){} }
+  try { localStorage.setItem(LS, JSON.stringify({profile:state.profile, plan:state.plan, goals:state.goals, txs:state.txs, recs:state.recs, sample:state.sample, custom:state.custom, planByMonth:state.planByMonth, checkins:state.checkins, recurDecisions:state.recurDecisions, alarms:state.alarms, prefs:state.prefs})); } catch(e){} }
 
 const memAudio = new Map(); let dbp = null;
 function db(){ if (dbp) return dbp; dbp = new Promise(res => { try { const r = indexedDB.open('budgetsense-voice', 1); r.onupgradeneeded = () => r.result.createObjectStore('notes'); r.onsuccess = () => res(r.result); r.onerror = () => res(null); } catch(e){ res(null); } }); return dbp; }
@@ -783,13 +836,20 @@ function loadSample(){
     [11,'saving',15000,'Goa trip savings','Goa Trip'],[13,'expense',32000,'Rent','Rent & home'],[13,'income',150000,'Salary','Salary'],
   ];
   state.txs = rows.map(([n,type,amount,description,category,mood], i) => ({id:uid(), date:day(n), type, amount, description, category, mood, source:'sample', at:Date.now() - i * 3600e3}));
+  // Earlier months, so repeating charges (Netflix, LinkedIn Premium) show up as automatic payments.
+  for (let back = 1; back <= 2; back++){
+    const d = k => iso(new Date(y, m - back, k));
+    state.txs.push({id:uid(), date:d(21), type:'expense', amount:649, description:'Netflix renewal', category:'Subscriptions', source:'sample', at:Date.now() - back * 30 * 864e5});
+    state.txs.push({id:uid(), date:d(12), type:'expense', amount:2400, description:'LinkedIn Premium', category:'Subscriptions', source:'sample', autopay:true, at:Date.now() - back * 30 * 864e5 - 1});
+  }
+  state.txs.push({id:uid(), date:day(12), type:'expense', amount:2400, description:'LinkedIn Premium', category:'Subscriptions', source:'sample', autopay:true, at:Date.now() - 20 * 3600e3});
   state.profile = {name:'Asha', income:150000, since:monthKey(t)};
   state.plan = {'Rent & home':32000,'Utilities':3500,'Groceries':8000,'Transport':4000,'Subscriptions':1500,'Eating out':3000,'Coffee & chai':1000,'Entertainment':2000,'Shopping':3000};
   state.goals = [
     {id:uid(), name:'Emergency Fund', icon:'🛟', target:300000, saved:185000, by:monthKey(new Date(y, m + 9, 1))},
     {id:uid(), name:'Goa Trip', icon:'🏖', target:60000, saved:18000, by:monthKey(new Date(y, m + 3, 1))},
   ];
-  state.recs = []; state.planByMonth = {}; state.sample = true; state.month = monthKey(t);
+  state.recs = []; state.planByMonth = {}; state.checkins = {}; state.recurDecisions = {}; state.alarms = {}; state.sample = true; state.month = monthKey(t);
   save();
 }
 
@@ -887,6 +947,8 @@ function readout(){
   else if (watch.length) p.push(`${watch.join(' and ')} ${watch.length > 1 ? 'need' : 'needs'} watching.`);
   else if (Object.keys(F.plan).length) p.push('Every envelope is comfortable.');
   if (F.saved) p.push(`${inr(F.saved)} went to milestones.`);
+  const autoP = recurring().filter(x => state.recurDecisions[x.key] !== 'ignore');
+  if (autoP.length) p.push(`Automatic payments add up to ${inr(autoP.reduce((a,x) => a + x.monthly, 0))} a month.`);
   let tip;
   if (regrets.length) tip = `You regretted ${regrets.map(r => r.description).slice(0,2).join(' and ')}. Next time, wait a day before a similar buy and send that money to a milestone instead.`;
   else if (over.length) tip = `Pause ${over[0].c.toLowerCase()} for the rest of the month, or cover the ${inr(over[0].by)} from an envelope with room.`;
@@ -911,6 +973,12 @@ function answer(r){
       if (r.term){ const hits = F.txs.filter(t => t.type === 'expense' && t.description.toLowerCase().includes(r.term)); return `${hits.length} ${r.term} entr${hits.length === 1 ? 'y' : 'ies'} this month, ${inr(hits.reduce((a,t) => a + t.amount, 0))} in total.`; }
       return `You have spent ${inr(F.spent)} so far in ${mLong(state.month)}.`;
     }
+    case 'recurring': {
+      const R = recurring().filter(x => state.recurDecisions[x.key] !== 'ignore');
+      if (!R.length) return 'I have not found any automatic payments yet. They show up once the same payment repeats, or when a bank alert mentions AutoPay or a mandate.';
+      const m = R.reduce((a,x) => a + x.monthly, 0);
+      return `${R.length} automatic payment${R.length > 1 ? 's' : ''}: ${R.map(x => `${x.name} ${inr(x.monthly)}`).join(', ')}. That is about ${inr(m)} a month, or ${inr(m * 12)} a year.`;
+    }
     case 'saved': return `You have put aside ${inr(state.goals.reduce((a,g) => a + g.saved, 0))} across ${state.goals.length} milestone${state.goals.length === 1 ? '' : 's'}.`;
     case 'afford': {
       if (!F.isNow) return 'Ask me that for the current month.';
@@ -920,6 +988,143 @@ function answer(r){
   }
   return '';
 }
+
+/* =====================================================================
+   Automatic payments: repeated charges from the same payee, or alerts
+   that mention AutoPay / e-mandate / standing instruction.
+   ===================================================================== */
+const payeeKey = d => d.toLowerCase().replace(/\b(premium|subscription|renewal|autopay|auto pay|monthly|bill|payment|recharge|plan|membership)\b/g,' ').replace(/[^a-z]+/g,' ').trim().split(' ').slice(0,2).join(' ');
+function recurring(){
+  const groups = {};
+  for (const t of state.txs.filter(t => t.type === 'expense')){
+    const k = payeeKey(t.description); if (!k) continue;
+    (groups[k] = groups[k] || []).push(t);
+  }
+  const out = [];
+  for (const [k, list] of Object.entries(groups)){
+    list.sort((a,b) => a.date.localeCompare(b.date));
+    const months = new Set(list.map(t => t.date.slice(0,7)));
+    const flagged = list.some(t => t.autopay);
+    const last = list[list.length - 1];
+    const similar = list.filter(t => Math.abs(t.amount - last.amount) <= last.amount * 0.15);
+    const repeats = new Set(similar.map(t => t.date.slice(0,7))).size >= 2;
+    if (!flagged && !repeats) continue;
+    const next = new Date(last.date + 'T00:00:00'); next.setMonth(next.getMonth() + 1);
+    out.push({key:k, name:last.description.replace(/\s+(renewal|autopay|subscription|payment)$/i,''), monthly:last.amount, category:last.category, last:last.date, next:iso(next), count:months.size, flagged});
+  }
+  return out.sort((a,b) => b.monthly - a.monthly);
+}
+
+/* =====================================================================
+   Bank / UPI / card alert import
+   ===================================================================== */
+const MON3 = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
+function alertDate(txt){
+  let m = txt.match(/\b(\d{1,2})[-\/.](\d{1,2})[-\/.](\d{2,4})\b/);
+  if (m){ const y = +m[3] < 100 ? 2000 + +m[3] : +m[3]; return iso(new Date(y, +m[2] - 1, +m[1])); }
+  m = txt.match(/\b(\d{1,2})[- ]?(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*[- ,]?(\d{2,4})?\b/i);
+  if (m){ const t = todayIST(); let y = m[3] ? (+m[3] < 100 ? 2000 + +m[3] : +m[3]) : t.getFullYear(); return iso(new Date(y, MON3.indexOf(m[2].toLowerCase()), +m[1])); }
+  return iso(todayIST());
+}
+function tidyName(n){
+  n = n.replace(/@.*$/,'').replace(/[._-]+/g,' ').replace(/\d+/g,' ').replace(/\s+/g,' ').trim();
+  if (!n) return '';
+  return n.toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
+}
+function parseAlert(raw){
+  const txt = raw.replace(/\s+/g,' ').trim(), low = txt.toLowerCase();
+  if (!txt || /\b(otp|one time password|will be debited|is due|due on|request(ed)? money|collect request|declined|failed|reversed|not processed)\b/.test(low)) return null;
+  const debit = /\b(debited|spent|sent|paid|withdrawn|charged|purchase|txn of|transaction of|payment of|auto ?pay|e-?mandate|si executed)\b/.test(low);
+  const credit = !debit && /\b(credited|received|deposited|refund(ed)?)\b/.test(low);
+  if (!debit && !credit) return null;
+  let amt = null;
+  for (const m of txt.matchAll(/(?:rs\.?|inr|₹)\s*([\d,]+(?:\.\d{1,2})?)/gi)){
+    const before = low.slice(Math.max(0, m.index - 18), m.index);
+    if (/(bal|balance|lmt|limit|avl|available)/.test(before)) continue;
+    amt = parseFloat(m[1].replace(/,/g,'')); break;
+  }
+  if (amt === null){ const m = low.match(/\b(?:debited|credited)\s+(?:by|for|with)?\s*([\d,]+(?:\.\d{1,2})?)/); if (m) amt = parseFloat(m[1].replace(/,/g,'')); }
+  if (!(amt > 0)) return null;
+  const pats = [
+    /\btowards\s+([A-Za-z][\w .&'-]{1,40}?)(?=\s+(?:via|on|from|ref)|[.,;]|$)/i,
+    /\bby\s+(?:neft|imps|rtgs|ach|nach)?[-\/ :]*([A-Za-z][\w .&-]{2,40}?)(?=\.|\s+(?:avl|ref|on)|$)/i,
+    /\bat\s+([A-Za-z0-9][\w .&'*-]{1,40}?)(?=\s+(?:on|avl|avbl|ref|via|using|\.|,)|[.,;]|$)/i,
+    /to\s+vpa\s+([\w.-]+)@/i,
+    /;\s*([A-Za-z][\w .&-]{1,40}?)\s+credited/i,
+    /upi\/p2[ma]\/\d+\/([A-Za-z][\w .&-]{1,40}?)(?=\/|\s|$)/i,
+    /trf to\s+([A-Za-z][\w .&-]{1,40}?)\s+ref/i,
+    /\bto\s+([A-Za-z][\w .&'-]{1,40}?)(?=\s+(?:on|ref|upi|via|\(|\.)|[.,;(]|$)/i,
+    /\bfrom\s+([A-Za-z][\w .&'-]{1,40}?)(?=\s+(?:on|ref|upi|via|\(|\.)|[.,;(]|$)/i,
+    /info:?\s*([A-Za-z][\w .&\/-]{1,40})/i,
+  ];
+  let payee = '';
+  for (const re of pats){
+    const m = txt.match(re);
+    if (m && !/^(a\/?c|acct|account|your|card|hdfc|icici|sbi|axis|kotak|bank|x+\d*)\b/i.test(m[1])){ payee = tidyName(m[1]); if (payee) break; }
+  }
+  const ref = (txt.match(/(?:ref(?:erence)?(?:\s*no\.?)?|utr|rrn|upi(?:\s*ref)?)[:\s.#-]*([0-9]{6,})/i) || [])[1] || '';
+  const acct = (txt.match(/(?:a\/?c|acct|account|card)[^\d]{0,14}[x*]+\s*(\d{3,4})/i) || [])[1] || '';
+  const via = /\bcard\b/i.test(txt) ? 'card' : /\bupi|vpa\b/i.test(txt) ? 'UPI' : 'bank';
+  const type = credit ? 'income' : 'expense';
+  const description = payee || (type === 'income' ? 'Money received' : 'Payment via ' + via);
+  const {category} = categorise((payee + ' ' + low), type);
+  return {type, amount:amt, description, category, date:alertDate(txt), ref, acct, via, autopay:/\b(auto ?pay|e-?mandate|standing instruction|\bsi\b|subscription|renew)/i.test(txt)};
+}
+function splitAlerts(text){
+  const blocks = text.split(/\n\s*\n+/).map(b => b.trim()).filter(Boolean);
+  const out = [];
+  for (const b of blocks){
+    const lines = b.split(/\n/).map(l => l.trim()).filter(Boolean);
+    const moneyLines = lines.filter(l => /(rs\.?|inr|₹)\s*[\d,]|debited|credited/i.test(l));
+    if (lines.length > 1 && moneyLines.length === lines.length) out.push(...lines); else out.push(b);
+  }
+  return out;
+}
+function isDuplicate(a){
+  return state.txs.some(t => (a.ref && t.ref === a.ref) ||
+    (t.amount === a.amount && t.type === a.type && Math.abs(new Date(t.date) - new Date(a.date)) <= 864e5 &&
+     (payeeKey(t.description) === payeeKey(a.description) || t.source !== 'bank')));
+}
+let importFound = [];
+function runImport(text){
+  importFound = splitAlerts(text).map(parseAlert).filter(Boolean).map(a => Object.assign(a, {dup:isDuplicate(a)}));
+  const box = $('importResult');
+  if (!importFound.length){ box.innerHTML = '<p class="hint">I could not find a debit or credit in that text. Paste the full message, including the amount.</p>'; return; }
+  const fresh = importFound.filter(a => !a.dup).length;
+  box.innerHTML = `<ul class="found">${importFound.map((a,i) => `<li class="${a.dup ? 'dup' : ''}"><input type="checkbox" id="imp${i}" ${a.dup ? '' : 'checked'} aria-label="Add ${esc(a.description)}">
+    <span class="t"><b>${esc(a.description)}</b><small>${esc(a.category)} · ${dayLabel(a.date)} · ${a.via}${a.acct ? ' ··' + a.acct : ''}${a.autopay ? ' · 🔁 automatic' : ''}${a.dup ? ' · already logged' : ''}</small></span>
+    <span class="amt ${a.type === 'income' ? 'in' : ''}">${a.type === 'income' ? '+' : ''}${inr(a.amount)}</span></li>`).join('')}</ul>
+    <button type="button" class="btn primary block" id="importAdd" style="margin-top:10px">Add ${fresh} new entr${fresh === 1 ? 'y' : 'ies'}</button>`;
+  $('importAdd').onclick = () => {
+    let n = 0;
+    const before = figures(monthKey(todayIST())).spent;
+    importFound.forEach((a,i) => { if ($('imp' + i).checked){ state.txs.push({id:uid(), date:a.date, amount:a.amount, type:a.type, description:a.description, category:a.category, source:'bank', ref:a.ref, acct:a.acct, autopay:a.autopay, at:Date.now() + i}); n++; } });
+    const id = uid(); state.recs.push({id, at:Date.now(), durationMs:0, transcript:`Imported ${importFound.length} alert${importFound.length === 1 ? '' : 's'}`, source:'import', hasAudio:false, outcome:`Added ${n} from bank alerts`});
+    save(); spendAlarm(monthKey(todayIST()), before); $('importText').value = ''; $('importResult').innerHTML = ''; $('importForm').classList.add('hide');
+    toast(`Added ${n} entr${n === 1 ? 'y' : 'ies'} from bank alerts`); reply(`Added ${n} from your bank alerts.`); render();
+  };
+}
+$('importOpen').onclick = () => { $('importForm').classList.toggle('hide'); $('importText').focus(); };
+$('importForm').onsubmit = e => { e.preventDefault(); runImport($('importText').value); };
+$('importClip').onclick = async () => {
+  try { const t = await navigator.clipboard.readText(); $('importText').value = t; runImport(t); }
+  catch(e){ toast('Clipboard access was refused. Long-press the box and choose Paste.'); }
+};
+
+/* =====================================================================
+   Evening check-in for cash and small spends
+   ===================================================================== */
+function nowHM(){ return new Date().toLocaleTimeString('en-GB',{timeZone:'Asia/Kolkata', hour:'2-digit', minute:'2-digit', hour12:false}); }
+function checkinDue(){ return !!state.profile && state.prefs.checkin && nowHM() >= state.prefs.checkinTime && !state.checkins[iso(todayIST())]; }
+function markCheckin(){ state.checkins[iso(todayIST())] = true; save(); }
+let notifiedFor = '';
+function checkinTick(){
+  if (!checkinDue() || notifiedFor === iso(todayIST())) return;
+  notifiedFor = iso(todayIST());
+  try { if ('Notification' in window && Notification.permission === 'granted') new Notification('BudgetSense check-in', {body:'Anything you paid in cash today? Tap and tell me.', icon:'media/notes.jpg'}); } catch(e){}
+  render();
+}
+setInterval(checkinTick, 60000);
 
 /* =====================================================================
    Command handling
@@ -984,6 +1189,15 @@ function handleCommand(text, recId, opts = {}){
       t.mood = r.value; save(); note(`${t.description}: ${r.value ? 'happy' : 'regret'}`);
       say(r.value ? `Noted — ${t.description} was worth it.` : `Noted — you regret ${t.description}. I'll remind you in your monthly read-out.`); break;
     }
+    case 'multi': {
+      if (state.pending){ const p = state.pending, pn = state.pendingNote; commit(p); pn && pn(txNote(p) + ' (auto-saved)'); clearPending(); }
+      r.txs.forEach(tx => { tx.recId = recId || null; tx.source = opts.source; commit(tx); });
+      if (checkinDue()) markCheckin();
+      const list = r.txs.map(tx => `${inr(tx.amount)} ${tx.description}`).join(', ');
+      note(`Saved ${r.txs.length} entries: ${list}`);
+      say(`Saved ${r.txs.length} entries: ${list}. Say “undo” to remove the last one.`, `Saved ${r.txs.length} entries. ${r.txs.map(tx => tx.amount + ' rupees for ' + tx.description).join(', ')}.`); break;
+    }
+    case 'checkinDone': markCheckin(); note('Evening check-in: nothing to add'); say('Great, nothing missed today.'); break;
     case 'ask': { const a = answer(r); note('Answered: ' + a); $('draft').innerHTML = `<div class="answer">💬 ${esc(a)}</div>`; say('Here is your answer', a); break; }
     case 'summary': closeSheet(); tab('pulse'); $('readout').scrollIntoView({behavior:'smooth', block:'center'}); note('Read out the month'); speak(readout().spoken); break;
     case 'nav': closeSheet(); tab(r.to); note('Opened ' + r.to); break;
@@ -997,9 +1211,42 @@ function handleCommand(text, recId, opts = {}){
 }
 const txNote = tx => `${tx.type === 'income' ? 'In' : 'Out'} ${inr(tx.amount)} → ${tx.category}`;
 function commit(tx){
+  const k = (tx.date || iso(todayIST())).slice(0,7), before = figures(k).spent;
   state.txs.push({id:uid(), date:tx.date, amount:tx.amount, type:tx.type, description:tx.description, category:tx.category, recId:tx.recId || null, source:tx.source || 'voice', at:Date.now()});
   save();
+  if (tx.type === 'expense') spendAlarm(k, before);
 }
+/* Spending alarm: fires once per month at each threshold of income spent. */
+const ALARM_LEVELS = [0.5, 0.75, 0.9, 1];
+function spendAlarm(k, before){
+  if (!state.prefs.alarm || state.sample && !demoOn) return;
+  const F = figures(k); if (!F.income) return;
+  const crossed = ALARM_LEVELS.filter(l => before < F.income * l && F.spent >= F.income * l).pop();
+  if (!crossed || (state.alarms[k] || 0) >= crossed) return;
+  state.alarms[k] = crossed; save();
+  const pct = Math.round(F.spent / F.income * 100), left = F.income - F.spent;
+  const msg = crossed >= 1
+    ? `Be alert: you have spent ${inr(F.spent)}, more than this month's income of ${inr(F.income)}. You are ${inr(-left)} over.`
+    : `Be alert: ${pct}% of this month's income is gone — ${inr(F.spent)} of ${inr(F.income)}.${F.isNow ? ` ${inr(left)} left for ${F.daysLeft} day${F.daysLeft === 1 ? '' : 's'}.` : ''}`;
+  $('alarmText').textContent = msg; $('alarm').classList.toggle('warn', crossed < 0.9); $('alarm').classList.remove('hide');
+  beep(crossed >= 0.9 ? 3 : 2);
+  try { navigator.vibrate && navigator.vibrate(crossed >= 0.9 ? [300,150,300,150,300] : [250,150,250]); } catch(e){}
+  if (state.prefs.replies && !demoOn) setTimeout(() => speak(msg), 900);
+  const r = state.recs[state.recs.length - 1]; if (r && Date.now() - r.at < 60000) r.alarm = msg;
+}
+function beep(times){
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    for (let i = 0; i < times; i++){
+      const o = ctx.createOscillator(), g = ctx.createGain(), t0 = ctx.currentTime + i * 0.28;
+      o.type = 'square'; o.frequency.value = 880; o.connect(g); g.connect(ctx.destination);
+      g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(0.25, t0 + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.2);
+      o.start(t0); o.stop(t0 + 0.22);
+    }
+    setTimeout(() => ctx.close(), times * 300 + 200);
+  } catch(e){}
+}
+$('alarmClose').onclick = () => $('alarm').classList.add('hide');
 function alertFor(tx){
   if (tx.type !== 'expense') return '';
   const l = planFor(tx.date.slice(0,7))[tx.category]; if (!l) return '';
@@ -1353,7 +1600,19 @@ function render(){
   if (state.tab === 'timeline') renderTimeline();
   if (state.tab === 'me') renderMe();
 }
+function renderCheckin(){
+  const slot = $('checkinSlot');
+  if (!checkinDue() || state.month !== monthKey(todayIST())){ slot.innerHTML = ''; return; }
+  const today = state.txs.filter(t => t.date === iso(todayIST()) && t.type === 'expense');
+  slot.innerHTML = `<div class="card checkin"><b>🌙 Evening check-in</b>
+    <p class="hint" style="margin:6px 0 10px">Anything you paid in cash or forgot today? Say it all in one go, for example <b>“10 to a beggar, 5 for the cobbler and 40 on chai”</b>.${today.length ? ` You have logged ${today.length} spend${today.length > 1 ? 's' : ''} today.` : ''}</p>
+    <div class="row" style="flex-wrap:wrap"><button class="btn primary" id="checkinSpeak">🎙 Tell me</button><button class="btn" id="checkinImport">📥 Import bank alerts</button><button class="btn" id="checkinNone">Nothing today</button></div></div>`;
+  $('checkinSpeak').onclick = () => { openSheet(); sheetStart(); };
+  $('checkinImport').onclick = () => { tab('timeline'); $('importForm').classList.remove('hide'); $('importText').focus(); };
+  $('checkinNone').onclick = () => { markCheckin(); toast('Check-in done for today'); render(); };
+}
 function renderPulse(){
+  renderCheckin();
   const F = figures(), base = Math.max(F.income, F.spent + F.saved, 1), C = 2 * Math.PI * 50;
   let off = 0;
   const arc = (v, col) => { const len = Math.max(0, v) / base * C; const s = `<circle cx="60" cy="60" r="50" fill="none" stroke="${col}" stroke-width="14" stroke-dasharray="${len} ${C - len}" stroke-dashoffset="${-off}"/>`; off += len; return s; };
@@ -1387,7 +1646,18 @@ function renderPulse(){
       <div class="meter"><i style="width:${pct}%;background:var(--teal)"></i></div><div class="fc ${f.ok ? 'ok' : 'short'}">${esc(f.text)}</div></div>`;
   }).join('') : '<div class="card ms empty">No milestones yet. Say “new goal Goa trip 60,000 by December”.</div>';
 
-  const qs = ['How much is left for eating out?','Safe to spend today?','Can I afford 3,000 shoes?','What did I spend on coffee?','Explain my month'];
+  const R = recurring();
+  const active = R.filter(x => state.recurDecisions[x.key] !== 'ignore');
+  const monthly = active.reduce((a,x) => a + x.monthly, 0);
+  $('recurWrap').innerHTML = R.length ? `<div class="h2row"><h2>Automatic payments</h2><small>${inr(monthly)}/month · ${inr(monthly * 12)}/year</small></div>
+    <ul class="items recur">${R.map(x => { const d = state.recurDecisions[x.key];
+      return `<li><span class="ico">🔁</span><span class="t"><b>${esc(x.name)}</b><small>${esc(x.category)} · last ${dayLabel(x.last)} · next about ${new Date(x.next + 'T00:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short'})}</small>
+        <div class="again">${d === 'cancel' ? '⏰ Marked to cancel' : d === 'keep' ? '✓ Keeping it' : d === 'ignore' ? 'Not a subscription' : 'Still using it?'}
+        ${d ? `<button data-recur="${esc(x.key)}:">Change</button>` : `<button data-recur="${esc(x.key)}:keep">Keep</button><button data-recur="${esc(x.key)}:cancel">Cancel it</button><button data-recur="${esc(x.key)}:ignore">Not recurring</button>`}</div></span>
+        <span class="amt">${inr(x.monthly)}<small>${inr(x.monthly * 12)}/yr</small></span></li>`; }).join('')}</ul>` : '';
+  document.querySelectorAll('[data-recur]').forEach(b => b.onclick = () => { const [k, v] = b.getAttribute('data-recur').split(':'); if (v) state.recurDecisions[k] = v; else delete state.recurDecisions[k]; save(); render(); if (v === 'cancel') toast('Noted. Cancel it from the service’s own settings; I will flag it if it charges again.'); });
+
+  const qs = ['What are my automatic payments?','How much is left for eating out?','Safe to spend today?','Can I afford 3,000 shoes?','What did I spend on coffee?','Explain my month'];
   $('askChips').innerHTML = qs.map(q => `<button class="chip" data-ask="${esc(q)}">${esc(q)}</button>`).join('');
   document.querySelectorAll('[data-ask]').forEach(b => b.onclick = () => { openSheet(); $('words').textContent = b.getAttribute('data-ask'); const id = uid(); state.recs.push({id, at:Date.now(), durationMs:0, transcript:b.getAttribute('data-ask'), source:'tap', hasAudio:false, outcome:''}); save(); handleCommand(b.getAttribute('data-ask'), id); });
 
@@ -1444,7 +1714,7 @@ function itemRow(t, full){
   const icon = t.type === 'saving' ? (state.goals.find(g => g.name === t.category)?.icon || '🎯') : (CATS[t.category]?.icon || '🧾');
   const kind = t.type === 'income' ? 'In' : t.type === 'saving' ? 'Milestone' : CATS[t.category]?.kind === 'must' ? 'Must-pay' : 'Lifestyle';
   const clip = t.recId && (memAudio.has(t.recId) || state.recs.find(r => r.id === t.recId)?.hasAudio);
-  const src = {sample:'sample', typed:'typed', demo:'demo'}[t.source] || 'voice';
+  const src = {sample:'sample', typed:'typed', demo:'demo', bank:'bank alert'}[t.source] || 'voice';
   const ask = full && kind === 'Lifestyle' && t.mood == null;
   return `<li><span class="ico">${icon}</span><span class="t"><b>${esc(t.description)}</b><small>${esc(t.category)} · ${full ? src : dayLabel(t.date)}${t.mood === true ? ' · 😊' : t.mood === false ? ' · 😕' : ''}</small>${clip ? `<button class="playb" data-play="${t.recId}" aria-label="Play the original voice note">▶</button>` : ''}
     ${ask ? `<div class="again">Buy it again? <button data-mood="${t.id}:1">😊 Yes</button><button data-mood="${t.id}:0">😕 No</button></div>` : ''}</span>
@@ -1466,7 +1736,10 @@ function renderMe(){
   $('meSince').textContent = 'Planning since ' + mLong(p.since); $('meIncome').textContent = 'Take-home ' + inr(p.income) + ' a month';
   $('meSaved').textContent = inr(state.goals.reduce((a,g) => a + g.saved, 0));
   $('meNotes').textContent = state.recs.filter(r => new Date(r.at).toLocaleDateString('en-CA',{timeZone:'Asia/Kolkata'}).slice(0,7) === monthKey(todayIST())).length;
-  $('swReplies').setAttribute('aria-pressed', state.prefs.replies); $('swQuick').setAttribute('aria-pressed', state.prefs.quick); $('swDark').setAttribute('aria-pressed', isDark());
+  $('swReplies').setAttribute('aria-pressed', state.prefs.replies);
+  $('swAlarm').setAttribute('aria-pressed', state.prefs.alarm);
+  $('swCheckin').setAttribute('aria-pressed', state.prefs.checkin); $('checkinTime').value = state.prefs.checkinTime;
+  $('checkinNote').textContent = 'A nudge each evening to add cash spends you forgot' + (!('Notification' in window) ? '' : Notification.permission === 'granted' ? ' · notifications on while the app is open' : ' · shows when you open the app'); $('swQuick').setAttribute('aria-pressed', state.prefs.quick); $('swDark').setAttribute('aria-pressed', isDark());
   const months = [...new Set(state.txs.map(t => t.date.slice(0,7)))].sort().reverse().slice(0,12);
   $('history').innerHTML = months.length ? months.map(k => {
     const F = figures(k), kept = F.income ? Math.round((F.income - F.spent) / F.income * 100) : null;
@@ -1478,7 +1751,7 @@ function renderMe(){
   const list = [...state.recs].sort((a,b) => b.at - a.at);
   $('diaryCount').textContent = list.length ? `${list.length} note${list.length === 1 ? '' : 's'}` : '';
   $('diary').innerHTML = list.length ? list.map(r => `<li>
-    ${r.hasAudio || memAudio.has(r.id) ? `<button class="ico" style="border:0" data-play="${r.id}" aria-label="Play note">▶</button>` : `<span class="ico">${{demo:'🤖', typed:'⌨', tap:'👆', setup:'📋'}[r.source] || '🎙'}</span>`}
+    ${r.hasAudio || memAudio.has(r.id) ? `<button class="ico" style="border:0" data-play="${r.id}" aria-label="Play note">▶</button>` : `<span class="ico">${{demo:'🤖', typed:'⌨', tap:'👆', setup:'📋', import:'📥'}[r.source] || '🎙'}</span>`}
     <span class="t"><b style="white-space:normal">“${esc(r.transcript || '(no words recognised)')}”</b>
     <small>${fmtTime(r.at)} IST · ${r.source}${r.durationMs ? ' · ' + (r.durationMs / 1000).toFixed(1) + 's' : ''}${r.edited ? ' · corrected' : ''}</small>
     ${r.outcome ? `<small style="display:block;color:var(--teal);font-weight:700">→ ${esc(r.outcome)}</small>` : ''}</span></li>`).join('')
@@ -1501,6 +1774,12 @@ function isDark(){ const r = document.documentElement.dataset.theme; return r ? 
 $('swDark').onclick = () => { document.documentElement.dataset.theme = isDark() ? 'light' : 'dark'; try { localStorage.setItem('budgetsense.theme', document.documentElement.dataset.theme); } catch(e){} render(); };
 try { const th = localStorage.getItem('budgetsense.theme'); if (th) document.documentElement.dataset.theme = th; } catch(e){}
 $('swReplies').onclick = () => { state.prefs.replies = !state.prefs.replies; save(); render(); };
+$('swAlarm').onclick = () => { state.prefs.alarm = !state.prefs.alarm; save(); render(); };
+$('swCheckin').onclick = async () => {
+  state.prefs.checkin = !state.prefs.checkin; save(); render();
+  if (state.prefs.checkin && 'Notification' in window && Notification.permission === 'default'){ try { await Notification.requestPermission(); } catch(e){} render(); }
+};
+$('checkinTime').onchange = () => { state.prefs.checkinTime = $('checkinTime').value; save(); render(); };
 $('swQuick').onclick = () => { state.prefs.quick = !state.prefs.quick; save(); render(); };
 $('editPlan').onclick = () => openBuilder(emptyPlan(), 'manual');
 $('respeak').onclick = () => { renderChecks({}); $('setupWords').innerHTML = ''; $('setupDraft').disabled = true; showSetup('voice'); };
@@ -1693,7 +1972,7 @@ document.addEventListener('keydown', e => { if ($('tour').classList.contains('hi
    ===================================================================== */
 load();
 if (state.profile) enterApp(); else { renderChecks({}); showSetup('welcome'); }
-if (location.hash === '#test') window.__bs = {handleCommand, state, uid, interpret, normalise, parseSetup, parseAmount, answer, figures, runDemo, save};
+if (location.hash === '#test') window.__bs = {handleCommand, state, uid, interpret, normalise, parseSetup, parseAmount, answer, figures, runDemo, save, parseAlert, splitAlerts, recurring};
 })();
 </script>
 </body>
