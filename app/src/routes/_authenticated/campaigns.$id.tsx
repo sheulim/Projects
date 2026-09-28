@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/hooks/useAuth";
+import { TOUR_TAB_EVENT } from "@/components/guided-tour";
 import {
   ApprovalControls,
   ApprovalHistory,
@@ -142,6 +143,14 @@ function CampaignDetail() {
     isReviewer: (reviewerRows.data ?? []).some((r) => r.reviewer_id === user?.id),
   };
   const hasPlan = (items.data?.length ?? 0) > 0;
+
+  // The guided tour switches tabs as it explains them.
+  const [tab, setTab] = useState("calendar");
+  useEffect(() => {
+    const onTab = (e: Event) => setTab(String((e as CustomEvent).detail));
+    window.addEventListener(TOUR_TAB_EVENT, onTab);
+    return () => window.removeEventListener(TOUR_TAB_EVENT, onTab);
+  }, []);
   const planBuilding = runGenerate.isPending || c?.status === "generating";
 
   return (
@@ -150,7 +159,10 @@ function CampaignDetail() {
         ← All campaigns
       </Link>
 
-      <div className="mt-4 flex flex-wrap items-end justify-between gap-4">
+      <div
+        data-tour="campaign-head"
+        className="mt-4 flex flex-wrap items-end justify-between gap-4"
+      >
         <div>
           <h1 className="text-3xl font-semibold">{c?.title ?? "Loading…"}</h1>
           {c ? (
@@ -180,7 +192,7 @@ function CampaignDetail() {
         />
       ) : null}
 
-      <Tabs defaultValue="calendar" className="mt-10">
+      <Tabs data-tour="tabs" value={tab} onValueChange={setTab} className="mt-10">
         <TabsList className="h-auto flex-wrap">
           <TabsTrigger value="calendar">Calendar</TabsTrigger>
           <TabsTrigger value="studio">Channel Studio</TabsTrigger>

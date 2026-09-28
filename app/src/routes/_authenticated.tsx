@@ -4,6 +4,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
+import { TourProvider, useTour } from "@/components/guided-tour";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -40,26 +42,38 @@ function AuthenticatedLayout() {
 
   return (
     <SidebarProvider>
-      <AppSidebar />
-      <SidebarInset>
-        <header className="flex h-14 shrink-0 items-center gap-2 border-b border-border px-4">
-          <SidebarTrigger className="-ml-1" />
-          <Separator orientation="vertical" className="mr-2 h-4" />
-          <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem className="hidden md:block">Workspace</BreadcrumbItem>
-              <BreadcrumbSeparator className="hidden md:block" />
-              <BreadcrumbItem>
-                <BreadcrumbPage>
-                  {LABELS[parts[0] ?? ""] ?? "Home"}
-                  {parts[1] ? " / Detail" : ""}
-                </BreadcrumbPage>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
-        </header>
-        <Outlet />
-      </SidebarInset>
+      <TourProvider>
+        <AppSidebar />
+        <SidebarInset>
+          <header className="flex h-14 shrink-0 items-center gap-2 border-b border-border px-4">
+            <SidebarTrigger className="-ml-1" />
+            <Separator orientation="vertical" className="mr-2 h-4" />
+            <Breadcrumb>
+              <BreadcrumbList>
+                <BreadcrumbItem className="hidden md:block">Workspace</BreadcrumbItem>
+                <BreadcrumbSeparator className="hidden md:block" />
+                <BreadcrumbItem>
+                  <BreadcrumbPage>
+                    {LABELS[parts[0] ?? ""] ?? "Home"}
+                    {parts[1] ? " / Detail" : ""}
+                  </BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
+            <TourButton />
+          </header>
+          <Outlet />
+        </SidebarInset>
+      </TourProvider>
     </SidebarProvider>
+  );
+}
+
+function TourButton() {
+  const { start, running } = useTour();
+  return (
+    <Button size="sm" variant="outline" className="ml-auto" disabled={running} onClick={start}>
+      ▶ Guided tour
+    </Button>
   );
 }
