@@ -1,0 +1,4 @@
+{
+  "extends": "./tsconfig.json",
+  "include": ["netlify/functions/**/*.mts", "src/lib/jobs/**/*.ts"]
+}

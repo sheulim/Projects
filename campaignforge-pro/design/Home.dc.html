@@ -91,9 +91,9 @@ footer{padding-block:28px;color:#8b91a0;font-size:13px;display:flex;justify-cont
 <p>Write a short brief and get a dated plan shaped by your Company DNA and the festivals your customers celebrate. Then produce ready-to-post content for ten channels and track budget and returns across every campaign you run.</p>
 <div class="ctas">
 <a class="btn pri" href="Auth.dc.html">Create your account</a>
-<button class="btn" type="button" onClick="{{demo}}">Explore the demo</button>
+<button class="btn" type="button" onClick="{{demo}}">Take the guided demo</button>
 </div>
-<p style="font-size: 13px; color: #8b91a0; margin: 16px 0 0">No card needed. The demo uses sample data.</p>
+<p style="font-size: 13px; color: #8b91a0; margin: 16px 0 0">The demo opens with a voice guide that walks you through a sample campaign, step by step. Turn your sound on.</p>
 </div>
 <div class="panel preview" aria-hidden="true">
 <div style="display: flex; justify-content: space-between; align-items: center"><span class="disp" style="font-weight: 600">Diwali Festive Push</span><span class="mono" style="font-size: 11px; color: #5ee0c9">PLAN BUILT</span></div>
@@ -140,7 +140,7 @@ footer{padding-block:28px;color:#8b91a0;font-size:13px;display:flex;justify-cont
 <section class="block">
 <div class="panel band">
 <h2 class="disp">Start planning your next campaign</h2>
-<div class="ctas"><a class="btn pri" href="Auth.dc.html">Create your account</a><button class="btn" type="button" onClick="{{demo}}">Explore the demo</button></div>
+<div class="ctas"><a class="btn pri" href="Auth.dc.html">Create your account</a><button class="btn" type="button" onClick="{{demo}}">Take the guided demo</button></div>
 </div>
 </section>
 <footer><span>CampaignForge Pro · prototype with sample data</span><span>© 2026 CampaignForge</span></footer>
@@ -153,7 +153,7 @@ renderVals() {
 var signed = !!(window.CFP && window.CFP.user());
 return {
 signedIn: signed, signedOut: !signed,
-demo: function () { if (window.CFP) { window.CFP.signIn({ name: 'Demo user', email: 'demo@example.com' }); } location.hash = 'Main'; }
+demo: function () { if (window.CFP) { window.CFP.signIn({ name: 'Demo user', email: 'demo@example.com' }); } window.CFP_TOUR_PENDING = true; location.hash = 'Main'; }
 };
 }
 }
