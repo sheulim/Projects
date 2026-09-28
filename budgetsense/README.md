@@ -23,6 +23,17 @@ On this repo's Netlify site, BudgetSense is served at `/budgetsense/` (CampaignF
 | Reflection | "Regret it" / "happy with it" on lifestyle spends; feeds the monthly read-out | 😊 / 😕 buttons |
 | Monthly read-out | "Explain my month" → spoken summary + next step | 🔊 Listen |
 | Tracking over time | Plan, limits, milestones, entries and voice notes are saved on the device as you go. Each month keeps its own limits; **Me → Month by month** shows every month's in, out, savings and overdrawn envelopes | — |
+| Note-taking visual | A looping visual with “Taking notes” plays while a note is recorded, and “Waiting for your answer” while BudgetSense waits for a confirmation. Silent, so it never reaches the microphone | — |
+| Missed spends | Evening check-in (default 9 pm): “10 to a beggar, 5 for the cobbler and 40 on chai” saves all three at once | “Nothing today” |
+| Bank alerts | Paste one or many bank, UPI or card alert messages or emails; amount, payee, date and account are read, duplicates and OTPs skipped | Untick any line before adding |
+| Automatic payments | Repeating charges and AutoPay / e-mandate alerts are listed with monthly and yearly cost; mark “Keep” or “Cancel it”. Ask: “What are my automatic payments?” | — |
+| Spending alarm | Beep, vibration and a spoken warning when the month's spending crosses 50%, 75%, 90% and 100% of income | Switch off in Me |
+| Before you buy | “Should I buy a 45,000 phone?” → month-end before/after, envelope impact, goal slip in months, verdict (Go ahead / Possible / Not this month) and actions: move budget & buy, save for it, not now | Form on Pulse |
+| Move money | “Move 2,000 from shopping to eating out” shifts budget between envelopes | ↔ Move form on Envelopes |
+| Forecast & pace | Month-end forecast after bills, goals and usual spending; pace badge (“spending 1.4× faster than the month”) | — |
+| Statement upload | Choose this month's bank statement (PDF, including password-protected, CSV or Excel). Every UPI payment is read, payee named from the narration, ATM and ACH/NACH mandates recognised, duplicates skipped. Read on the device only | — |
+| Connect bank or UPI | Account Aggregator consent flow: choose bank or UPI app, review exactly what is shared (transactions only, period, purpose, revoke any time), confirm. Runs on sample data; live linking needs an RBI-regulated partner | Upload statement / paste alerts |
+| Timeline tools | Filter money in/out, by envelope, search; edit envelope or amount, delete (two taps) | — |
 | Record keeping | Every note kept with audio, transcript, time (IST) and result; CSV export | — |
 
 Additional features beyond the reference app: safe-to-spend today, spoken limit alerts at 75% and 100%, a daily voice streak, voice Q&A, and Indian number handling (lakh, "four fifty", ₹ formatting).
@@ -46,4 +57,4 @@ Everything is saved automatically in the browser on the device you use: the plan
 
 ## Testing
 
-`node budgetsense/tests/e2e.js` runs 33 end-to-end checks in Chromium with a simulated microphone and speech engine: the voice tour, voice and manual setup, every voice command, typed fallbacks, envelopes, milestones, questions, month history and per-month limits, persistence of data and audio after reload, the guided demo, a refused microphone, and layout at 360px, 390px and desktop widths.
+`node budgetsense/tests/e2e.js` runs 44 end-to-end checks (set `BS_LIBS` to a folder holding `pdfjs-dist-3.11.174/` and `xlsx-0.18.5/` from npm if the machine cannot reach cdnjs) in Chromium with a simulated microphone and speech engine: the voice tour, the note-taking visual, multi-item notes, the evening check-in, bank alert import with duplicate detection, automatic payments, the spending alarm, before-you-buy verdicts, moving money between envelopes, statement upload (CSV, Excel, PDF), the connect-bank consent flow, timeline edit/delete/filter, voice and manual setup, every voice command, typed fallbacks, envelopes, milestones, questions, month history and per-month limits, persistence of data and audio after reload, the guided demo, a refused microphone, and layout at 360px, 390px and desktop widths.

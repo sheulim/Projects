@@ -44,6 +44,14 @@ const FAKE_SR = () => {
   const browser = await chromium.launch({args: ['--use-fake-device-for-media-stream', '--use-fake-ui-for-media-stream', '--autoplay-policy=no-user-gesture-required']});
   const ctx = await browser.newContext({viewport: {width: 390, height: 844}, permissions: ['microphone']});
   await ctx.addInitScript(FAKE_SR);
+  const LIBS = process.env.BS_LIBS || path.resolve(__dirname, '../../..', 'libs');
+  const fs = require('fs');
+  await ctx.route('https://cdnjs.cloudflare.com/**', route => {
+    const u = route.request().url();
+    const f = /pdf\.worker\.min\.js$/.test(u) ? 'pdfjs-dist-3.11.174/build/pdf.worker.min.js' : /pdf\.min\.js$/.test(u) ? 'pdfjs-dist-3.11.174/build/pdf.min.js' : /xlsx\.full\.min\.js$/.test(u) ? 'xlsx-0.18.5/dist/xlsx.full.min.js' : null;
+    if (!f || !fs.existsSync(path.join(LIBS, f))) return route.abort();
+    route.fulfill({path: path.join(LIBS, f), contentType: 'application/javascript'});
+  });
   const page = await ctx.newPage(); page.setDefaultTimeout(5000);
   const errors = [];
   page.on('pageerror', e => errors.push(`[${current}] ${e.message}`));
@@ -52,7 +60,6 @@ const FAKE_SR = () => {
   // After a failed test, close any overlay so later tests start from a usable screen.
   cleanup = async () => {
     if (await page.isVisible('#tour')) await page.click('#tSkip').catch(() => page.keyboard.press('Escape'));
-    if (await page.isVisible('#scrim')) await page.click('#sheetClose');
   };
   const st = () => page.evaluate(() => JSON.parse(localStorage.getItem('budgetsense.v3') || 'null'));
   const say = async (text, mic = '#recBtn') => {
@@ -81,7 +88,7 @@ const FAKE_SR = () => {
     await page.evaluate(() => { speechSynthesis.speak = () => window.__spoke(); });
     await page.click('#tourStart');
     const titles = [];
-    for (let i = 0; i < 12; i++){
+    for (let i = 0; i < 13; i++){
       await page.waitForTimeout(500);
       titles.push(await text('#tTitle'));
       const hole = await page.$eval('#tHole', h => { const r = h.getBoundingClientRect(); return {none: h.classList.contains('none'), w: r.width, h: r.height, top: r.top, bottom: r.bottom}; });
@@ -94,8 +101,8 @@ const FAKE_SR = () => {
       if (await page.isVisible('#tEnd button')) break;
       await page.click('#tNext');
     }
-    check(titles.length === 11, `expected 11 tour screens, saw ${titles.length}: ${titles.join(' / ')}`);
-    check(spoken >= 11, `narration spoke ${spoken} times`);
+    check(titles.length === 12, `expected 12 tour screens, saw ${titles.length}: ${titles.join(' / ')}`);
+    check(spoken >= 12, `narration spoke ${spoken} times`);
     check(!(await st()) || (await st()).sample, 'tour data leaked as real data');
     await page.click('[data-tend=voice]'); await page.waitForTimeout(200);
     check(await page.isVisible('#s-voice'), 'Speak my plan did not open voice setup');
@@ -105,6 +112,10 @@ const FAKE_SR = () => {
 
   await test('Voice setup: one note drafts the full plan', async () => {
     await page.click('#goVoiceSetup');
+    await page.evaluate(() => window.__speech.push("x")); await page.click('#setupMic'); await page.waitForTimeout(300);
+    check(await page.isVisible('#setupVisual'), 'setup note-taking visual not shown while recording');
+    await page.click('#setupMic'); await page.waitForTimeout(700);
+    check(!(await page.isVisible('#setupVisual')), 'setup visual not hidden after recording');
     await say("I'm Sheuli. I take home 1.5 lakh a month. Rent is 32,000, electricity and internet about 3,000, groceries 8,000, transport 4,000. I spend around 4,000 eating out and 1,500 on coffee. I'm saving for a Goa trip, 60,000 by December.", '#setupMic');
     const got = await page.$$eval('#setupChecks .check.got', els => els.length);
     check(got === 4, `expected 4 of 4 checklist items ticked, got ${got}`);
@@ -120,7 +131,11 @@ const FAKE_SR = () => {
   });
 
   await test('Plan builder: voice correction updates a line', async () => {
-    await say('rent is 30,000', '#builderMic');
+    await page.evaluate(() => window.__speech.push('rent is 30,000'));
+    await page.click('#builderMic'); await page.waitForTimeout(300);
+    check(await page.isVisible('#floatVisual'), 'floating note-taking visual not shown while correcting');
+    await page.waitForTimeout(200); await page.click('#builderMic'); await page.waitForTimeout(700);
+    check(!(await page.isVisible('#floatVisual')), 'floating visual not hidden after correcting');
     check(await page.inputValue('[data-cat="Rent & home"]') === '30000', 'rent not corrected: ' + await page.inputValue('[data-cat="Rent & home"]'));
   });
 
@@ -142,6 +157,24 @@ const FAKE_SR = () => {
     const s = await st(); const t = s.txs.at(-1);
     check(t.amount === 450 && t.category === 'Coffee & chai', `saved ${t.amount} to ${t.category}`);
     check(s.recs.filter(r => r.hasAudio).length >= 3, 'voice notes not kept with audio');
+  });
+
+  await test('Note-taking visual plays while recording and while waiting for an answer', async () => {
+    const vis = () => page.evaluate(() => { const b = document.getElementById('sheetVisual'); const v = b.querySelector('video');
+      return {shown: !b.classList.contains('hide'), label: b.querySelector('b').textContent, playing: !v.paused, src: v.currentSrc}; });
+    await page.evaluate(() => window.__speech.push('Metro 240'));
+    await page.click('#recBtn'); await page.waitForTimeout(400);
+    let v = await vis();
+    check(v.shown && v.label === 'Taking notes' && v.playing, 'not shown/playing while recording: ' + JSON.stringify(v));
+    check(/notes\.(webm|mp4)$/.test(v.src), 'video source not loaded: ' + v.src);
+    await page.click('#recBtn'); await page.waitForTimeout(700);
+    v = await vis();
+    check(v.shown && v.label === 'Waiting for your answer', 'not shown while waiting for confirmation: ' + JSON.stringify(v));
+    await say('yes');
+    v = await vis();
+    check(!v.shown, 'still shown after the answer');
+    await say('how much is left for coffee');
+    check(!(await vis()).shown, 'shown for a question answer');
   });
 
   await test('Voice note: "yes" confirms the AI pick', async () => {
@@ -183,7 +216,8 @@ const FAKE_SR = () => {
   await test('Questions are answered', async () => {
     await say('how much is left for coffee'); check(/left in Coffee|overdrawn/.test(await text('#draft')), 'left answer: ' + await text('#draft'));
     await say('safe to spend today'); check(/safely spend/.test(await text('#draft')), 'safe answer missing');
-    await say('can I afford 3,000 shoes'); check(/^💬 (Yes|Not comfortably)/.test((await text('#draft')).trim()), 'afford answer missing');
+    await say('can I afford 3,000 shoes'); check(/Month-end/.test(await text('#draft')) && /(Go ahead|Possible|Not this month)/.test(await text('#draft')), 'before-you-buy answer missing: ' + await text('#draft'));
+    await say('not now'); check(!/Month-end/.test(await text('#draft')), 'before-you-buy card not closed');
     await say('what did I spend on swiggy'); check(/entr/.test(await text('#draft')), 'term spend answer missing');
   });
 
@@ -336,6 +370,58 @@ const FAKE_SR = () => {
     check((await text('#hello')).includes('Sheuli'), 'did not return to own plan');
   });
 
+  await test('Several spends in one voice note are all saved', async () => {
+    await page.click('[data-tab=pulse]'); await page.click('#speakBtn'); await page.waitForTimeout(300); await page.click('#recBtn'); await page.waitForTimeout(600);
+    const n = (await st()).txs.length;
+    await say('10 to a beggar, 5 for the cobbler and 40 on chai');
+    const t = (await st()).txs.slice(n);
+    check(t.length === 3 && t.map(x => x.amount).join() === '10,5,40', 'multi-item note not split: ' + JSON.stringify(t.map(x => [x.amount, x.description])));
+    check(t[0].category === 'Gifts & giving' && t[1].category === 'Small cash', 'multi-item categories wrong');
+    await page.click('#sheetClose'); await page.waitForTimeout(200);
+  });
+
+  await test('Evening check-in appears after its time and can be closed', async () => {
+    await page.evaluate(() => { const s = JSON.parse(localStorage.getItem('budgetsense.v3')); s.prefs.checkin = true; s.prefs.checkinTime = '00:00'; s.checkins = {}; localStorage.setItem('budgetsense.v3', JSON.stringify(s)); });
+    await page.reload(); await page.waitForTimeout(300);
+    check(await page.isVisible('#checkinSlot .checkin'), 'check-in card missing');
+    await page.click('#checkinNone'); await page.waitForTimeout(200);
+    check(!(await page.isVisible('#checkinSlot .checkin')), 'check-in card did not close');
+    check(Object.keys((await st()).checkins).length === 1, 'check-in not recorded');
+  });
+
+  await test('Bank alert import: parses, skips duplicates and OTPs, adds the rest', async () => {
+    await page.click('[data-tab=timeline]'); await page.click('#importOpen');
+    const alerts = [
+      'Rs.5.00 debited from A/c XX1234 on 28-09-26 to VPA cobbler.raju@ybl (UPI Ref No 426512345678). Not you? Call 1800',
+      'INR 1,950.00 spent on ICICI Bank Card XX9876 on 26-Sep-26 at AMAZON PAY INDIA. Avl Lmt: INR 1,20,000.00',
+      'Your OTP for txn of Rs 500 is 123456',
+      'AutoPay: Rs 2,400 debited towards LinkedIn Premium via e-mandate on 12-09-26 from A/c XX1234',
+    ].join('\n\n');
+    await page.fill('#importText', alerts); await page.click('#importForm button[type=submit]'); await page.waitForTimeout(200);
+    check((await page.$$('#importResult .found li')).length === 3, 'expected 3 payments found (OTP skipped)');
+    check((await page.$$('#importResult .found li.dup')).length === 1 && /Cobbler/.test(await text('#importResult .found li.dup')), 'voice-logged cobbler payment not recognised as already logged');
+    const n = (await st()).txs.length;
+    await page.click('#importAdd'); await page.waitForTimeout(200);
+    const added = (await st()).txs.slice(n);
+    // The ₹5 cobbler payment was already logged by voice earlier, so only 2 are new.
+    check(added.length === 2 && added.every(t => t.source === 'bank'), 'imported entries not added: ' + added.length);
+    check(added.find(t => /Linkedin Premium/i.test(t.description)).autopay, 'AutoPay not flagged');
+    await page.click('#importOpen'); await page.fill('#importText', alerts); await page.click('#importForm button[type=submit]'); await page.waitForTimeout(200);
+    check(/Add 0 new/.test(await text('#importAdd')), 'duplicates not detected on second import: ' + await text('#importAdd'));
+    await page.click('#importOpen');
+    await noOverflow('import');
+  });
+
+  await test('Automatic payments are detected and can be marked to cancel', async () => {
+    await page.click('[data-tab=pulse]');
+    check(/Linkedin Premium/i.test(await text('#recurWrap')), 'LinkedIn AutoPay not listed as automatic');
+    await page.click('#recurWrap [data-recur$=":cancel"]'); await page.waitForTimeout(200);
+    check(/Marked to cancel/.test(await text('#recurWrap')), 'cancel decision not shown');
+    await page.click('[data-ask="What are my automatic payments?"]'); await page.waitForTimeout(200);
+    check(/automatic payment/.test(await text('#draft')) && /a year/.test(await text('#draft')), 'automatic payments answer missing: ' + await text('#draft'));
+    await page.click('#sheetClose'); await page.waitForTimeout(200);
+  });
+
   await test('Dark mode toggle', async () => {
     await page.click('[data-tab=me]'); await page.click('#swDark');
     const bg = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
@@ -364,9 +450,136 @@ const FAKE_SR = () => {
     check(s.profile.name === 'Asha' && s.plan.Travel === 3000 && !('Coffee & chai' in s.plan) && s.goals[0].icon === '🛟', 'manual plan wrong: ' + JSON.stringify(s.plan));
   });
 
+  await test('Spending alarm fires when half the month\'s income is spent', async () => {
+    let beeps = 0;
+    await page.exposeFunction('__beeped', () => { beeps++; });
+    await page.evaluate(() => { const O = window.OscillatorNode.prototype.start; window.OscillatorNode.prototype.start = function(...a){ window.__beeped(); return O.apply(this, a); }; });
+    await page.click('[data-tab=pulse]'); await page.click('#speakBtn'); await page.waitForTimeout(300); await page.click('#recBtn'); await page.waitForTimeout(600);
+    await say('rent 46,000'); await say('yes');
+    check(await page.isVisible('#alarm'), 'alarm banner not shown at 50%');
+    check(/Be alert/.test(await text('#alarmText')) && /51%/.test(await text('#alarmText')), 'alarm text wrong: ' + await text('#alarmText'));
+    check(beeps >= 2, 'no alarm sound: ' + beeps);
+    await page.click('#alarmClose');
+    await say('Starbucks 200'); await say('yes');
+    check(!(await page.isVisible('#alarm')), 'alarm repeated for the same threshold');
+    await page.click('#sheetClose'); await page.waitForTimeout(200);
+  });
+
+  await test('Before you buy: verdicts, goal slip and actions', async () => {
+    await page.click('#speakBtn'); await page.waitForTimeout(300); await page.click('#recBtn'); await page.waitForTimeout(600);
+    const d = () => text('#draft');
+    await say('should I buy a 500 rupee book');
+    check(/Go ahead/.test(await d()), 'small purchase should be Go ahead: ' + await d());
+    await say('yes, buy it');
+    check((await st()).txs.at(-1).amount === 500, 'purchase not logged after yes');
+    await say('should I buy a 5 lakh car');
+    check(/Not this month/.test(await d()) && /slips/.test(await d()), 'huge purchase should be Not this month with a goal slip: ' + await d());
+    await say('save for it');
+    check((await st()).goals.some(g => g.target === 500000), 'save-for-it goal not created');
+    await page.click('#sheetClose'); await page.waitForTimeout(200);
+    await page.click('[data-tab=pulse]');
+    await page.fill('#buyAmt', '2000'); await page.fill('#buyWhat', 'headphones'); await page.click('#buyForm button[type=submit]'); await page.waitForTimeout(200);
+    check(/Month-end/.test(await text('#buyResult')), 'form check did not show impact');
+    check(/Month-end forecast/.test(await text('#pulseCard')) && /(faster|pace|Slower)/.test(await text('#pulseCard')), 'forecast/pace missing on Pulse');
+  });
+
+  await test('Move money between envelopes by voice and by form', async () => {
+    const before = (await st()).plan;
+    await page.click('#speakBtn'); await page.waitForTimeout(300); await page.click('#recBtn'); await page.waitForTimeout(600);
+    await say('move 1,000 from rent to travel');
+    const after = (await st()).plan;
+    check(after['Rent & home'] === before['Rent & home'] - 1000 && after['Travel'] === (before['Travel'] || 0) + 1000, 'voice move wrong: ' + JSON.stringify([before, after]));
+    await page.click('#sheetClose'); await page.waitForTimeout(200);
+    await page.click('[data-tab=envelopes]'); await page.click('#moveBtn');
+    await page.selectOption('#mvFrom', 'Travel'); await page.selectOption('#mvTo', 'Groceries'); await page.fill('#mvAmt', '400'); await page.click('#moveForm button[type=submit]'); await page.waitForTimeout(200);
+    const p2 = (await st()).plan;
+    check(p2.Travel === after.Travel - 400 && p2.Groceries === (after.Groceries || 0) + 400, 'form move wrong: ' + JSON.stringify(p2));
+    await noOverflow('move form');
+  });
+
+  await test('Statement upload: CSV, Excel and PDF are read, with debits and credits told apart', async () => {
+    const os = require('os'), fs = require('fs'), dir = fs.mkdtempSync(path.join(os.tmpdir(), 'bs-'));
+    const now = new Date(new Date().toLocaleDateString('en-CA', {timeZone: 'Asia/Kolkata'}));
+    const dd = k => { const d = new Date(now); d.setDate(Math.max(1, now.getDate() - k)); return String(d.getDate()).padStart(2,'0') + '/' + String(d.getMonth() + 1).padStart(2,'0') + '/' + d.getFullYear(); };
+    const csv = [
+      'Account Statement for XX1234,,,,,',
+      'Date,Narration,Chq./Ref.No.,Value Dt,Withdrawal Amt.,Deposit Amt.,Closing Balance',
+      `${dd(3)},UPI-CHAI POINT-chaipoint@ybl-YESB0000001-426577771111-UPI,0000426577771111,${dd(3)},35.00,,50000.00`,
+      `${dd(3)},UPI-RAMU COBBLER-ramu@okaxis-UTIB0000001-426577772222-Payment,0000426577772222,${dd(3)},15.00,,49985.00`,
+      `${dd(2)},ACH D- LINKEDIN SINGAPORE-MANDATE123,0000000000,${dd(2)},"2,400.00",,47585.00`,
+      `${dd(2)},POS 4591XXXXXXXX1234 DECATHLON SPORTS,0000,${dd(2)},"1,299.00",,46286.00`,
+      `${dd(1)},NEFT CR-HDFC0000001-ACME TECHNOLOGIES-SALARY SEP,N123,${dd(1)},,"90,000.00",136286.00`,
+      `${dd(1)},ATW-4591XXXXXX1234-S1ANHY01-HYDERABAD,0000,${dd(1)},"2,000.00",,134286.00`,
+    ].join('\n');
+    fs.writeFileSync(path.join(dir, 'stmt.csv'), csv);
+    await page.click('[data-tab=timeline]'); await page.click('#stmtOpen');
+    await page.setInputFiles('#stmtFile', path.join(dir, 'stmt.csv')); await page.waitForTimeout(400);
+    const rows = await page.$$eval('#stmtResult .found li', els => els.map(e => e.textContent.replace(/\s+/g,' ').trim()));
+    check(rows.length === 6, 'CSV: expected 6 payments, got ' + rows.length + ' ' + JSON.stringify(rows));
+    check(rows.some(r => /Chai Point/.test(r) && /₹35/.test(r)) && rows.some(r => /Ramu Cobbler/.test(r)), 'CSV: UPI payees not named: ' + JSON.stringify(rows));
+    check(rows.some(r => /Linkedin Singapore/i.test(r) && /automatic/.test(r)), 'CSV: ACH mandate not flagged automatic');
+    check(rows.some(r => /Acme Technologies/.test(r) && /\+₹90,000/.test(r)), 'CSV: salary credit not read as income');
+    check(rows.some(r => /Cash withdrawal/.test(r)), 'CSV: ATM withdrawal not recognised');
+    const n = (await st()).txs.length; await page.click('#importAdd'); await page.waitForTimeout(200);
+    check((await st()).txs.length === n + 6 && (await st()).txs.at(-1).source === 'statement', 'CSV entries not added');
+    // Same statement again: everything is already logged.
+    await page.click('#stmtOpen'); await page.setInputFiles('#stmtFile', path.join(dir, 'stmt.csv')); await page.waitForTimeout(400);
+    check(/Add 0 new/.test(await text('#importAdd')), 'CSV re-import not deduplicated');
+    // Excel: write the same rows as .xlsx using the page's SheetJS, then upload it.
+    const xlsxB64 = await page.evaluate(async c => { await new Promise((r, j) => { const s = document.createElement('script'); s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'; s.onload = r; s.onerror = j; document.head.appendChild(s); });
+      const rows = c.split('\n').map(l => l.match(/("[^"]*"|[^,]*)(,|$)/g).map(x => x.replace(/,$/,'').replace(/^"|"$/g,'')));
+      const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(rows.map(r => r.map(v => /^[\d,]+\.\d{2}$/.test(v) ? parseFloat(v.replace(/,/g,'')) : v))), 'S');
+      return XLSX.write(wb, {type:'base64', bookType:'xlsx'}); }, csv.replace('CHAI POINT','BLUE TOKAI').replace('426577771111','426599991111').replace('35.00','85.00'));
+    fs.writeFileSync(path.join(dir, 'stmt.xlsx'), Buffer.from(xlsxB64, 'base64'));
+    await page.setInputFiles('#stmtFile', path.join(dir, 'stmt.xlsx')); await page.waitForTimeout(600);
+    check(/Blue Tokai/.test(await text('#stmtResult')) && /Add 1 new/.test(await text('#importAdd')), 'Excel: statement not read or deduplicated: ' + await text('#stmtResult'));
+    // PDF: render a bank-style statement table to PDF with Chromium, then upload it.
+    const pdfPage = await ctx.newPage();
+    await pdfPage.setContent(`<table style="font:12px Arial;border-collapse:collapse" cellpadding="6"><tr><td>Date</td><td>Narration</td><td>Withdrawal</td><td>Deposit</td><td>Balance</td></tr>
+      <tr><td>${dd(4)}</td><td>Opening Balance</td><td></td><td></td><td>20,000.00</td></tr>
+      <tr><td>${dd(4)}</td><td>UPI/P2M/426511110000/SWIGGY LIMITED</td><td>450.00</td><td></td><td>19,550.00</td></tr>
+      <tr><td>${dd(3)}</td><td>UPI/P2A/426511110001/BEGGAR NAME</td><td>10.00</td><td></td><td>19,540.00</td></tr>
+      <tr><td>${dd(2)}</td><td>IMPS/426511110002/REFUND FLIPKART</td><td></td><td>1,200.00</td><td>20,740.00</td></tr></table>`);
+    fs.writeFileSync(path.join(dir, 'stmt.pdf'), await pdfPage.pdf()); await pdfPage.close();
+    await page.setInputFiles('#stmtFile', path.join(dir, 'stmt.pdf')); await page.waitForTimeout(1500);
+    const pr = await page.$$eval('#stmtResult .found li', els => els.map(e => e.textContent.replace(/\s+/g,' ').trim()));
+    check(pr.length === 3, 'PDF: expected 3 payments, got ' + JSON.stringify(pr) + ' ' + await text('#stmtResult'));
+    check(pr.some(r => /Swiggy/.test(r) && /₹450/.test(r)) && pr.some(r => /\+₹1,200/.test(r)), 'PDF: debit/credit wrong: ' + JSON.stringify(pr));
+    await page.click('#stmtOpen');
+  });
+
+  await test('Connect bank or UPI: consent steps, sample fetch, and an honest "not live" on real data', async () => {
+    await page.click('#connectOpen');
+    check((await page.$$('#connectBody [data-src]')).length === 9, 'source list missing');
+    await page.click('#connectBody [data-src="ICICI Bank"]');
+    check(/Transactions only/.test(await text('#connectBody')) && /OTP/.test(await text('#connectBody')), 'consent summary missing');
+    await page.click('#cOk');
+    check(/Not live yet/.test(await text('#connectBody')) && /Nothing was shared/.test(await text('#connectBody')), 'real-data path should say not live');
+    await page.click('#connectOpen');
+    await noOverflow('connect');
+  });
+
+  await test('Timeline: filter, search, edit and delete entries', async () => {
+    await page.click('[data-tt=income]'); await page.waitForTimeout(100);
+    const kinds = await page.$$eval('#timeline .items .amt small', els => [...new Set(els.map(e => e.textContent))]);
+    check(kinds.length === 1 && kinds[0] === 'In', 'money-in filter shows: ' + kinds);
+    await page.click('[data-tt=all]'); await page.fill('#tlSearch', 'cobbler'); await page.waitForTimeout(100);
+    const names = await page.$$eval('#timeline .items .t b', els => els.map(e => e.textContent));
+    check(names.length >= 1 && names.every(n => /cobbler/i.test(n)), 'search results wrong: ' + names);
+    await page.click('#timeline [data-edit]'); await page.selectOption('#edCat', 'Personal care'.replace('Personal care','Self-care')); await page.fill('#edAmt', '20');
+    const id = await page.$eval('#timeline [data-edsave]', b => b.getAttribute('data-edsave'));
+    await page.click('#timeline [data-edsave]'); await page.waitForTimeout(100);
+    const t = (await st()).txs.find(x => x.id === id);
+    check(t.amount === 20 && t.category === 'Self-care', 'edit not saved: ' + JSON.stringify(t));
+    await page.click('#timeline [data-edit]'); await page.click('#timeline [data-eddel]'); await page.click('#timeline [data-eddel]'); await page.waitForTimeout(100);
+    check(!(await st()).txs.some(x => x.id === id), 'delete failed');
+    await page.fill('#tlSearch', ''); await page.dispatchEvent('#tlSearch', 'input');
+  });
+
   await test('Load sample data needs two taps', async () => {
     await page.click('[data-tab=me]'); await page.click('#sampleBtn'); await page.click('#sampleBtn'); await page.waitForTimeout(300);
-    check((await st()).sample && (await st()).txs.length === 18, 'sample data not loaded');
+    check((await st()).sample && (await st()).txs.length === 23, 'sample data not loaded: ' + (await st()).txs.length);
+    check(/Netflix/.test(await text('#recurWrap')) && /Linkedin|LinkedIn/.test(await text('#recurWrap')), 'sample automatic payments missing');
   });
 
   await test('Guided demo runs from setup to summary', async () => {

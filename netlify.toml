@@ -1,9 +1,16 @@
 # Netlify: build and serve the CampaignForge app from app/.
 # The clickable prototype with the voice-guided demo is served at /demo/.
+# The BudgetSense Voice prototype is copied into app/public before the build and served at /budgetsense/.
 [build]
   base = "app"
-  command = "npm run build"
+  command = "rm -rf public/budgetsense && mkdir -p public/budgetsense && cp ../budgetsense/index.html public/budgetsense/index.html && cp -R ../budgetsense/media public/budgetsense/media && npm run build"
   publish = "dist"
 
 [build.environment]
   NODE_VERSION = "22"
+
+# BudgetSense records voice notes, so allow the microphone on its pages.
+[[headers]]
+  for = "/budgetsense/*"
+  [headers.values]
+    Permissions-Policy = "microphone=(self)"
