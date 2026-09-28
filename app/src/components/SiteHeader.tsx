@@ -4,7 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 
 export function SiteHeader() {
-  const { user, loading } = useAuth();
+  const { user, loading, isGuest } = useAuth();
   const navigate = useNavigate();
 
   return (
@@ -31,11 +31,20 @@ export function SiteHeader() {
         <div className="flex items-center gap-2">
           {loading ? null : user ? (
             <>
-              <span className="hidden text-xs text-muted-foreground sm:inline">{user.email}</span>
+              <span className="hidden text-xs text-muted-foreground sm:inline">
+                {isGuest ? "Guest" : user.email}
+              </span>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={async () => {
+                  if (
+                    isGuest &&
+                    !window.confirm(
+                      "You're using a guest account. If you sign out, you can't get back to this work. Sign out anyway?",
+                    )
+                  )
+                    return;
                   await supabase.auth.signOut();
                   navigate({ to: "/" });
                 }}

@@ -44,7 +44,8 @@ import {
 } from "@/components/ui/sidebar";
 
 export function AppSidebar() {
-  const { user } = useAuth();
+  const { user, isGuest } = useAuth();
+  const displayName = isGuest ? "Guest" : user?.email;
   const { roles, isAdmin } = useMyRoles();
   const { isMobile } = useSidebar();
   const navigate = useNavigate();
@@ -63,7 +64,7 @@ export function AppSidebar() {
     },
   });
 
-  const initials = (user?.email ?? "?").slice(0, 2).toUpperCase();
+  const initials = isGuest ? "G" : (user?.email ?? "?").slice(0, 2).toUpperCase();
 
   return (
     <Sidebar collapsible="icon">
@@ -200,7 +201,7 @@ export function AppSidebar() {
                     <AvatarFallback className="rounded-lg">{initials}</AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-medium">{user?.email}</span>
+                    <span className="truncate font-medium">{displayName}</span>
                     <span className="truncate text-xs text-muted-foreground">
                       {roles.join(" · ")}
                     </span>
@@ -215,11 +216,18 @@ export function AppSidebar() {
                 sideOffset={4}
               >
                 <DropdownMenuLabel className="text-xs text-muted-foreground">
-                  {user?.email}
+                  {isGuest ? "Guest — your work is saved in this browser" : user?.email}
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   onClick={async () => {
+                    if (
+                      isGuest &&
+                      !window.confirm(
+                        "You're using a guest account. If you sign out, you can't get back to this work. Sign out anyway?",
+                      )
+                    )
+                      return;
                     await supabase.auth.signOut();
                     navigate({ to: "/" });
                   }}

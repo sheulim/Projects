@@ -15,6 +15,11 @@ Follow these steps once. No coding is needed.
    - Site URL: `https://campaign-forge.netlify.app`
    - Redirect URLs: add `https://campaign-forge.netlify.app/**` and `https://*--campaign-forge.netlify.app/**` (deploy previews).
 
+5. Make sign-in easy (recommended while CampaignForge is an MVP):
+   - **Authentication → Sign In / Providers → Email**: switch **Confirm email** off. New users are signed in straight after sign-up, with no email to wait for.
+   - **Authentication → Sign In / Providers**: switch **Allow anonymous sign-ins** on. This powers the "Try it now — no sign-up needed" button.
+   Turn email confirmation back on later, once you have your own email sender (SMTP) set up.
+
 ## 2. Add the keys to Netlify
 
 Netlify → **Site configuration → Environment variables → Add a variable**. Never paste keys into chat or code.
@@ -39,7 +44,7 @@ Until then, email sign-up works and the Google button shows a friendly message.
 
 ## 4. Test
 
-1. Open the site, create an account and confirm the email.
+1. Open the site and press **Try it now — no sign-up needed**, or create an account.
 2. Fill in **Company DNA**.
 3. Create a campaign, click **Generate plan** (about 1–2 minutes).
 4. Open **Channel Studio**, pick channels and click **Generate**. Then try **Generate image**, **Generate voiceover** and **Make video** on Instagram or YouTube.
