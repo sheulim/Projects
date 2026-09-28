@@ -32,12 +32,21 @@ Netlify → **Site configuration → Environment variables → Add a variable**.
 | `SUPABASE_PUBLISHABLE_KEY` | Same publishable key | AI jobs |
 | `ANTHROPIC_API_KEY` | From console.anthropic.com | Plans, strategy, all channel text |
 | `OPENAI_API_KEY` | From platform.openai.com | Images and voiceover |
+| `FISH_AUDIO_API_KEY` | From fish.audio (API keys page) | Your cloned voice (My voice, Daily video) |
 
-Optional: `OPENAI_IMAGE_MODEL` (default `gpt-image-1`), `OPENAI_TTS_MODEL` (default `gpt-4o-mini-tts`), `OPENAI_TTS_VOICE` (default `alloy`), `OPENAI_TOUR_VOICE` (the guided tour's voice; defaults to `OPENAI_TTS_VOICE`).
+Optional: `FISH_AUDIO_MODEL` (pins a Fish Audio speech model; leave empty for Fish Audio's default), `OPENAI_IMAGE_MODEL` (default `gpt-image-1`), `OPENAI_TTS_MODEL` (default `gpt-4o-mini-tts`), `OPENAI_TTS_VOICE` (default `alloy`), `OPENAI_TOUR_VOICE` (the guided tour's voice; defaults to `OPENAI_TTS_VOICE`).
 
 The guided tour uses `OPENAI_API_KEY` for a natural voice. Each line is recorded once and then served from Netlify's cache. Without the key, the tour uses the browser's built-in voice.
 
 After adding variables, trigger a new deploy: **Deploys → Trigger deploy → Deploy site**.
+
+## Your cloned voice (Fish Audio)
+
+1. Create a Fish Audio account and an API key, and add it as `FISH_AUDIO_API_KEY` in Netlify.
+2. In CampaignForge, open **My voice**, record 30–90 seconds in a quiet room (or upload a recording), tick the consent box and press **Create my voice**. A test line in your voice appears in about a minute.
+3. From then on, every **Create voiceover** — in Channel Studio and in **Daily video** — uses your voice. Without a ready voice, voiceovers use the standard OpenAI voice.
+
+If you already ran `setup.sql` before this feature, run `drizzle/migrations/0005_voice_profiles.sql` once in the Supabase SQL Editor.
 
 ## 3. Optional: Google sign-in
 

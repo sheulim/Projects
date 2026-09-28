@@ -14,6 +14,7 @@ import {
 import { startJob } from "@/lib/jobs/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Link } from "@tanstack/react-router";
 
 type Campaign = Database["public"]["Tables"]["campaigns"]["Row"];
 type Asset = Database["public"]["Tables"]["channel_assets"]["Row"];
@@ -22,7 +23,7 @@ type Content = Record<string, unknown> & { _media?: Media; _error?: string };
 
 const BUCKET = "campaign-media";
 
-function isBusy(a: Asset) {
+export function isBusy(a: Asset) {
   const media = (a.content as Content)?._media ?? {};
   return a.status === "generating" || Object.values(media).includes("generating");
 }
@@ -404,7 +405,7 @@ function useSignedUrl(path: string | null) {
   });
 }
 
-function ChannelCard({
+export function ChannelCard({
   asset,
   canEdit,
   onRegenerate,
@@ -444,7 +445,7 @@ function ChannelCard({
   });
 
   const allText = useMemo(() => {
-    const { _media, _error, ...rest } = c;
+    const { _media, _error, _source, ...rest } = c;
     return JSON.stringify(rest, null, 2);
   }, [c]);
 
@@ -558,9 +559,10 @@ function ChannelCard({
                           : "Create voiceover"}
                     </Button>
                   ) : null}
+                  {canEdit ? <VoiceNote /> : null}
                   {media.voice === "error" ? (
                     <p className="text-xs text-destructive">
-                      Voiceover failed. Check the OpenAI key and try again.
+                      Voiceover failed. Check the voice settings and try again.
                     </p>
                   ) : null}
                 </div>
@@ -772,5 +774,27 @@ function VideoMaker({
         {state === "done" ? "Rebuild video" : state === "recording" ? "Building…" : "Build video"}
       </Button>
     </div>
+  );
+}
+
+/** Tells the user whose voice the voiceover will use. */
+function VoiceNote() {
+  const profile = useQuery({
+    queryKey: ["voice_profile"],
+    staleTime: 60_000,
+    queryFn: async () => {
+      const { data } = await supabase.from("voice_profiles").select("status").maybeSingle();
+      return data;
+    },
+  });
+  return profile.data?.status === "ready" ? (
+    <p className="text-xs text-support">Voiceovers use your cloned voice.</p>
+  ) : (
+    <p className="text-xs text-muted-foreground">
+      Standard AI voice.{" "}
+      <Link to="/my-voice" className="text-primary underline">
+        Use your own voice
+      </Link>
+    </p>
   );
 }

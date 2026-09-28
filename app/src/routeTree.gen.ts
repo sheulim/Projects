@@ -15,7 +15,9 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedApprovalsRouteImport } from './routes/_authenticated/approvals'
 import { Route as AuthenticatedCompanyDnaRouteImport } from './routes/_authenticated/company-dna'
 import { Route as AuthenticatedCompareRouteImport } from './routes/_authenticated/compare'
+import { Route as AuthenticatedDailyVideoRouteImport } from './routes/_authenticated/daily-video'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedMyVoiceRouteImport } from './routes/_authenticated/my-voice'
 import { Route as AuthenticatedTeamRouteImport } from './routes/_authenticated/team'
 import { Route as AuthenticatedCampaignsIndexRouteImport } from './routes/_authenticated/campaigns.index'
 import { Route as AuthenticatedCampaignsIdRouteImport } from './routes/_authenticated/campaigns.$id'
@@ -49,9 +51,19 @@ const AuthenticatedCompareRoute = AuthenticatedCompareRouteImport.update({
   path: '/compare',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedDailyVideoRoute = AuthenticatedDailyVideoRouteImport.update({
+  id: '/daily-video',
+  path: '/daily-video',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedMyVoiceRoute = AuthenticatedMyVoiceRouteImport.update({
+  id: '/my-voice',
+  path: '/my-voice',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedTeamRoute = AuthenticatedTeamRouteImport.update({
@@ -78,7 +90,9 @@ export interface FileRoutesByFullPath {
   '/approvals': typeof AuthenticatedApprovalsRoute
   '/company-dna': typeof AuthenticatedCompanyDnaRoute
   '/compare': typeof AuthenticatedCompareRoute
+  '/daily-video': typeof AuthenticatedDailyVideoRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/my-voice': typeof AuthenticatedMyVoiceRoute
   '/team': typeof AuthenticatedTeamRoute
   '/campaigns/$id': typeof AuthenticatedCampaignsIdRoute
   '/campaigns/': typeof AuthenticatedCampaignsIndexRoute
@@ -89,7 +103,9 @@ export interface FileRoutesByTo {
   '/approvals': typeof AuthenticatedApprovalsRoute
   '/company-dna': typeof AuthenticatedCompanyDnaRoute
   '/compare': typeof AuthenticatedCompareRoute
+  '/daily-video': typeof AuthenticatedDailyVideoRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/my-voice': typeof AuthenticatedMyVoiceRoute
   '/team': typeof AuthenticatedTeamRoute
   '/campaigns/$id': typeof AuthenticatedCampaignsIdRoute
   '/campaigns': typeof AuthenticatedCampaignsIndexRoute
@@ -102,7 +118,9 @@ export interface FileRoutesById {
   '/_authenticated/approvals': typeof AuthenticatedApprovalsRoute
   '/_authenticated/company-dna': typeof AuthenticatedCompanyDnaRoute
   '/_authenticated/compare': typeof AuthenticatedCompareRoute
+  '/_authenticated/daily-video': typeof AuthenticatedDailyVideoRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/my-voice': typeof AuthenticatedMyVoiceRoute
   '/_authenticated/team': typeof AuthenticatedTeamRoute
   '/_authenticated/campaigns/$id': typeof AuthenticatedCampaignsIdRoute
   '/_authenticated/campaigns/': typeof AuthenticatedCampaignsIndexRoute
@@ -115,7 +133,9 @@ export interface FileRouteTypes {
     | '/approvals'
     | '/company-dna'
     | '/compare'
+    | '/daily-video'
     | '/dashboard'
+    | '/my-voice'
     | '/team'
     | '/campaigns/$id'
     | '/campaigns/'
@@ -126,7 +146,9 @@ export interface FileRouteTypes {
     | '/approvals'
     | '/company-dna'
     | '/compare'
+    | '/daily-video'
     | '/dashboard'
+    | '/my-voice'
     | '/team'
     | '/campaigns/$id'
     | '/campaigns'
@@ -138,7 +160,9 @@ export interface FileRouteTypes {
     | '/_authenticated/approvals'
     | '/_authenticated/company-dna'
     | '/_authenticated/compare'
+    | '/_authenticated/daily-video'
     | '/_authenticated/dashboard'
+    | '/_authenticated/my-voice'
     | '/_authenticated/team'
     | '/_authenticated/campaigns/$id'
     | '/_authenticated/campaigns/'
@@ -194,11 +218,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCompareRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/daily-video': {
+      id: '/_authenticated/daily-video'
+      path: '/daily-video'
+      fullPath: '/daily-video'
+      preLoaderRoute: typeof AuthenticatedDailyVideoRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/my-voice': {
+      id: '/_authenticated/my-voice'
+      path: '/my-voice'
+      fullPath: '/my-voice'
+      preLoaderRoute: typeof AuthenticatedMyVoiceRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/team': {
@@ -229,7 +267,9 @@ interface AuthenticatedRouteChildren {
   AuthenticatedApprovalsRoute: typeof AuthenticatedApprovalsRoute
   AuthenticatedCompanyDnaRoute: typeof AuthenticatedCompanyDnaRoute
   AuthenticatedCompareRoute: typeof AuthenticatedCompareRoute
+  AuthenticatedDailyVideoRoute: typeof AuthenticatedDailyVideoRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedMyVoiceRoute: typeof AuthenticatedMyVoiceRoute
   AuthenticatedTeamRoute: typeof AuthenticatedTeamRoute
   AuthenticatedCampaignsIdRoute: typeof AuthenticatedCampaignsIdRoute
   AuthenticatedCampaignsIndexRoute: typeof AuthenticatedCampaignsIndexRoute
@@ -239,7 +279,9 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedApprovalsRoute: AuthenticatedApprovalsRoute,
   AuthenticatedCompanyDnaRoute: AuthenticatedCompanyDnaRoute,
   AuthenticatedCompareRoute: AuthenticatedCompareRoute,
+  AuthenticatedDailyVideoRoute: AuthenticatedDailyVideoRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedMyVoiceRoute: AuthenticatedMyVoiceRoute,
   AuthenticatedTeamRoute: AuthenticatedTeamRoute,
   AuthenticatedCampaignsIdRoute: AuthenticatedCampaignsIdRoute,
   AuthenticatedCampaignsIndexRoute: AuthenticatedCampaignsIndexRoute,
