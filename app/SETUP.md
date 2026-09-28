@@ -33,7 +33,9 @@ Netlify → **Site configuration → Environment variables → Add a variable**.
 | `ANTHROPIC_API_KEY` | From console.anthropic.com | Plans, strategy, all channel text |
 | `OPENAI_API_KEY` | From platform.openai.com | Images and voiceover |
 
-Optional: `OPENAI_IMAGE_MODEL` (default `gpt-image-1`), `OPENAI_TTS_MODEL` (default `gpt-4o-mini-tts`), `OPENAI_TTS_VOICE` (default `alloy`).
+Optional: `OPENAI_IMAGE_MODEL` (default `gpt-image-1`), `OPENAI_TTS_MODEL` (default `gpt-4o-mini-tts`), `OPENAI_TTS_VOICE` (default `alloy`), `OPENAI_TOUR_VOICE` (the guided tour's voice; defaults to `OPENAI_TTS_VOICE`).
+
+The guided tour uses `OPENAI_API_KEY` for a natural voice. Each line is recorded once and then served from Netlify's cache. Without the key, the tour uses the browser's built-in voice.
 
 After adding variables, trigger a new deploy: **Deploys → Trigger deploy → Deploy site**.
 
@@ -49,4 +51,4 @@ Until then, email sign-up works and the Google button shows a friendly message.
 3. Create a campaign, click **Generate plan** (about 1–2 minutes).
 4. Open **Channel Studio**, pick channels and click **Generate**. Then try **Generate image**, **Generate voiceover** and **Make video** on Instagram or YouTube.
 
-The guided voice demo is at `/demo/` and needs no keys.
+On the home page, **▶ Take the guided tour** signs the visitor in as a guest, adds a sample campaign and walks through every screen with a voice guide. Signed-in users can replay it with **▶ Guided tour** at the top of any page. Before Supabase is connected, the button opens the older demo at `/demo/` instead.

@@ -1,4 +1,8 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useState } from "react";
+import { toast } from "sonner";
+import { isSupabaseConfigured, supabase } from "@/integrations/supabase/client";
+import { requestTour } from "@/components/guided-tour";
 import { SiteHeader } from "@/components/SiteHeader";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -76,6 +80,33 @@ function Landing() {
   const { user } = useAuth();
   const primaryTo = user ? "/dashboard" : "/auth";
   const primaryLabel = user ? "Open your dashboard" : "Create your account";
+  const navigate = useNavigate();
+  const [startingTour, setStartingTour] = useState(false);
+
+  // One tap: sign in as a guest if needed, then the voice guide tours the real app.
+  async function startTour() {
+    requestTour(); // unlocks sound inside this tap
+    if (!isSupabaseConfigured()) {
+      window.location.href = "/demo/";
+      return;
+    }
+    setStartingTour(true);
+    try {
+      if (!user) {
+        const { error } = await supabase.auth.signInAnonymously({
+          options: { data: { full_name: "Guest" } },
+        });
+        if (error) throw error;
+      }
+      await navigate({ to: "/dashboard" });
+    } catch (e) {
+      console.error(e);
+      toast.message("Opening the demo version of the tour.");
+      window.location.href = "/demo/";
+    } finally {
+      setStartingTour(false);
+    }
+  }
 
   return (
     <div className="min-h-screen">
@@ -99,15 +130,13 @@ function Landing() {
                   {primaryLabel}
                 </Button>
               </Link>
-              <a href="/demo/">
-                <Button size="lg" variant="outline">
-                  Watch the guided demo
-                </Button>
-              </a>
+              <Button size="lg" variant="outline" disabled={startingTour} onClick={startTour}>
+                {startingTour ? "Starting the tour…" : "▶ Take the guided tour"}
+              </Button>
             </div>
             <p className="mt-3 text-xs text-muted-foreground">
-              The demo has a voice guide that walks you through a sample campaign. Turn your sound
-              on.
+              No sign-up needed. A voice guide walks you through every screen with a sample
+              campaign. Turn your sound on.
             </p>
           </div>
 

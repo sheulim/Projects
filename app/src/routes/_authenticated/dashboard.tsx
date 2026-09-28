@@ -1,3 +1,4 @@
+import { TourWelcome } from "@/components/guided-tour";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -126,6 +127,7 @@ function DashboardPage() {
 
   return (
     <main className="mx-auto max-w-6xl px-5 py-10">
+      <TourWelcome />
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="eyebrow">All campaigns</p>
@@ -136,7 +138,7 @@ function DashboardPage() {
         </Link>
       </div>
 
-      <section className="mt-8 grid grid-cols-2 gap-3 lg:grid-cols-5">
+      <section data-tour="tiles" className="mt-8 grid grid-cols-2 gap-3 lg:grid-cols-5">
         {tiles.map((t) => (
           <div key={t.label} className="panel p-4">
             <p className="eyebrow">{t.label}</p>
@@ -146,7 +148,7 @@ function DashboardPage() {
         ))}
       </section>
 
-      <section className="panel mt-6 overflow-x-auto p-2">
+      <section data-tour="campaign-table" className="panel mt-6 overflow-x-auto p-2">
         <h2 className="px-3 pb-2 pt-3 font-display text-lg font-semibold">Campaigns</h2>
         {list.length === 0 ? (
           <p className="px-3 pb-4 text-sm text-muted-foreground">

@@ -15,12 +15,14 @@ export const Route = createFileRoute("/_authenticated/campaigns/")({
       { title: "Your campaigns — CampaignForge" },
       {
         name: "description",
-        content: "Every campaign brief, calendar and creative asset you have planned, in one place.",
+        content:
+          "Every campaign brief, calendar and creative asset you have planned, in one place.",
       },
       { property: "og:title", content: "Your campaigns — CampaignForge" },
       {
         property: "og:description",
-        content: "Every campaign brief, calendar and creative asset you have planned, in one place.",
+        content:
+          "Every campaign brief, calendar and creative asset you have planned, in one place.",
       },
     ],
   }),
@@ -70,14 +72,19 @@ function CampaignsPage() {
         <Button onClick={() => setOpen((v) => !v)}>{open ? "Close" : "New campaign"}</Button>
       </div>
 
-      {open ? <BriefForm onCreated={(id) => navigate({ to: "/campaigns/$id", params: { id } })} /> : null}
+      {open ? (
+        <BriefForm onCreated={(id) => navigate({ to: "/campaigns/$id", params: { id } })} />
+      ) : null}
 
       <div className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {isLoading ? (
           <p className="text-sm text-muted-foreground">Loading campaigns…</p>
         ) : campaigns && campaigns.length > 0 ? (
           campaigns.map((c) => (
-            <div key={c.id} className="panel group flex flex-col p-5 transition-colors hover:border-primary/40">
+            <div
+              key={c.id}
+              className="panel group flex flex-col p-5 transition-colors hover:border-primary/40"
+            >
               <div className="flex items-start justify-between gap-3">
                 <h2 className="font-display text-lg font-semibold leading-snug">{c.title}</h2>
                 <Badge variant="outline" className="shrink-0 capitalize">
@@ -111,7 +118,8 @@ function CampaignsPage() {
           <div className="panel col-span-full p-10 text-center">
             <h2 className="font-display text-lg font-semibold">No campaigns yet</h2>
             <p className="mx-auto mt-2 max-w-sm text-sm text-muted-foreground">
-              Start with a short brief — audience, goal and dates. The plan builds itself from there.
+              Start with a short brief — audience, goal and dates. The plan builds itself from
+              there.
             </p>
             <Button className="mt-5" onClick={() => setOpen(true)}>
               Create your first campaign
@@ -155,6 +163,7 @@ function BriefForm({ onCreated }: { onCreated: (id: string) => void }) {
 
   return (
     <form
+      data-tour="brief-form"
       className="panel mt-8 grid gap-5 p-6 md:grid-cols-2"
       onSubmit={(e) => {
         e.preventDefault();
