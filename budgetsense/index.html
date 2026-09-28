@@ -141,6 +141,7 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--teal);outline-of
 .checkin{background:linear-gradient(135deg,var(--saffron-soft),var(--surface));border-color:color-mix(in srgb,var(--saffron) 45%,var(--line))}
 .checkin b{font-size:16px}
 .importcard small{font-size:12px}
+.lastimp{display:block;margin-top:6px;color:var(--teal);font-weight:700}
 .srcs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
 .src{border:1px solid var(--line);background:var(--sunk);border-radius:14px;padding:10px 8px;text-align:left;display:grid;gap:1px}
 .src span{font-size:18px}.src b{font-size:13px;line-height:1.25}.src small{color:var(--muted);font-size:11px}
@@ -451,6 +452,7 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--teal);outline-of
     <div class="card importcard">
       <b>📥 Catch what you missed</b>
       <small class="muted" style="display:block;margin-top:2px">Bring in payments you did not speak. Nothing is added twice, and bank access is read-only.</small>
+      <small class="lastimp" id="lastImport"></small>
       <div class="srcs">
         <button class="src" id="connectOpen"><span>🔗</span><b>Connect bank or UPI</b><small>Daily, automatic</small></button>
         <button class="src" id="stmtOpen"><span>📄</span><b>Upload statement</b><small>PDF, CSV or Excel</small></button>
@@ -877,7 +879,7 @@ function load(){
   try {
     const s = JSON.parse(localStorage.getItem(LS) || 'null');
     if (!s) return false;
-    Object.assign(state, {profile:s.profile||null, plan:s.plan||{}, goals:s.goals||[], txs:s.txs||[], recs:s.recs||[], sample:!!s.sample, custom:s.custom||{}, planByMonth:s.planByMonth||{}, checkins:s.checkins||{}, recurDecisions:s.recurDecisions||{}, alarms:s.alarms||{}, prefs:Object.assign(state.prefs, s.prefs||{})});
+    Object.assign(state, {profile:s.profile||null, plan:s.plan||{}, goals:s.goals||[], txs:s.txs||[], recs:s.recs||[], sample:!!s.sample, lastImport:s.lastImport||null, custom:s.custom||{}, planByMonth:s.planByMonth||{}, checkins:s.checkins||{}, recurDecisions:s.recurDecisions||{}, alarms:s.alarms||{}, prefs:Object.assign(state.prefs, s.prefs||{})});
     for (const [n,c] of Object.entries(state.custom)) addCustom(n, c.kind, c.icon);
     return true;
   } catch(e){ return false; }
@@ -885,7 +887,7 @@ function load(){
 function save(){
   // Snapshot this month's limits so each month is judged against the plan it actually had.
   if (state.profile && !state.sample) state.planByMonth[monthKey(todayIST())] = {...state.plan};
-  try { localStorage.setItem(LS, JSON.stringify({profile:state.profile, plan:state.plan, goals:state.goals, txs:state.txs, recs:state.recs, sample:state.sample, custom:state.custom, planByMonth:state.planByMonth, checkins:state.checkins, recurDecisions:state.recurDecisions, alarms:state.alarms, prefs:state.prefs})); } catch(e){} }
+  try { localStorage.setItem(LS, JSON.stringify({profile:state.profile, plan:state.plan, goals:state.goals, txs:state.txs, recs:state.recs, sample:state.sample, custom:state.custom, lastImport:state.lastImport, planByMonth:state.planByMonth, checkins:state.checkins, recurDecisions:state.recurDecisions, alarms:state.alarms, prefs:state.prefs})); } catch(e){} }
 
 const memAudio = new Map(); let dbp = null;
 function db(){ if (dbp) return dbp; dbp = new Promise(res => { try { const r = indexedDB.open('budgetsense-voice', 1); r.onupgradeneeded = () => r.result.createObjectStore('notes'); r.onsuccess = () => res(r.result); r.onerror = () => res(null); } catch(e){ res(null); } }); return dbp; }
@@ -921,7 +923,7 @@ function loadSample(){
     {id:uid(), name:'Emergency Fund', icon:'🛟', target:300000, saved:185000, by:monthKey(new Date(y, m + 9, 1))},
     {id:uid(), name:'Goa Trip', icon:'🏖', target:60000, saved:18000, by:monthKey(new Date(y, m + 3, 1))},
   ];
-  state.recs = []; state.planByMonth = {}; state.checkins = {}; state.recurDecisions = {}; state.alarms = {}; state.sample = true; state.month = monthKey(t);
+  state.recs = []; state.planByMonth = {}; state.checkins = {}; state.recurDecisions = {}; state.alarms = {}; state.lastImport = null; state.sample = true; state.month = monthKey(t);
   save();
 }
 
@@ -1244,9 +1246,9 @@ function showFound(items, label, box, source){
   $('importAdd').onclick = () => {
     let n = 0;
     const before = figures(monthKey(todayIST())).spent;
-    importFound.forEach((a,i) => { if ($('imp' + i).checked){ state.txs.push({id:uid(), date:a.date, amount:a.amount, type:a.type, description:a.description, category:a.category, source, ref:a.ref, acct:a.acct, autopay:a.autopay, at:Date.now() + i}); n++; } });
+    importFound.forEach((a,i) => { if ($('imp' + i).checked){ state.txs.push({id:uid(), date:a.date, amount:a.amount, type:a.type, description:a.description, category:a.category, source, ref:a.ref, acct:a.acct, via:a.via, autopay:a.autopay, at:Date.now() + i}); n++; } });
     const id = uid(); state.recs.push({id, at:Date.now(), durationMs:0, transcript:`Imported ${importFound.length} from ${label}`, source:'import', hasAudio:false, outcome:`Added ${n} from ${label}`});
-    save(); spendAlarm(monthKey(todayIST()), before);
+    state.lastImport = {at:Date.now(), label, n}; save(); spendAlarm(monthKey(todayIST()), before);
     box.innerHTML = ''; $('importText').value = ''; ['importForm','stmtPanel','connectPanel'].forEach(x => $(x).classList.add('hide'));
     toast(`Added ${n} entr${n === 1 ? 'y' : 'ies'} from your ${label}`); reply(`Added ${n} from your ${label}.`); render();
   };
@@ -1383,14 +1385,14 @@ let connectPick = null;
 function connectStep(n){
   const box = $('connectBody'), t = todayIST(), from = new Date(t.getFullYear(), t.getMonth(), 1);
   if (n === 1){
-    box.innerHTML = `<p class="label" style="margin:10px 0 6px">1 · Choose where your payments come from</p>
+    box.innerHTML = `<p class="label" style="margin:10px 0 6px">Step 1 of 3 · Choose where your payments come from</p>
       <small class="muted">UPI apps share payments made from their linked bank account.</small>
       <div class="picks">${SOURCES.upi.map(x => `<button data-src="${x}"><b>${x}</b><small>UPI app</small></button>`).join('')}</div>
       <div class="picks">${SOURCES.bank.map(x => `<button data-src="${x}"><b>${x}</b><small>Savings or current</small></button>`).join('')}</div>`;
     box.querySelectorAll('[data-src]').forEach(b => b.onclick = () => { connectPick = b.getAttribute('data-src'); connectStep(2); });
   }
   if (n === 2){
-    box.innerHTML = `<p class="label" style="margin:10px 0 6px">2 · Check what you are agreeing to share</p>
+    box.innerHTML = `<p class="label" style="margin:10px 0 6px">Step 2 of 3 · Check what you are agreeing to share</p>
       <table class="consent"><tr><td>From</td><td>${esc(connectPick)}</td></tr><tr><td>What</td><td>Transactions only. No balance, no login, no ability to pay</td></tr>
       <tr><td>Period</td><td>${from.toLocaleDateString('en-IN',{day:'numeric',month:'short'})} – today, then daily</td></tr><tr><td>Purpose</td><td>Budgeting in BudgetSense</td></tr>
       <tr><td>How long</td><td>Until you switch it off. Stop any time from your Account Aggregator app</td></tr></table>
@@ -1400,12 +1402,18 @@ function connectStep(n){
   }
   if (n === 3){
     if (!state.sample){
-      box.innerHTML = `<p class="label" style="margin:10px 0 6px">3 · Not live yet</p>
+      box.innerHTML = `<p class="label" style="margin:10px 0 6px">Step 3 of 3 · Not live yet</p>
         <p class="hint">Live bank linking needs an RBI-regulated partner, which is planned once the one-month trial shows results. Nothing was shared. Until then, the fastest options are <b>Upload statement</b> (a PDF or CSV from your bank, which catches every UPI payment) and <b>Paste alerts</b>.</p>
         <div class="row"><button class="btn" id="cBack">Back</button><button class="btn primary" id="cStmt" style="flex:1">Upload a statement instead</button></div>`;
       $('cBack').onclick = () => connectStep(2); $('cStmt').onclick = () => { $('connectPanel').classList.add('hide'); $('stmtPanel').classList.remove('hide'); };
       return;
     }
+    box.innerHTML = `<p class="label" style="margin:10px 0 6px">Step 3 of 3 · Fetching</p><p class="hint" id="cFetch">Waiting for ${esc(connectPick)} to confirm your OTP…</p>`;
+    setTimeout(() => { const f = $('cFetch'); if (f) f.textContent = `Receiving encrypted transactions from ${connectPick}…`; }, 500);
+    setTimeout(() => connectStep(4), 1100);
+    return;
+  }
+  if (n === 4){
     const d = k => { const x = new Date(t); x.setDate(Math.max(1, t.getDate() - k)); return iso(x); };
     const acct = String(1000 + (connectPick.length * 137) % 9000);
     const sample = [[0,20,'Chai Tapri','Coffee & chai'],[0,60,'Rapido Auto','Transport'],[1,10,'Beggar','Gifts & giving'],[1,249,'Jiomart','Groceries'],[2,5,'Cobbler','Small cash'],[3,2400,'LinkedIn Premium','Subscriptions',true],[4,180,'Zomato','Eating out'],[5,499,'Airtel Recharge','Utilities']];
@@ -1588,7 +1596,7 @@ function createEnvelope(name, kind, icon, amount){
 }
 function clearPending(){ state.pending = null; state.pendingNote = null; renderDraft(); }
 async function wipe(){
-  state.profile = null; state.plan = {}; state.goals = []; state.txs = []; state.recs = []; state.planByMonth = {}; state.sample = false; clearPending();
+  state.profile = null; state.plan = {}; state.goals = []; state.txs = []; state.recs = []; state.planByMonth = {}; state.lastImport = null; state.sample = false; clearPending();
   for (const n of Object.keys(state.custom)){ delete CATS[n]; delete ALIAS[n.toLowerCase()]; } state.custom = {}; refreshCats();
   save(); await clearAudio(); closeSheet(); showSetup('welcome'); toast('Everything wiped from this device');
 }
@@ -1917,7 +1925,8 @@ function render(){
   const hr = +new Date().toLocaleString('en-GB',{timeZone:'Asia/Kolkata',hour:'2-digit',hour12:false});
   const part = hr < 5 ? 'Still up' : hr < 12 ? 'Good morning' : hr < 17 ? 'Good afternoon' : 'Good evening';
   $('hello').textContent = `${hr >= 5 && hr < 12 ? 'Namaste' : part}, ${state.profile.name}`;
-  $('today').textContent = todayIST().toLocaleDateString('en-IN',{weekday:'long', day:'numeric', month:'long'}) + ' · IST';
+  const HF = figures(monthKey(todayIST()));
+  $('today').textContent = todayIST().toLocaleDateString('en-IN',{weekday:'short', day:'numeric', month:'short'}) + ' · ' + (HF.income ? inr(HF.income) + ' this month · ' : '') + HF.daysLeft + ' day' + (HF.daysLeft === 1 ? '' : 's') + ' left';
   $('mLabel').textContent = mShort(state.month);
   $('mNext').disabled = state.month >= monthKey(todayIST());
   $('sampleNote').classList.toggle('hide', !state.sample);
@@ -2069,7 +2078,8 @@ function itemRow(t, full){
   const icon = t.type === 'saving' ? (state.goals.find(g => g.name === t.category)?.icon || '🎯') : (CATS[t.category]?.icon || '🧾');
   const kind = t.type === 'income' ? 'In' : t.type === 'saving' ? 'Milestone' : CATS[t.category]?.kind === 'must' ? 'Must-pay' : 'Lifestyle';
   const clip = t.recId && (memAudio.has(t.recId) || state.recs.find(r => r.id === t.recId)?.hasAudio);
-  const src = {sample:'sample', typed:'typed', demo:'demo', bank:'bank alert', statement:'statement'}[t.source] || 'voice';
+  const base = {sample:'sample', typed:'typed', demo:'demo', bank:'bank alert', statement:'statement'}[t.source] || 'voice';
+  const src = t.via || t.acct ? `${base} · ${t.via && !/^(bank)$/.test(t.via) ? t.via : ''}${t.acct ? ' ··' + t.acct : ''}`.replace(/ · $/, '') : base;
   const ask = full && kind === 'Lifestyle' && t.mood == null;
   const editing = full && state.editing === t.id;
   const pool = t.type === 'income' ? INCOME : SPEND;
@@ -2082,6 +2092,8 @@ function itemRow(t, full){
     <span class="amt ${t.type !== 'expense' ? 'in' : ''}">${t.type === 'income' ? '+' : t.type === 'saving' ? '→' : ''}${inr(t.amount)}<small>${kind}</small></span></li>`;
 }
 function renderTimeline(){
+  const li = state.lastImport;
+  $('lastImport').textContent = li ? `Last import: ${li.label.replace(/ \(sample\)/,'')} · ${fmtTime(li.at)} IST · ${li.n} added` : 'No imports yet. A weekly statement upload keeps everything complete.';
   const f = state.tlf, all = figures().txs;
   document.querySelectorAll('[data-tt]').forEach(b => b.setAttribute('aria-pressed', b.getAttribute('data-tt') === f.type));
   const cats = [...new Set(all.map(t => t.category))].sort();
