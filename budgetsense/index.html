@@ -194,6 +194,18 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--teal);outline-of
 .typeform{margin-top:12px;display:grid;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px}
 .typeform .two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 
+/* ---------- Note-taking visual (shown while recording or waiting for an answer) ---------- */
+.notetaker{position:relative;height:190px;border-radius:20px;overflow:hidden;margin:12px 0 2px;background:#04060c}
+.notetaker video{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 40%}
+.nt-label{position:absolute;left:12px;bottom:12px;display:flex;gap:8px;align-items:center;background:rgba(4,6,12,.62);color:#fff;border-radius:999px;padding:5px 12px;font-weight:700;font-size:13px;backdrop-filter:blur(4px)}
+.nt-label i{width:8px;height:8px;border-radius:50%;background:#ff5a6e;animation:blink 1.1s infinite}
+.notetaker.asking{height:130px}
+.notetaker.asking .nt-label i{background:#f3ae55}
+@keyframes blink{50%{opacity:.25}}
+.ntfloat{position:fixed;right:16px;bottom:calc(96px + env(safe-area-inset-bottom, 0px));width:150px;height:200px;margin:0;z-index:30;box-shadow:0 14px 34px rgba(0,0,0,.35)}
+.ntfloat .nt-label{left:8px;right:8px;bottom:8px;font-size:12px;padding:4px 10px}
+@media (prefers-reduced-motion: reduce){.nt-label i{animation:none}}
+
 /* ---------- Setup ---------- */
 .welcome{padding-top:18px}
 .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:17px;margin-bottom:26px}
@@ -278,6 +290,7 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--teal);outline-of
     <div class="example">Try something like: <i>“I'm Asha. I take home 1.5 lakh a month. Rent is 32,000, electricity and internet about 3,000, groceries 8,000, transport 4,000. I spend around 4,000 eating out and 1,500 on coffee. I'm saving for a Goa trip, 60,000 by December.”</i></div>
     <p class="label" style="margin:16px 0 0">What I am listening for</p>
     <div class="checks" id="setupChecks"></div>
+    <div class="notetaker hide" id="setupVisual" aria-live="polite"><video muted loop playsinline preload="none" poster="media/notes.jpg" aria-hidden="true"><source src="media/notes.webm" type="video/webm"><source src="media/notes.mp4" type="video/mp4"></video><span class="nt-label"><i></i><b>Taking notes</b></span></div>
     <div class="rec"><button class="recbtn" id="setupMic" aria-label="Start or stop recording"></button><div class="wave" id="setupWave"></div></div>
     <div class="status" id="setupStatus">Tap the mic and start talking. Tap again when you are done.</div>
     <div class="words" id="setupWords" style="margin-top:10px"></div>
@@ -409,6 +422,7 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--teal);outline-of
 <div class="scrim hide" id="scrim">
   <div class="sheet" role="dialog" aria-label="Voice note">
     <div class="sheet-h"><h2 id="sheetTitle">Listening</h2><button class="x" id="sheetClose" aria-label="Close">✕</button></div>
+    <div class="notetaker hide" id="sheetVisual" aria-live="polite"><video muted loop playsinline preload="none" poster="media/notes.jpg" aria-hidden="true"><source src="media/notes.webm" type="video/webm"><source src="media/notes.mp4" type="video/mp4"></video><span class="nt-label"><i></i><b>Taking notes</b></span></div>
     <div class="rec"><button class="recbtn" id="recBtn" aria-label="Start or stop recording"></button><div class="wave" id="wave"></div></div>
     <div class="status" id="status">Tap the mic and speak</div>
     <div class="words" id="words" style="margin-top:10px"></div>
@@ -440,6 +454,7 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--teal);outline-of
 
 <div class="demo hide" id="demoBar"><div><b id="demoTitle">Guided demo</b><span id="demoText"></span><div class="bar"><i id="demoProg"></i></div></div><button id="demoStop">Stop</button></div>
 <div class="toast" id="toast"></div>
+<div class="notetaker hide ntfloat" id="floatVisual" aria-live="polite"><video muted loop playsinline preload="none" poster="media/notes.jpg" aria-hidden="true"><source src="media/notes.webm" type="video/webm"><source src="media/notes.mp4" type="video/mp4"></video><span class="nt-label"><i></i><b>Taking notes</b></span></div>
 
 <script>
 (() => {
@@ -1014,7 +1029,7 @@ function makeWave(el, n){ el.innerHTML = ''; for (let i = 0; i < n; i++) el.appe
 function animate(bars, level){ bars.forEach((b,i) => b.style.height = Math.max(4, Math.min(38, level * 38 * (0.35 + Math.abs(Math.sin(i * .7 + Date.now() / 140))))) + 'px'); }
 function still(bars){ bars.forEach(b => b.style.height = '4px'); }
 
-function Recorder({button, wordsEl, waveEl, onStatus, onText}){
+function Recorder({button, wordsEl, waveEl, onStatus, onText, onLive}){
   const bars = makeWave(waveEl, 30);
   let live = false, stream = null, mr = null, chunks = [], sr = null, finalText = '', raf = 0, ctx = null, started = 0;
   async function start(){
@@ -1024,7 +1039,7 @@ function Recorder({button, wordsEl, waveEl, onStatus, onText}){
     if (!navigator.mediaDevices?.getUserMedia){ onStatus('This browser cannot use a microphone.'); return false; }
     try { stream = await navigator.mediaDevices.getUserMedia({audio:true}); }
     catch(e){ onStatus('The microphone is blocked. Allow microphone access for this page, then tap again.'); return false; }
-    live = true; started = Date.now(); button.classList.add('live'); onStatus('Listening… tap again when you are done');
+    live = true; started = Date.now(); button.classList.add('live'); onLive && onLive(true); onStatus('Listening… tap again when you are done');
     chunks = [];
     try { mr = new MediaRecorder(stream); mr.ondataavailable = e => { if (e.data.size) chunks.push(e.data); }; mr.start(); } catch(e){ mr = null; }
     try {
@@ -1052,7 +1067,7 @@ function Recorder({button, wordsEl, waveEl, onStatus, onText}){
   }
   async function stop(){
     if (!live) return null;
-    live = false; button.classList.remove('live'); cancelAnimationFrame(raf); still(bars);
+    live = false; button.classList.remove('live'); onLive && onLive(false); cancelAnimationFrame(raf); still(bars);
     if (sr){ try { sr.stop(); } catch(e){} }
     const blob = await new Promise(res => {
       if (!mr || mr.state === 'inactive') return res(null);
@@ -1089,13 +1104,28 @@ function speak(text){
 }
 function reply(text){ if (state.prefs.replies && text && !demoOn) speak(text); }
 
+/* Note-taking visual: plays while a note is being recorded ("Taking notes")
+   and while BudgetSense waits for the user's answer ("Waiting for your answer"). */
+const REDUCED_MOTION = matchMedia('(prefers-reduced-motion: reduce)').matches;
+function showNotes(id, mode){
+  const box = $(id), v = box.querySelector('video');
+  if (!mode){ box.classList.add('hide'); try { v.pause(); } catch(e){} return; }
+  box.classList.remove('hide'); box.classList.toggle('asking', mode === 'asking');
+  box.querySelector('b').textContent = mode === 'asking' ? 'Waiting for your answer' : 'Taking notes';
+  if (!REDUCED_MOTION){ const p = v.play(); if (p && p.catch) p.catch(() => {}); }
+}
+function sheetVisual(){
+  const recording = $('recBtn').classList.contains('live');
+  showNotes('sheetVisual', $('scrim').classList.contains('hide') ? null : recording ? 'listening' : state.pending ? 'asking' : null);
+}
+
 /* =====================================================================
    Everyday voice sheet
    ===================================================================== */
-const sheetRec = Recorder({button:$('recBtn'), wordsEl:$('words'), waveEl:$('wave'), onStatus:s => setStatus(s)});
+const sheetRec = Recorder({button:$('recBtn'), wordsEl:$('words'), waveEl:$('wave'), onStatus:s => setStatus(s), onLive:() => sheetVisual()});
 function setStatus(s){ $('status').textContent = s; }
-function openSheet(){ $('scrim').classList.remove('hide'); $('typeForm').classList.add('hide'); renderDraft(); }
-async function closeSheet(){ if (sheetRec.live){ const r = await sheetRec.stop(); if (r){ const id = await keepNote(r); const x = state.recs.find(q => q.id === id); x.outcome = 'Closed before processing'; save(); } } $('scrim').classList.add('hide'); render(); }
+function openSheet(){ $('scrim').classList.remove('hide'); $('typeForm').classList.add('hide'); renderDraft(); sheetVisual(); }
+async function closeSheet(){ if (sheetRec.live){ const r = await sheetRec.stop(); if (r){ const id = await keepNote(r); const x = state.recs.find(q => q.id === id); x.outcome = 'Closed before processing'; save(); } } $('scrim').classList.add('hide'); sheetVisual(); render(); }
 $('sheetClose').onclick = closeSheet;
 $('scrim').onclick = e => { if (e.target === $('scrim')) closeSheet(); };
 $('speakBtn').onclick = () => { openSheet(); sheetStart(); };
@@ -1145,6 +1175,7 @@ $('typeForm').onsubmit = e => {
 };
 function renderDraft(){
   const tx = state.pending, box = $('draft');
+  sheetVisual();
   if (!tx){ if (box.querySelector('.draft')) box.innerHTML = ''; return; }
   const pool = tx.type === 'income' ? INCOME : SPEND;
   box.innerHTML = `<div class="draft">
@@ -1169,7 +1200,7 @@ $('goVoiceSetup').onclick = () => { renderChecks({}); $('setupWords').innerHTML 
 $('goManualSetup').onclick = () => openBuilder(emptyPlan(), 'manual');
 $('goSample').onclick = () => { loadSample(); enterApp(); };
 
-const setupRec = Recorder({button:$('setupMic'), wordsEl:$('setupWords'), waveEl:$('setupWave'), onStatus:s => $('setupStatus').textContent = s, onText:t => renderChecks(setupCoverage(parseSetup(t)))});
+const setupRec = Recorder({button:$('setupMic'), wordsEl:$('setupWords'), waveEl:$('setupWave'), onStatus:s => $('setupStatus').textContent = s, onLive:on => showNotes('setupVisual', on ? 'listening' : null), onText:t => renderChecks(setupCoverage(parseSetup(t)))});
 function renderChecks(c){
   $('setupChecks').innerHTML = [['income','Take-home pay'],['must','Must-pay bills'],['life','Lifestyle spends'],['goal','A savings target']]
     .map(([k,l]) => `<div class="check ${c[k] ? 'got' : ''}">${l}</div>`).join('');
@@ -1266,7 +1297,7 @@ $('builderSave').onclick = () => {
   reply(firstTime ? `Your plan is saved. Tap speak whenever you spend something.` : 'Plan updated.');
 };
 // Correct the draft plan by voice: "rent is 30,000", "remove coffee", "goal is 80,000", "my name is Asha".
-const builderRec = Recorder({button:$('builderMic'), wordsEl:document.createElement('div'), waveEl:document.createElement('div'), onStatus:s => toast(s)});
+const builderRec = Recorder({button:$('builderMic'), wordsEl:document.createElement('div'), waveEl:document.createElement('div'), onStatus:s => toast(s), onLive:on => showNotes('floatVisual', on ? 'listening' : null)});
 $('builderMic').onclick = async () => {
   if (!builderRec.live){ if (await builderRec.start()) $('builderMic').textContent = '■ Stop'; return; }
   $('builderMic').textContent = '🎙 Correct';
@@ -1535,9 +1566,9 @@ async function runDemo(){
   // 1. Setup by voice
   showSetup('voice'); renderChecks({});
   demoStep(1, total, 'Setting up the plan by voice…');
-  $('setupMic').classList.add('live');
+  $('setupMic').classList.add('live'); showNotes('setupVisual', 'listening');
   await typeInto($('setupWords'), setupRec.bars, SETUP_LINE);
-  $('setupMic').classList.remove('live');
+  $('setupMic').classList.remove('live'); showNotes('setupVisual', null);
   renderChecks(setupCoverage(parseSetup(SETUP_LINE)));
   state.recs.push({id:uid(), at:Date.now(), durationMs:14000, transcript:SETUP_LINE, source:'setup', hasAudio:false, outcome:'Drafted a plan'});
   await wait(900); if (demoAbort) return endDemo();
@@ -1550,9 +1581,9 @@ async function runDemo(){
   for (let i = 0; i < SCRIPT.length && !demoAbort; i++){
     const line = SCRIPT[i];
     demoStep(i + 3, total, `“${line}”`);
-    $('recBtn').classList.add('live'); setStatus('Listening… (demo)');
+    $('recBtn').classList.add('live'); sheetVisual(); setStatus('Listening… (demo)');
     await typeInto($('words'), sheetRec.bars, line);
-    $('recBtn').classList.remove('live');
+    $('recBtn').classList.remove('live'); sheetVisual();
     if (demoAbort) break;
     const id = uid(); state.recs.push({id, at:Date.now(), durationMs:line.length * 60, transcript:line, source:'demo', hasAudio:false, outcome:''}); save();
     const confirmStep = /^(four fifty|dhobi)/i.test(line);
@@ -1563,7 +1594,7 @@ async function runDemo(){
   endDemo();
 }
 function endDemo(){
-  demoOn = false; $('scrim').classList.add('hide');
+  demoOn = false; $('scrim').classList.add('hide'); sheetVisual();
   if (state.profile){ enterApp(); } else showSetup('welcome');
   $('demoTitle').textContent = demoAbort ? 'Demo stopped' : 'Demo complete';
   $('demoText').textContent = demoAbort ? '' : 'Setup to summary with no typing and no bank login.';
@@ -1599,7 +1630,7 @@ function startTour(){
 }
 function endTour(next){
   try { speechSynthesis.cancel(); } catch(e){}
-  $('tour').classList.add('hide'); if (tourSheet){ state.pending = null; $('scrim').classList.add('hide'); tourSheet = false; }
+  $('tour').classList.add('hide'); if (tourSheet){ state.pending = null; $('scrim').classList.add('hide'); tourSheet = false; sheetVisual(); }
   if (next === 'sample'){ state.sample = true; save(); enterApp(); return; }
   resetState();
   try { if (tourBackup) localStorage.setItem(LS, tourBackup); else localStorage.removeItem(LS); } catch(e){}
@@ -1611,7 +1642,7 @@ function endTour(next){
 async function showStep(){
   const st = TOUR[tourI], card = $('tCard'), hole = $('tHole');
   try { speechSynthesis.cancel(); } catch(e){}
-  if (tourSheet && !st.sheet){ state.pending = null; $('scrim').classList.add('hide'); tourSheet = false; }
+  if (tourSheet && !st.sheet){ state.pending = null; $('scrim').classList.add('hide'); tourSheet = false; sheetVisual(); }
   if (st.tab && state.tab !== st.tab) tab(st.tab);
   if (st.sheet){
     tourSheet = true; $('scrim').classList.remove('hide'); $('typeForm').classList.add('hide');

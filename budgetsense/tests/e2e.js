@@ -52,7 +52,6 @@ const FAKE_SR = () => {
   // After a failed test, close any overlay so later tests start from a usable screen.
   cleanup = async () => {
     if (await page.isVisible('#tour')) await page.click('#tSkip').catch(() => page.keyboard.press('Escape'));
-    if (await page.isVisible('#scrim')) await page.click('#sheetClose');
   };
   const st = () => page.evaluate(() => JSON.parse(localStorage.getItem('budgetsense.v3') || 'null'));
   const say = async (text, mic = '#recBtn') => {
@@ -105,6 +104,10 @@ const FAKE_SR = () => {
 
   await test('Voice setup: one note drafts the full plan', async () => {
     await page.click('#goVoiceSetup');
+    await page.evaluate(() => window.__speech.push("x")); await page.click('#setupMic'); await page.waitForTimeout(300);
+    check(await page.isVisible('#setupVisual'), 'setup note-taking visual not shown while recording');
+    await page.click('#setupMic'); await page.waitForTimeout(700);
+    check(!(await page.isVisible('#setupVisual')), 'setup visual not hidden after recording');
     await say("I'm Sheuli. I take home 1.5 lakh a month. Rent is 32,000, electricity and internet about 3,000, groceries 8,000, transport 4,000. I spend around 4,000 eating out and 1,500 on coffee. I'm saving for a Goa trip, 60,000 by December.", '#setupMic');
     const got = await page.$$eval('#setupChecks .check.got', els => els.length);
     check(got === 4, `expected 4 of 4 checklist items ticked, got ${got}`);
@@ -120,7 +123,11 @@ const FAKE_SR = () => {
   });
 
   await test('Plan builder: voice correction updates a line', async () => {
-    await say('rent is 30,000', '#builderMic');
+    await page.evaluate(() => window.__speech.push('rent is 30,000'));
+    await page.click('#builderMic'); await page.waitForTimeout(300);
+    check(await page.isVisible('#floatVisual'), 'floating note-taking visual not shown while correcting');
+    await page.waitForTimeout(200); await page.click('#builderMic'); await page.waitForTimeout(700);
+    check(!(await page.isVisible('#floatVisual')), 'floating visual not hidden after correcting');
     check(await page.inputValue('[data-cat="Rent & home"]') === '30000', 'rent not corrected: ' + await page.inputValue('[data-cat="Rent & home"]'));
   });
 
@@ -142,6 +149,24 @@ const FAKE_SR = () => {
     const s = await st(); const t = s.txs.at(-1);
     check(t.amount === 450 && t.category === 'Coffee & chai', `saved ${t.amount} to ${t.category}`);
     check(s.recs.filter(r => r.hasAudio).length >= 3, 'voice notes not kept with audio');
+  });
+
+  await test('Note-taking visual plays while recording and while waiting for an answer', async () => {
+    const vis = () => page.evaluate(() => { const b = document.getElementById('sheetVisual'); const v = b.querySelector('video');
+      return {shown: !b.classList.contains('hide'), label: b.querySelector('b').textContent, playing: !v.paused, src: v.currentSrc}; });
+    await page.evaluate(() => window.__speech.push('Metro 240'));
+    await page.click('#recBtn'); await page.waitForTimeout(400);
+    let v = await vis();
+    check(v.shown && v.label === 'Taking notes' && v.playing, 'not shown/playing while recording: ' + JSON.stringify(v));
+    check(/notes\.(webm|mp4)$/.test(v.src), 'video source not loaded: ' + v.src);
+    await page.click('#recBtn'); await page.waitForTimeout(700);
+    v = await vis();
+    check(v.shown && v.label === 'Waiting for your answer', 'not shown while waiting for confirmation: ' + JSON.stringify(v));
+    await say('yes');
+    v = await vis();
+    check(!v.shown, 'still shown after the answer');
+    await say('how much is left for coffee');
+    check(!(await vis()).shown, 'shown for a question answer');
   });
 
   await test('Voice note: "yes" confirms the AI pick', async () => {

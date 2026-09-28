@@ -2,7 +2,7 @@
 # and the BudgetSense Voice prototype at /budgetsense/.
 [build]
   publish = "_site"
-  command = "rm -rf _site && mkdir -p _site/budgetsense && cp -R campaignforge-pro/site/. _site/ && cp budgetsense/index.html _site/budgetsense/index.html"
+  command = "rm -rf _site && mkdir -p _site/budgetsense && cp -R campaignforge-pro/site/. _site/ && cp budgetsense/index.html _site/budgetsense/index.html && cp -R budgetsense/media _site/budgetsense/media"
 
 # BudgetSense records voice notes, so allow the microphone on its pages.
 [[headers]]
