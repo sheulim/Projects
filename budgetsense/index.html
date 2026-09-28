@@ -159,6 +159,16 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--teal);outline-of
 @keyframes shake{0%,100%{transform:translateX(-50%)}25%{transform:translateX(calc(-50% - 6px))}75%{transform:translateX(calc(-50% + 6px))}}
 @media (prefers-reduced-motion: reduce){.alarm{animation:none}}
 
+.whatif{margin-top:12px;border-radius:16px;padding:14px;border:2px solid var(--line);background:var(--surface)}
+.whatif.ok{border-color:var(--teal)} .whatif.watch{border-color:var(--saffron)} .whatif.over{border-color:var(--danger)}
+.whatif ul{margin:8px 0 0;padding-left:18px;font-size:14px}
+.whatif li{margin:3px 0}
+.forecast{margin-top:10px;display:flex;justify-content:space-between;gap:10px;font-size:13px;align-items:center}
+.forecast b{font-size:16px;font-variant-numeric:tabular-nums}
+.pace{font-size:12px;font-weight:800;padding:3px 9px;border-radius:999px}
+.movebox{display:grid;gap:8px;grid-template-columns:1fr 1fr;margin-top:10px}
+.movebox .full{grid-column:1/-1}
+
 /* ---------- Me ---------- */
 .me{display:flex;gap:14px;align-items:center}
 .avatar{width:60px;height:60px;border-radius:18px;background:var(--teal);color:var(--teal-ink);display:grid;place-items:center;font-weight:800;font-size:24px;flex:none}
@@ -382,6 +392,12 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--teal);outline-of
     <div id="checkinSlot"></div>
     <div class="card" id="pulseCard"></div>
     <div id="alerts"></div>
+    <div class="card" id="buyCard">
+      <b>🛍 Before you buy</b>
+      <p class="hint" style="margin:4px 0 10px">See the effect on your month and your goals first. Say <b>“Should I buy a 45,000 phone?”</b> or check here.</p>
+      <form class="row" id="buyForm" style="flex-wrap:wrap"><input type="number" id="buyAmt" inputmode="numeric" min="1" placeholder="₹ amount" style="flex:1;min-width:110px" required><input type="text" id="buyWhat" placeholder="What? e.g. phone" style="flex:2;min-width:140px" required><button class="btn primary" type="submit">Check impact</button></form>
+      <div id="buyResult"></div>
+    </div>
     <div class="card readout" id="readout"></div>
     <div class="h2row"><h2>Milestones</h2><small>Say “put 5,000 in Goa trip”</small></div>
     <div class="hscroll" id="milestones"></div>
@@ -393,7 +409,13 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--teal);outline-of
   </section>
 
   <section id="t-envelopes" class="hide">
-    <div class="spread" style="margin-bottom:10px"><div class="filters" id="filters"></div><button class="btn primary" id="newEnvBtn">＋ New</button></div>
+    <div class="spread" style="margin-bottom:10px"><div class="filters" id="filters"></div><span class="row"><button class="btn" id="moveBtn">↔ Move</button><button class="btn primary" id="newEnvBtn">＋ New</button></span></div>
+    <form class="card hide" id="moveForm">
+      <div class="spread"><h3 style="font-size:16px;font-weight:800">Move money between envelopes</h3><button type="button" class="x" id="moveClose" aria-label="Close">✕</button></div>
+      <p class="hint" style="margin:4px 0 0">Or say <b>“move 2,000 from shopping to eating out”</b>.</p>
+      <div class="movebox"><label class="fields">From <select id="mvFrom"></select></label><label class="fields">To <select id="mvTo"></select></label>
+      <input class="full" type="number" id="mvAmt" inputmode="numeric" min="1" placeholder="₹ amount" required><button class="btn primary block full" type="submit">Move</button></div>
+    </form>
     <form class="card newenv hide" id="newEnv">
       <div class="spread"><h3 style="font-size:16px;font-weight:800">Create an envelope</h3><button type="button" class="x" id="newEnvClose" aria-label="Close">✕</button></div>
       <p class="hint" style="margin:0 0 10px">Quicker by voice: <b>“pet care limit 2,000”</b> or <b>“new goal laptop 80,000 by March”</b>.</p>
@@ -703,12 +725,31 @@ function interpret(raw){
     if (/^(yes|yeah|yep|ok|okay|correct|right|confirm|save|sure|haan|ha|perfect|done|looks good)\b/.test(low)) return {kind:'confirm'};
     if (/^(no|nope|discard|cancel|delete|scrap|forget it)\b/.test(low)) return {kind:'reject'};
   }
+  if (lastWhatIf){
+    if (/\b(save for it|save up|make it a goal)\b/.test(low)) return {kind:'whatifAct', act:'goal'};
+    if (/^(not now|no|skip|leave it|cancel)\b/.test(low)) return {kind:'whatifAct', act:'skip'};
+    if (/\b(move (the )?budget|move and buy)\b/.test(low) && lastWhatIf.coverFrom.length) return {kind:'whatifAct', act:'move'};
+    if (/^(yes|ok|okay|buy it|bought it|i bought it|go ahead|done)\b/.test(low)) return {kind:'whatifAct', act:'buy'};
+  }
   if (/\b(wipe everything|start fresh|start over|clear everything|delete everything)\b/.test(low)) return {kind:'wipe'};
   if (/\b(demo)\b/.test(low) && /\b(play|run|start|show)\b/.test(low)) return {kind:'demo'};
 
   // Questions
   if (/\b(safe to spend|how much can i spend)\b/.test(low)) return {kind:'ask', q:'safe'};
-  if (/\bcan i afford\b/.test(low)){ const a = parseAmount(low); if (a) return {kind:'ask', q:'afford', amount:a.value}; }
+  if (/\b(can i afford|should i (buy|get|spend)|thinking of (buying|getting)|planning to (buy|get)|want to (buy|get)|what if i (buy|spend|get)|before i buy)\b/.test(low)){
+    const a = parseAmount(low);
+    if (a){
+      const item = low.replace(a.match,' ').replace(/\b(can i afford|should i|thinking of|planning to|want to|what if i|before i|buy(ing)?|get(ting)?|spend(ing)?|a|an|the|rupees?|rs|on|for|worth|new|now|this month)\b/g,' ').replace(/[?.!]/g,'').replace(/\s+/g,' ').trim();
+      return {kind:'whatif', amount:a.value, item: item ? item.charAt(0).toUpperCase() + item.slice(1) : 'This purchase'};
+    }
+  }
+  // Move budget between envelopes: "move 2,000 from shopping to eating out"
+  const mv = low.match(/\b(?:move|shift|transfer|take)\b(.*?)\bfrom\s+(.+?)\s+(?:to|into)\s+(.+)$/);
+  if (mv){
+    const a = parseAmount(mv[1] + ' ' + low), from = findCategory(mv[2], 'expense'), to = findCategory(mv[3], 'expense');
+    if (a && from && to && from !== to) return {kind:'move', amount:a.value, from, to};
+    if (a && (from || to)) return {kind:'error', msg:'Tell me both envelopes, for example “move 2,000 from shopping to eating out”.'};
+  }
   if (/\bhow much\b.*\b(left|remaining)\b/.test(low)){ const c = findCategory(low, 'expense'); return {kind:'ask', q: c ? 'left' : 'free', category:c}; }
   if (/\b(how much|what)\b.*\b(did i )?(spend|spent)\b/.test(low)){
     const c = findCategory(low, 'expense');
@@ -896,7 +937,14 @@ function figures(k = state.month){
   const t = todayIST(); const isNow = k === monthKey(t);
   const daysLeft = isNow ? new Date(t.getFullYear(), t.getMonth() + 1, 0).getDate() - t.getDate() + 1 : 0;
   const safeToday = isNow ? Math.max(0, (free - unpaidMust - goalDue) / daysLeft) : 0;
-  return {txs, income, salary, extra, expected, salaryPending: salary === 0 && expected > 0, must, life, saved, spent: must + life, free, byCat, plan, unpaidMust, goalDue, daysLeft, safeToday, isNow};
+  // Month-end forecast: lifestyle spending continues at its current daily pace; must-pays and milestone savings still due are held back.
+  const dim = (() => { const [yy, mm] = k.split('-').map(Number); return new Date(yy, mm, 0).getDate(); })();
+  const dayNo = isNow ? t.getDate() : dim, rest = dim - dayNo;
+  const lifePace = dayNo ? life / dayNo : 0;
+  const projectedLife = isNow ? Math.round(lifePace * rest) : 0;
+  const forecastEnd = Math.round(free - (isNow ? unpaidMust + goalDue + projectedLife : 0));
+  const elapsed = dayNo / dim, pace = income && elapsed ? (must + life) / income / elapsed : 0;
+  return {txs, income, salary, extra, expected, salaryPending: salary === 0 && expected > 0, must, life, saved, spent: must + life, free, byCat, plan, unpaidMust, goalDue, daysLeft, safeToday, isNow, dim, dayNo, projectedLife, forecastEnd, pace, elapsed};
 }
 function planFor(k){
   if (k >= monthKey(todayIST()) || state.sample) return state.plan;
@@ -987,6 +1035,71 @@ function answer(r){
     }
   }
   return '';
+}
+
+/* =====================================================================
+   Before you buy: predicts the effect of a purchase on this month's
+   cashflow, its envelope and every milestone, before money is spent.
+   ===================================================================== */
+function whatIf(amount, item){
+  const F = figures(monthKey(todayIST()));
+  const category = categorise(item.toLowerCase(), 'expense').category;
+  const endBefore = F.forecastEnd, endAfter = endBefore - amount;
+  const limit = F.plan[category] || 0, used = F.byCat[category] || 0;
+  const envLeftAfter = limit ? limit - used - amount : null;
+  // Milestone slip: money this month's goals needed but would no longer be there.
+  const shortfall = Math.max(0, Math.min(amount, -endAfter));
+  const slips = state.goals.filter(g => g.target > g.saved).map(g => {
+    const left = Math.max(1, monthsBetween(monthKey(todayIST()), g.by)), monthly = Math.max(1, (g.target - g.saved) / left);
+    const share = F.goalDue ? shortfall * (monthly / Math.max(1, F.goalDue)) : 0;
+    return {name:g.name, months: share > 0 ? Math.max(1, Math.ceil(share / monthly)) : 0};
+  }).filter(x => x.months);
+  // Envelopes with room this month, largest first (lifestyle only: must-pays stay protected).
+  const room = LIFE.filter(c => c !== category && F.plan[c] > (F.byCat[c] || 0)).map(c => ({c, left: F.plan[c] - (F.byCat[c] || 0)})).sort((a,b) => b.left - a.left);
+  const coverFrom = []; let need = Math.max(0, -Math.min(0, envLeftAfter ?? 0));
+  for (const r of room){ if (need <= 0) break; const take = Math.min(r.left, need); coverFrom.push({c:r.c, amount:take}); need -= take; }
+  const next = new Date(todayIST()); next.setMonth(next.getMonth() + 1, 1);
+  let verdict, tone;
+  if (endAfter >= 0.05 * F.income){ verdict = 'Go ahead'; tone = 'ok'; }
+  else if (endAfter >= 0){ verdict = 'Possible, but it leaves almost no buffer'; tone = 'watch'; }
+  else if (endBefore > 0 && -endAfter <= F.goalDue){ verdict = 'Possible, but your goals slip'; tone = 'watch'; }
+  else { verdict = 'Not this month'; tone = 'over'; }
+  const weeks = endAfter < 0 ? Math.ceil(-endAfter / Math.max(1, (F.income * 0.1) / 4.3)) : 0;
+  const lines = [
+    `Month-end: ${inr(endBefore)} → ${inr(endAfter)} left after bills, goals and your usual spending.`,
+    limit ? `${category}: ${envLeftAfter >= 0 ? inr(envLeftAfter) + ' left in the envelope after this' : 'goes over its limit by ' + inr(-envLeftAfter)}.` : `${category} has no limit set.`,
+    slips.length ? `Goals: ${slips.map(x => `${x.name} slips about ${x.months} month${x.months > 1 ? 's' : ''}`).join(', ')}.` : (state.goals.length ? 'Goals: no delay.' : ''),
+    tone === 'over' ? `Better: wait until your next salary (${next.toLocaleDateString('en-IN',{day:'numeric',month:'short'})}) or set it aside as a goal, about ${weeks} week${weeks === 1 ? '' : 's'} of saving 10% of income.` :
+    coverFrom.length ? `To stay within limits, move ${coverFrom.map(x => `${inr(x.amount)} from ${x.c}`).join(' and ')}.` : '',
+  ].filter(Boolean);
+  return {amount, item, category, endBefore, endAfter, verdict, tone, lines, coverFrom, slips};
+}
+let lastWhatIf = null;
+function renderWhatIf(w, box){
+  lastWhatIf = w;
+  box.innerHTML = `<div class="whatif ${w.tone}"><div class="spread"><b>${esc(w.item)} · ${inr(w.amount)}</b><span class="tagx t-${w.tone === 'ok' ? 'ok' : w.tone === 'watch' ? 'watch' : 'over'}">${esc(w.verdict)}</span></div>
+    <ul>${w.lines.map(l => `<li>${esc(l)}</li>`).join('')}</ul>
+    <div class="row" style="flex-wrap:wrap;margin-top:8px">
+      ${w.coverFrom.length ? `<button class="btn primary" data-wi="move">Move budget &amp; buy</button>` : ''}
+      <button class="btn ${w.coverFrom.length ? '' : 'primary'}" data-wi="buy">I bought it</button>
+      ${w.tone !== 'ok' ? `<button class="btn" data-wi="goal">Save for it instead</button>` : ''}
+      <button class="btn" data-wi="skip">Not now</button></div>
+    <p class="hint">🎙 Or say <b>“yes, buy it”</b>, <b>“save for it”</b> or <b>“not now”</b>.</p></div>`;
+  box.querySelectorAll('[data-wi]').forEach(b => b.onclick = () => whatIfAction(b.getAttribute('data-wi'), box));
+}
+function whatIfAction(act, box){
+  const w = lastWhatIf; if (!w) return;
+  if (act === 'move') w.coverFrom.forEach(x => moveBudget(x.c, w.category, x.amount));
+  if (act === 'buy' || act === 'move'){ commit({type:'expense', amount:w.amount, description:w.item, category:w.category, date:iso(todayIST()), source:'voice'}); toast(`Logged ${inr(w.amount)} for ${w.item}`); }
+  if (act === 'goal'){ const by = new Date(todayIST()); by.setMonth(by.getMonth() + 2); state.goals.push({id:uid(), name:w.item, icon:goalIcon(w.item), target:w.amount, saved:0, by:monthKey(by)}); save(); toast(`New goal: ${w.item}`); }
+  lastWhatIf = null; box.innerHTML = act === 'skip' ? '' : `<p class="hint">Done.</p>`; render();
+}
+function moveBudget(from, to, amount){
+  const take = Math.min(amount, state.plan[from] || 0);
+  if (take <= 0) return 0;
+  state.plan[from] = (state.plan[from] || 0) - take; if (!state.plan[from]) delete state.plan[from];
+  state.plan[to] = (state.plan[to] || 0) + take;
+  save(); return take;
 }
 
 /* =====================================================================
@@ -1131,6 +1244,7 @@ setInterval(checkinTick, 60000);
    ===================================================================== */
 function handleCommand(text, recId, opts = {}){
   const r = interpret(text);
+  if (r.kind !== 'whatif' && r.kind !== 'whatifAct') lastWhatIf = null;
   const rec = recId ? state.recs.find(x => x.id === recId) : null;
   const note = msg => { if (rec){ rec.outcome = msg; save(); } };
   const say = (msg, spoken) => { setStatus(msg); reply(spoken ?? msg); };
@@ -1188,6 +1302,21 @@ function handleCommand(text, recId, opts = {}){
       if (!t){ say('No lifestyle spends to rate yet.'); break; }
       t.mood = r.value; save(); note(`${t.description}: ${r.value ? 'happy' : 'regret'}`);
       say(r.value ? `Noted — ${t.description} was worth it.` : `Noted — you regret ${t.description}. I'll remind you in your monthly read-out.`); break;
+    }
+    case 'whatif': {
+      const w = whatIf(r.amount, r.item); renderWhatIf(w, $('draft'));
+      note(`Before you buy: ${w.item} ${inr(w.amount)} → ${w.verdict}`);
+      setStatus(w.verdict); reply(`${w.verdict}. ${w.lines.join(' ')}`);
+      return render();
+    }
+    case 'whatifAct': whatIfAction(r.act, $('draft')); note('Before you buy: ' + r.act); setStatus({buy:'Logged it.', goal:'Saved as a goal.', skip:'Okay, not now.', move:'Moved budget and logged it.'}[r.act]); reply({buy:'Logged it.', goal:'Saved as a new goal.', skip:'Okay.', move:'Budget moved and purchase logged.'}[r.act]); break;
+    case 'move': {
+      const moved = moveBudget(r.from, r.to, r.amount);
+      if (!moved){ say(`${r.from} has no budget to move.`); note('Move failed: empty envelope'); break; }
+      const F = figures(monthKey(todayIST()));
+      note(`Moved ${inr(moved)} ${r.from} → ${r.to}`);
+      say(`Moved ${inr(moved)} from ${r.from} to ${r.to}. ${r.to} now has ${inr((F.plan[r.to] || 0) - (F.byCat[r.to] || 0))} left; ${r.from} has ${inr(Math.max(0, (F.plan[r.from] || 0) - (F.byCat[r.from] || 0)))}.`);
+      break;
     }
     case 'multi': {
       if (state.pending){ const p = state.pending, pn = state.pendingNote; commit(p); pn && pn(txNote(p) + ' (auto-saved)'); clearPending(); }
@@ -1600,6 +1729,13 @@ function render(){
   if (state.tab === 'timeline') renderTimeline();
   if (state.tab === 'me') renderMe();
 }
+$('buyForm').onsubmit = e => {
+  e.preventDefault();
+  const amt = parseFloat($('buyAmt').value), what = $('buyWhat').value.trim();
+  if (!(amt > 0) || !what) return;
+  const w = whatIf(amt, what.charAt(0).toUpperCase() + what.slice(1)); renderWhatIf(w, $('buyResult'));
+  reply(`${w.verdict}. ${w.lines[0]}`);
+};
 function renderCheckin(){
   const slot = $('checkinSlot');
   if (!checkinDue() || state.month !== monthKey(todayIST())){ slot.innerHTML = ''; return; }
@@ -1628,6 +1764,8 @@ function renderPulse(){
         ${F.extra ? `<div class="stat" style="--c:transparent"><span>incl. extra income</span><b class="in">+${inr(F.extra)}</b></div>` : ''}
       </div>
     </div>
+    ${F.isNow && F.income ? `<div class="forecast"><span class="muted">Month-end forecast<br><b class="${F.forecastEnd < 0 ? 'short' : 'ok'}">${inr(F.forecastEnd)}</b> ${F.forecastEnd < 0 ? 'short' : 'left'} after bills, goals and your usual pace</span>
+      <span class="pace ${F.pace > 1.1 ? 't-over' : F.pace > 0.95 ? 't-watch' : 't-ok'}">${F.pace > 1.1 ? `Spending ${F.pace.toFixed(1)}× faster than the month` : F.pace > 0.95 ? 'On pace with the month' : 'Slower than the month 👍'}</span></div>` : ''}
     ${F.isNow ? `<div class="safe"><span><small>Safe to spend today</small><b>${inr(F.safeToday)}</b></span><span style="text-align:right"><small>${F.daysLeft} day${F.daysLeft === 1 ? '' : 's'} left · holding ${inr(F.unpaidMust)} for must-pays${F.goalDue ? ' and ' + inr(F.goalDue) + ' for milestones' : ''}</small></span></div>` : ''}
     <div class="chips" style="margin-top:12px">${streak() ? `<span class="chip streak">🔥 ${streak()}-day voice streak</span>` : ''}<span class="chip">${F.txs.length} entries in ${mShort(state.month)}</span></div>`;
 
@@ -1657,7 +1795,7 @@ function renderPulse(){
         <span class="amt">${inr(x.monthly)}<small>${inr(x.monthly * 12)}/yr</small></span></li>`; }).join('')}</ul>` : '';
   document.querySelectorAll('[data-recur]').forEach(b => b.onclick = () => { const [k, v] = b.getAttribute('data-recur').split(':'); if (v) state.recurDecisions[k] = v; else delete state.recurDecisions[k]; save(); render(); if (v === 'cancel') toast('Noted. Cancel it from the service’s own settings; I will flag it if it charges again.'); });
 
-  const qs = ['What are my automatic payments?','How much is left for eating out?','Safe to spend today?','Can I afford 3,000 shoes?','What did I spend on coffee?','Explain my month'];
+  const qs = ['Should I buy a 45,000 phone?','What are my automatic payments?','How much is left for eating out?','Safe to spend today?','What did I spend on coffee?','Explain my month'];
   $('askChips').innerHTML = qs.map(q => `<button class="chip" data-ask="${esc(q)}">${esc(q)}</button>`).join('');
   document.querySelectorAll('[data-ask]').forEach(b => b.onclick = () => { openSheet(); $('words').textContent = b.getAttribute('data-ask'); const id = uid(); state.recs.push({id, at:Date.now(), durationMs:0, transcript:b.getAttribute('data-ask'), source:'tap', hasAudio:false, outcome:''}); save(); handleCommand(b.getAttribute('data-ask'), id); });
 
@@ -1689,6 +1827,26 @@ function renderEnvelopes(){
   if (f === 'all' || f === 'life'){ const l = show(LIFE); parts.push(`<div class="h2row"><h2>Lifestyle</h2><small>${inr(F.life)} of ${inr(sumL(LIFE))}</small></div><div class="egrid">${l.length ? l.map(tile).join('') : '<div class="card empty" style="grid-column:1/-1">No lifestyle envelopes yet.</div>'}</div>`); }
   $('envBody').innerHTML = parts.join('');
 }
+/* Move money between envelopes (secondary to voice) */
+$('moveBtn').onclick = () => {
+  const F = figures(monthKey(todayIST()));
+  const opts = SPEND.map(c => `<option value="${esc(c)}">${CATS[c].icon} ${c}${F.plan[c] ? ' · ' + inr(Math.max(0, F.plan[c] - (F.byCat[c] || 0))) + ' left' : ''}</option>`).join('');
+  $('mvFrom').innerHTML = opts; $('mvTo').innerHTML = opts;
+  const withRoom = SPEND.filter(c => F.plan[c] > (F.byCat[c] || 0)).sort((a,b) => (F.plan[b] - (F.byCat[b]||0)) - (F.plan[a] - (F.byCat[a]||0)));
+  if (withRoom[0]) $('mvFrom').value = withRoom[0];
+  const over = SPEND.find(c => F.plan[c] && (F.byCat[c] || 0) > F.plan[c]); if (over) $('mvTo').value = over;
+  $('moveForm').classList.toggle('hide');
+};
+$('moveClose').onclick = () => $('moveForm').classList.add('hide');
+$('moveForm').onsubmit = e => {
+  e.preventDefault();
+  const from = $('mvFrom').value, to = $('mvTo').value, amt = parseFloat($('mvAmt').value);
+  if (from === to || !(amt > 0)){ toast('Pick two different envelopes and an amount'); return; }
+  const moved = moveBudget(from, to, amt);
+  toast(moved ? `Moved ${inr(moved)} from ${from} to ${to}` : `${from} has no budget to move`);
+  $('moveForm').reset(); $('moveForm').classList.add('hide'); render();
+};
+
 /* New envelope form (secondary to voice) */
 const ICONS = ['🎯','🚗','✈️','🏖','🏡','💍','🎓','💻','📱','🛟','🐶','👶','🏋️','🎨','🎮','🎵','📌','✨','🧘','🍷','🌱','🕌','🪔','🎁'];
 let neKind = 'life', neIcon = '✨';
@@ -1891,10 +2049,11 @@ const TOUR = [
   {tab:'pulse', target:'#speakBtn', title:'One button does most of the work', body:'Tap Speak a money note, say what happened, then tap again to stop. Say amounts the way you normally would, like four fifty or one point five lakh.', say:'Four fifty at Swiggy'},
   {tab:'pulse', sheet:true, target:'#draft', title:'Check what I heard', body:'I show the amount and the envelope I picked. Say yes to save it, no to drop it, or name another envelope. If I mishear, tap Fix what I heard. You can also type instead.', say:'Yes  ·  Make it coffee'},
   {tab:'pulse', target:'#pulseCard', title:'Your month at a glance', body:'The ring splits your income into must-pay bills, lifestyle spends and money sent to milestones. Safe to spend today tells you how much you can use each day and still cover your bills and savings.', say:'Safe to spend today?'},
+  {tab:'pulse', target:'#buyCard', title:'Before you buy', body:'Thinking of a big purchase? Ask first. I show how your month ends, which envelope it hits and whether any goal slips, then tell you to go ahead, move budget, wait for salary, or save for it.', say:'Should I buy a 45,000 phone?'},
   {tab:'pulse', target:'#readout', title:'Your month, explained', body:'This read-out summarises the month and gives one next step. Tap Listen, or say explain my month, and I will read it out.', say:'Explain my month'},
   {tab:'pulse', target:'#milestones', title:'Milestones', body:'Milestones are what you are saving for. Each one shows whether you will get there on time at your current pace, and how much to add if not.', say:'New goal laptop 80,000 by March  ·  Put 5,000 in laptop'},
   {tab:'pulse', target:'#askChips', title:'Ask me anything', body:'Ask about your money in plain words: what is left in an envelope, what you spent on something, or whether you can afford a purchase.', say:'Can I afford 3,000 shoes?'},
-  {tab:'envelopes', target:'#envBody', title:'Envelopes', body:'Each envelope is a monthly limit. Green is comfortable, amber means watch it, red means overdrawn. I warn you out loud at 75 percent and when you go over. Use the filters on top, or the New button to add one.', say:'Groceries limit 8,000  ·  Pet care limit 2,000'},
+  {tab:'envelopes', target:'#envBody', title:'Envelopes', body:'Each envelope is a monthly limit. Green is comfortable, amber means watch it, red means overdrawn. I warn you out loud at 75 percent and when you go over. Use the filters on top, Move to shift money from one envelope to another, or New to add one.', say:'Move 2,000 from shopping to eating out  ·  Groceries limit 8,000'},
   {tab:'timeline', target:'#timeline', title:'Timeline', body:'Every entry, day by day. Tap the play button to hear the original voice note. For lifestyle spends, tell me whether you would buy it again, and I will learn from your regrets.', say:'Undo  ·  Move last to shopping  ·  Regret it'},
   {tab:'me', target:'#history', title:'Your months are kept', body:'Everything you record is saved on this device: your plan, limits, milestones, entries and voice notes. Each month keeps its own limits, so this history shows how every month went. Me also holds the full voice diary, settings and a spreadsheet export.'},
   {end:true, title:'Ready to set up your own plan?', body:'The quickest way is one voice note of about a minute: your take-home pay, bills, what you enjoy spending on, and one thing you are saving for.'},

@@ -80,7 +80,7 @@ const FAKE_SR = () => {
     await page.evaluate(() => { speechSynthesis.speak = () => window.__spoke(); });
     await page.click('#tourStart');
     const titles = [];
-    for (let i = 0; i < 12; i++){
+    for (let i = 0; i < 13; i++){
       await page.waitForTimeout(500);
       titles.push(await text('#tTitle'));
       const hole = await page.$eval('#tHole', h => { const r = h.getBoundingClientRect(); return {none: h.classList.contains('none'), w: r.width, h: r.height, top: r.top, bottom: r.bottom}; });
@@ -93,8 +93,8 @@ const FAKE_SR = () => {
       if (await page.isVisible('#tEnd button')) break;
       await page.click('#tNext');
     }
-    check(titles.length === 11, `expected 11 tour screens, saw ${titles.length}: ${titles.join(' / ')}`);
-    check(spoken >= 11, `narration spoke ${spoken} times`);
+    check(titles.length === 12, `expected 12 tour screens, saw ${titles.length}: ${titles.join(' / ')}`);
+    check(spoken >= 12, `narration spoke ${spoken} times`);
     check(!(await st()) || (await st()).sample, 'tour data leaked as real data');
     await page.click('[data-tend=voice]'); await page.waitForTimeout(200);
     check(await page.isVisible('#s-voice'), 'Speak my plan did not open voice setup');
@@ -208,7 +208,8 @@ const FAKE_SR = () => {
   await test('Questions are answered', async () => {
     await say('how much is left for coffee'); check(/left in Coffee|overdrawn/.test(await text('#draft')), 'left answer: ' + await text('#draft'));
     await say('safe to spend today'); check(/safely spend/.test(await text('#draft')), 'safe answer missing');
-    await say('can I afford 3,000 shoes'); check(/^💬 (Yes|Not comfortably)/.test((await text('#draft')).trim()), 'afford answer missing');
+    await say('can I afford 3,000 shoes'); check(/Month-end/.test(await text('#draft')) && /(Go ahead|Possible|Not this month)/.test(await text('#draft')), 'before-you-buy answer missing: ' + await text('#draft'));
+    await say('not now'); check(!/Month-end/.test(await text('#draft')), 'before-you-buy card not closed');
     await say('what did I spend on swiggy'); check(/entr/.test(await text('#draft')), 'term spend answer missing');
   });
 
@@ -454,6 +455,38 @@ const FAKE_SR = () => {
     await say('Starbucks 200'); await say('yes');
     check(!(await page.isVisible('#alarm')), 'alarm repeated for the same threshold');
     await page.click('#sheetClose'); await page.waitForTimeout(200);
+  });
+
+  await test('Before you buy: verdicts, goal slip and actions', async () => {
+    await page.click('#speakBtn'); await page.waitForTimeout(300); await page.click('#recBtn'); await page.waitForTimeout(600);
+    const d = () => text('#draft');
+    await say('should I buy a 500 rupee book');
+    check(/Go ahead/.test(await d()), 'small purchase should be Go ahead: ' + await d());
+    await say('yes, buy it');
+    check((await st()).txs.at(-1).amount === 500, 'purchase not logged after yes');
+    await say('should I buy a 5 lakh car');
+    check(/Not this month/.test(await d()) && /slips/.test(await d()), 'huge purchase should be Not this month with a goal slip: ' + await d());
+    await say('save for it');
+    check((await st()).goals.some(g => g.target === 500000), 'save-for-it goal not created');
+    await page.click('#sheetClose'); await page.waitForTimeout(200);
+    await page.click('[data-tab=pulse]');
+    await page.fill('#buyAmt', '2000'); await page.fill('#buyWhat', 'headphones'); await page.click('#buyForm button[type=submit]'); await page.waitForTimeout(200);
+    check(/Month-end/.test(await text('#buyResult')), 'form check did not show impact');
+    check(/Month-end forecast/.test(await text('#pulseCard')) && /(faster|pace|Slower)/.test(await text('#pulseCard')), 'forecast/pace missing on Pulse');
+  });
+
+  await test('Move money between envelopes by voice and by form', async () => {
+    const before = (await st()).plan;
+    await page.click('#speakBtn'); await page.waitForTimeout(300); await page.click('#recBtn'); await page.waitForTimeout(600);
+    await say('move 1,000 from rent to travel');
+    const after = (await st()).plan;
+    check(after['Rent & home'] === before['Rent & home'] - 1000 && after['Travel'] === (before['Travel'] || 0) + 1000, 'voice move wrong: ' + JSON.stringify([before, after]));
+    await page.click('#sheetClose'); await page.waitForTimeout(200);
+    await page.click('[data-tab=envelopes]'); await page.click('#moveBtn');
+    await page.selectOption('#mvFrom', 'Travel'); await page.selectOption('#mvTo', 'Groceries'); await page.fill('#mvAmt', '400'); await page.click('#moveForm button[type=submit]'); await page.waitForTimeout(200);
+    const p2 = (await st()).plan;
+    check(p2.Travel === after.Travel - 400 && p2.Groceries === (after.Groceries || 0) + 400, 'form move wrong: ' + JSON.stringify(p2));
+    await noOverflow('move form');
   });
 
   await test('Load sample data needs two taps', async () => {
