@@ -37,7 +37,7 @@
   "Main.dc.html": {
    "h": 1540,
    "is_interactive": true,
-   "title": "01 Portfolio command centre",
+   "title": "01 Campaign dashboard",
    "w": 1440,
    "x": 0,
    "y": 0
@@ -113,6 +113,22 @@
    "w": 1440,
    "x": 1520,
    "y": 3680
+  },
+  "Home.dc.html": {
+   "x": 0,
+   "y": 5620,
+   "w": 1440,
+   "h": 2300,
+   "title": "Landing page",
+   "is_interactive": true
+  },
+  "Auth.dc.html": {
+   "x": 1520,
+   "y": 5620,
+   "w": 1440,
+   "h": 900,
+   "title": "Sign up / sign in",
+   "is_interactive": true
   }
  },
  "createdOnFiles": {
@@ -127,7 +143,7 @@
   "t1": {
    "kind": "title1",
    "maxW": 6000,
-   "text": "Start here — portfolio, Company DNA, moments, new campaign",
+   "text": "Start here — dashboard, Company DNA, moments, new campaign",
    "w": 240,
    "x": 0,
    "y": -300
@@ -143,10 +159,18 @@
   "t3": {
    "kind": "title1",
    "maxW": 6000,
-   "text": "Manage — budget planning and portfolio features",
+   "text": "Track — budget, timeline, risks and reporting",
    "w": 240,
    "x": 0,
    "y": 3400
+  },
+  "t4": {
+   "kind": "title1",
+   "maxW": 3000,
+   "text": "Public pages — landing and sign-up",
+   "w": 240,
+   "x": 0,
+   "y": 5360
   }
  },
  "order": [
@@ -163,7 +187,9 @@
   "Budget.dc.html",
   "Timeline.dc.html",
   "Prioritise.dc.html",
-  "Report.dc.html"
+  "Report.dc.html",
+  "Home.dc.html",
+  "Auth.dc.html"
  ],
  "pages": [],
  "title": "CampaignForge Pro"

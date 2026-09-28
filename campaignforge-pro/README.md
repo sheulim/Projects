@@ -1,6 +1,8 @@
 # CampaignForge Pro — product design
 
-A campaign and portfolio management product that extends [CampaignForge](https://github.com/sheulim/insightful-campaign-buddy): AI planning from one brief, ready-to-post output for every social channel, and a portfolio layer for budget, timeline, risk and executive reporting.
+A campaign planner and tracker that extends [CampaignForge](https://github.com/sheulim/insightful-campaign-buddy): AI planning from one brief, ready-to-post output for every social channel, and tracking of budget, timeline, risks and results for every campaign.
+
+**Live site:** https://campaign-forge.netlify.app
 
 **Interactive design:** https://claude.ai/artifact/2U64oiurGdf6ph7AbK5ABh (private to the owner until shared from the page's Share menu)
 
@@ -8,9 +10,12 @@ A campaign and portfolio management product that extends [CampaignForge](https:/
 
 ## Screens
 
+Public pages: `design/Home.dc.html` (landing page) and `design/Auth.dc.html` (sign up / sign in). App screens:
+
+
 | # | Screen | File | What it does |
 |---|---|---|---|
-| 01 | Portfolio command centre | `design/Main.dc.html` | KPIs, pacing alerts, campaign health, this week, content mix by channel, upcoming moments, setup checklist |
+| 01 | Campaign dashboard | `design/Main.dc.html` | KPIs, pacing alerts, campaign health, this week, content mix by channel, upcoming moments, setup checklist |
 | 02 | Company DNA | `design/Brand.dc.html` | Brand voice, words to use and avoid, product facts, persona, colours, languages, disclaimer, guardrail checks |
 | 2b | Moments calendar | `design/Dates.dc.html` | Annual festivals, holidays and shopping days for India (national and states) and international markets, with brand fit and lead time |
 | + | New campaign | `design/New.dc.html` | Templates, brief with voice input and AI writing help, target markets, channels, tone, language, posts per week, live generation progress |
@@ -30,12 +35,12 @@ Channels covered: Instagram, Facebook, YouTube, X, LinkedIn, TikTok (non-India m
 ## Proposed phasing
 
 1. **Phase 1:** campaign types, Company DNA, moments calendar, Refine with AI, readiness score, calendar and approvals, budget planner, dashboard, ready-to-post output with export packages for every channel.
-2. **Phase 2:** auto-posting through connected accounts (after each platform's app approval), portfolio timeline and tasks, prioritisation, risks, executive report.
+2. **Phase 2:** auto-posting through connected accounts (after each platform's app approval), campaign timeline and tasks, prioritisation, risks, executive report.
 3. **Phase 3:** full video generation at scale and live spend feeds from ad platforms (paid APIs; cost before committing).
 
 ## Working site
 
-`site/index.html` is a standalone, clickable version of all 14 screens (no build tools or server needed; open it in a browser or host it on GitHub Pages). It reuses the design files directly: `site/build.py` reads `design/*.dc.html` and regenerates `site/index.html`, so after editing a screen run:
+`site/index.html` is a standalone, clickable version of the landing page, sign-up and all 14 app screens. It adapts to phone, tablet and desktop widths. Sign-up is a prototype: details are kept only in the visitor's browser, and app screens require signing in (or "Explore the demo"). It reuses the design files directly: `site/build.py` reads `design/*.dc.html` and regenerates `site/index.html`, so after editing a screen run:
 
 ```
 cd campaignforge-pro/site && python3 build.py

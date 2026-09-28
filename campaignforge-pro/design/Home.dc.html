@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Welcome</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=DM+Sans:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap">
+<style>
+body{margin:0;background:#14161c;color:#eceef2;font-family:'DM Sans',system-ui,sans-serif}
+a{color:#f2a93b}a:hover{color:#ffc46b}
+.disp{font-family:'Space Grotesk',sans-serif}
+.mono{font-family:'JetBrains Mono',monospace}
+.wrap{max-width:1200px;margin:0 auto;padding-inline:24px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-block:18px;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:#eceef2}
+.mark{width:32px;height:32px;border-radius:8px;background:#f2a93b;display:flex;align-items:center;justify-content:center;color:#1a1305;font:700 15px 'Space Grotesk',sans-serif}
+.links{display:flex;align-items:center;gap:22px;flex-wrap:wrap}
+.links a.plain{color:#b4b9c4;text-decoration:none;font-size:14px}
+.links a.plain:hover{color:#eceef2}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 20px;border-radius:10px;font-weight:600;font-size:15px;font-family:inherit;border:1px solid #343945;background:#1f232c;color:#eceef2;cursor:pointer;text-decoration:none}
+.btn:hover{color:#eceef2;border-color:#4a4f5c}
+.btn.pri{background:#f2a93b;border-color:#f2a93b;color:#1a1305}
+.btn.pri:hover{background:#ffbd5a;color:#1a1305}
+.eyebrow{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:#f2a93b}
+.hero{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:48px;align-items:center;padding-block:56px 72px}
+.hero h1{font-family:'Space Grotesk',sans-serif;font-size:52px;line-height:1.05;margin:14px 0 18px;font-weight:600;text-wrap:balance}
+.hero p{font-size:18px;line-height:1.6;color:#c3c8d2;margin:0 0 28px;max-width:58ch}
+.ctas{display:flex;gap:12px;flex-wrap:wrap}
+.panel{background:#1b1e26;border:1px solid #2a2e38;border-radius:14px}
+.preview{padding:20px;display:flex;flex-direction:column;gap:14px}
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}
+.cal span{height:30px;border-radius:5px;background:#171a21;border:1px solid #262a33}
+.stat{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.stat div{background:#14161c;border:1px solid #2a2e38;border-radius:10px;padding:12px}
+.k{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#a3a9b5}
+.v{font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:600;margin-top:4px}
+section.block{padding-block:56px;border-top:1px solid #23262f}
+.block h2{font-family:'Space Grotesk',sans-serif;font-size:34px;margin:10px 0 28px;font-weight:600;text-wrap:balance}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.feat{padding:22px}
+.feat h3{font-family:'Space Grotesk',sans-serif;font-size:18px;margin:12px 0 8px;font-weight:600}
+.feat p{margin:0;color:#b4b9c4;font-size:14px;line-height:1.6}
+.ic{width:40px;height:40px;border-radius:10px;background:#2e2514;display:flex;align-items:center;justify-content:center;color:#f2a93b}
+.steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;counter-reset:s}
+.step{padding:22px}
+.step .n{font-family:'JetBrains Mono',monospace;color:#5ee0c9;font-size:13px}
+.step h3{font-family:'Space Grotesk',sans-serif;font-size:17px;margin:10px 0 6px;font-weight:600}
+.step p{margin:0;color:#b4b9c4;font-size:14px;line-height:1.55}
+.chips{display:flex;flex-wrap:wrap;gap:10px}
+.chip{padding:8px 14px;border-radius:999px;border:1px solid #343945;font-size:14px;color:#dfe2e8}
+.band{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;padding:32px}
+.band h2{margin:0;font-size:28px}
+footer{padding-block:28px;color:#8b91a0;font-size:13px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;border-top:1px solid #23262f}
+@media (max-width:980px){
+.hero{grid-template-columns:1fr;padding-block:32px 48px}
+.hero h1{font-size:40px}
+.grid3{grid-template-columns:repeat(2,minmax(0,1fr))}
+.steps{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:620px){
+.wrap{padding-inline:16px}
+.hero h1{font-size:32px}
+.hero p{font-size:16px}
+.grid3,.steps{grid-template-columns:1fr}
+.links a.plain{display:none}
+.block h2{font-size:26px}
+.stat .v{font-size:18px}
+}
+</style>
+</helmet>
+<div style="width: 1440px; min-height: 2300px; background: #14161c">
+<div class="wrap">
+<header class="top">
+<a class="logo" href="Home.dc.html"><span class="mark">CF</span><span class="disp" style="font-size: 18px; font-weight: 600">CampaignForge <span style="color: #f2a93b">Pro</span></span></a>
+<nav class="links" aria-label="Main">
+<a class="plain" href="#features">Features</a>
+<a class="plain" href="#how">How it works</a>
+<a class="plain" href="#channels">Channels</a>
+<sc-if value="{{signedIn}}" hint-placeholder-val="{{false}}"><a class="btn pri" href="Main.dc.html">Open the app</a></sc-if>
+<sc-if value="{{signedOut}}" hint-placeholder-val="{{true}}"><a class="plain" href="Auth.dc.html" style="display: inline">Sign in</a><a class="btn pri" href="Auth.dc.html">Get started</a></sc-if>
+</nav>
+</header>
+<section class="hero">
+<div>
+<div class="eyebrow">Campaign planning and tracking</div>
+<h1>Plan every campaign. Publish on every channel. Account for every rupee.</h1>
+<p>Write a short brief and get a dated plan shaped by your Company DNA and the festivals your customers celebrate. Then produce ready-to-post content for ten channels and track budget and returns across every campaign you run.</p>
+<div class="ctas">
+<a class="btn pri" href="Auth.dc.html">Create your account</a>
+<button class="btn" type="button" onClick="{{demo}}">Explore the demo</button>
+</div>
+<p style="font-size: 13px; color: #8b91a0; margin: 16px 0 0">No card needed. The demo uses sample data.</p>
+</div>
+<div class="panel preview" aria-hidden="true">
+<div style="display: flex; justify-content: space-between; align-items: center"><span class="disp" style="font-weight: 600">Diwali Festive Push</span><span class="mono" style="font-size: 11px; color: #5ee0c9">PLAN BUILT</span></div>
+<div class="cal">
+<span></span><span style="background: #7a2748"></span><span></span><span style="background: #1f4b7a"></span><span></span><span style="background: #7a2748"></span><span style="background: #132724; border-color: #2a5a52"></span>
+<span style="background: #7a4a1c"></span><span></span><span style="background: #7a2748"></span><span style="background: #17564d"></span><span></span><span style="background: #1f4b7a"></span><span></span>
+<span></span><span style="background: #7a2748"></span><span></span><span style="background: #7a4a1c"></span><span style="background: #1f4b7a"></span><span></span><span style="background: #7a2748"></span>
+</div>
+<div class="stat">
+<div><div class="k">Readiness</div><div class="v" style="color: #5ee0c9">90</div></div>
+<div><div class="k">Budget used</div><div class="v">70%</div></div>
+<div><div class="k">Next moment</div><div class="v" style="font-size: 16px">Diwali</div></div>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 6px"><span class="chip" style="font-size: 12px; padding: 4px 10px">Instagram reel</span><span class="chip" style="font-size: 12px; padding: 4px 10px">YouTube video</span><span class="chip" style="font-size: 12px; padding: 4px 10px">LinkedIn post</span><span class="chip" style="font-size: 12px; padding: 4px 10px">Email</span></div>
+</div>
+</section>
+<section class="block" id="features">
+<div class="eyebrow">What you get</div>
+<h2>Everything between the brief and the results</h2>
+<div class="grid3">
+<div class="panel feat"><div class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M7 4c0 6 10 10 10 16M17 4c0 6-10 10-10 16M8 8h8M8 16h8"></path></svg></div><h3>Company DNA</h3><p>Voice, signature phrases, banned words and approved facts, saved once and applied to every plan, post and video.</p></div>
+<div class="panel feat"><div class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M3 10h18M8 3v4M16 3v4"></path></svg></div><h3>Moments calendar</h3><p>Festivals, holidays and sale days for India, its states and your international markets, timed with the right lead.</p></div>
+<div class="panel feat"><div class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"></path></svg></div><h3>Plan and refine with AI</h3><p>A dated plan from one brief. Refine the whole plan, a week or a single post in plain words.</p></div>
+<div class="panel feat"><div class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="8"></circle><path d="M12 8v4l3 2"></path></svg></div><h3>Readiness score</h3><p>A visible rubric scores each plan out of 100 and suggests quick fixes before anything goes live.</p></div>
+<div class="panel feat"><div class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 12l16-8-6 16-3-7z"></path></svg></div><h3>Publish hub</h3><p>Every approved post in the exact size and length each channel needs, auto-posted or exported as a ready folder.</p></div>
+<div class="panel feat"><div class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"></path></svg></div><h3>Budget and campaign tracking</h3><p>Split budget by channel and week, watch spend and returns, and see every campaign's health, timeline and risks.</p></div>
+</div>
+</section>
+<section class="block" id="how">
+<div class="eyebrow">How it works</div>
+<h2>From brief to published in four steps</h2>
+<div class="steps">
+<div class="panel step"><div class="n">Step 1</div><h3>Set up Company DNA</h3><p>Add your voice, facts and markets once.</p></div>
+<div class="panel step"><div class="n">Step 2</div><h3>Write a short brief</h3><p>Goal, audience, channels and dates. Type it or dictate it.</p></div>
+<div class="panel step"><div class="n">Step 3</div><h3>Review and approve</h3><p>Check the readiness score, refine with AI and send posts to reviewers.</p></div>
+<div class="panel step"><div class="n">Step 4</div><h3>Publish and track</h3><p>Post or export for each channel, then follow spend and returns.</p></div>
+</div>
+</section>
+<section class="block" id="channels">
+<div class="eyebrow">Channels</div>
+<h2>Ready-to-post content for ten channels</h2>
+<div class="chips"><span class="chip">Instagram</span><span class="chip">Facebook</span><span class="chip">YouTube</span><span class="chip">X</span><span class="chip">LinkedIn</span><span class="chip">TikTok</span><span class="chip">Blog</span><span class="chip">Google Ads</span><span class="chip">Email</span><span class="chip">WhatsApp</span></div>
+</section>
+<section class="block">
+<div class="panel band">
+<h2 class="disp">Start planning your next campaign</h2>
+<div class="ctas"><a class="btn pri" href="Auth.dc.html">Create your account</a><button class="btn" type="button" onClick="{{demo}}">Explore the demo</button></div>
+</div>
+</section>
+<footer><span>CampaignForge Pro · prototype with sample data</span><span>© 2026 CampaignForge</span></footer>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":2300}}'>
+class Component extends DCLogic {
+renderVals() {
+var signed = !!(window.CFP && window.CFP.user());
+return {
+signedIn: signed, signedOut: !signed,
+demo: function () { if (window.CFP) { window.CFP.signIn({ name: 'Demo user', email: 'demo@example.com' }); } location.hash = 'Main'; }
+};
+}
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sign in</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=DM+Sans:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap">
+<style>
+body{margin:0;background:#14161c;color:#eceef2;font-family:'DM Sans',system-ui,sans-serif}
+a{color:#f2a93b}a:hover{color:#ffc46b}
+.disp{font-family:'Space Grotesk',sans-serif}
+.shell{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);min-height:900px}
+.side{background:#101218;border-right:1px solid #262a33;padding:40px 56px;display:flex;flex-direction:column;gap:28px}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:#eceef2}
+.mark{width:32px;height:32px;border-radius:8px;background:#f2a93b;display:flex;align-items:center;justify-content:center;color:#1a1305;font:700 15px 'Space Grotesk',sans-serif}
+.side h2{font-family:'Space Grotesk',sans-serif;font-size:34px;line-height:1.15;margin:0;font-weight:600;text-wrap:balance}
+.side ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:14px}
+.side li{display:flex;gap:12px;font-size:15px;line-height:1.5;color:#c3c8d2}
+.tick{flex-shrink:0;width:22px;height:22px;border-radius:50%;background:#123a33;color:#5ee0c9;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+.formside{display:flex;align-items:center;justify-content:center;padding:40px 24px}
+.card{width:100%;max-width:400px}
+.card h1{font-family:'Space Grotesk',sans-serif;font-size:32px;margin:0 0 6px;font-weight:600}
+.sub{margin:0 0 24px;color:#b4b9c4;font-size:14px}
+.panel{background:#1b1e26;border:1px solid #2a2e38;border-radius:14px;padding:24px}
+form{display:flex;flex-direction:column;gap:16px}
+label{display:block;font-size:14px;font-weight:600;margin-bottom:6px}
+.fld{width:100%;box-sizing:border-box;min-height:44px;background:#14161c;border:1px solid #343945;border-radius:10px;color:#eceef2;font-family:inherit;font-size:15px;padding:10px 14px}
+.fld:focus{outline:2px solid #f2a93b;outline-offset:1px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:46px;border-radius:10px;font-weight:600;font-size:15px;font-family:inherit;border:1px solid #343945;background:#1f232c;color:#eceef2;cursor:pointer}
+.btn.pri{background:#f2a93b;border-color:#f2a93b;color:#1a1305}
+.or{display:flex;align-items:center;gap:12px;margin:18px 0;color:#8b91a0;font-size:12px}
+.or span{flex:1;height:1px;background:#2a2e38}
+.err{background:#44191b;color:#ff8a8e;border-radius:8px;padding:10px 12px;font-size:13px}
+.switch{margin-top:18px;width:100%;background:transparent;border:0;color:#b4b9c4;font-family:inherit;font-size:14px;cursor:pointer;min-height:44px}
+.switch:hover{color:#eceef2}
+.note{margin-top:14px;font-size:12px;line-height:1.5;color:#8b91a0;text-align:center}
+@media (max-width:860px){
+.shell{grid-template-columns:1fr;min-height:0}
+.side{border-right:0;border-bottom:1px solid #262a33;padding:24px 16px;gap:16px}
+.side h2{font-size:24px}
+.side ul{display:none}
+.formside{padding:28px 16px 40px}
+}
+</style>
+</helmet>
+<div class="shell" style="width: 1440px; min-height: 900px; background: #14161c">
+<aside class="side">
+<a class="logo" href="Home.dc.html"><span class="mark">CF</span><span class="disp" style="font-size: 18px; font-weight: 600">CampaignForge <span style="color: #f2a93b">Pro</span></span></a>
+<h2>Plan, publish and track every campaign in one place.</h2>
+<ul>
+<li><span class="tick">✓</span>Dated plans built around your Company DNA and the moments your customers celebrate</li>
+<li><span class="tick">✓</span>Ready-to-post content for Instagram, YouTube, LinkedIn, X, email and more</li>
+<li><span class="tick">✓</span>Budget, spend and results tracked for every campaign</li>
+</ul>
+<p style="margin: auto 0 0; font-size: 13px; color: #8b91a0">Your campaigns stay private to your workspace.</p>
+</aside>
+<div class="formside">
+<div class="card">
+<h1>{{heading}}</h1>
+<p class="sub">{{subheading}}</p>
+<div class="panel">
+<form onSubmit="{{submit}}" novalidate="novalidate">
+<sc-if value="{{isSignup}}" hint-placeholder-val="{{true}}">
+<div><label for="au-name">Full name</label><input id="au-name" class="fld" type="text" autocomplete="name" placeholder="Your name" value="{{v.name}}"></div>
+<div><label for="au-company">Company</label><input id="au-company" class="fld" type="text" autocomplete="organization" placeholder="Company or brand" value="{{v.company}}"></div>
+</sc-if>
+<div><label for="au-email">Work email</label><input id="au-email" class="fld" type="email" autocomplete="email" placeholder="you@company.com" value="{{v.email}}"></div>
+<div><label for="au-pass">Password</label><input id="au-pass" class="fld" type="password" autocomplete="{{pwAuto}}" placeholder="At least 8 characters"></div>
+<sc-if value="{{hasErr}}" hint-placeholder-val="{{false}}"><div class="err" role="alert">{{err}}</div></sc-if>
+<button class="btn pri" type="submit">{{cta}}</button>
+</form>
+<div class="or"><span></span>or<span></span></div>
+<button class="btn" type="button" onClick="{{google}}"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="#eceef2" d="M21.6 12.2c0-.7-.1-1.4-.2-2H12v3.8h5.4a4.6 4.6 0 0 1-2 3v2.5h3.2c1.9-1.7 3-4.3 3-7.3z"></path><path fill="#c3c8d2" d="M12 22c2.7 0 5-.9 6.6-2.5l-3.2-2.5c-.9.6-2 1-3.4 1-2.6 0-4.8-1.8-5.6-4.1H3.1v2.6A10 10 0 0 0 12 22z"></path><path fill="#a3a9b5" d="M6.4 13.9a6 6 0 0 1 0-3.8V7.5H3.1a10 10 0 0 0 0 9z"></path><path fill="#dfe2e8" d="M12 6c1.5 0 2.8.5 3.8 1.5l2.9-2.9A10 10 0 0 0 3.1 7.5l3.3 2.6C7.2 7.8 9.4 6 12 6z"></path></svg>Continue with Google</button>
+</div>
+<button class="switch" type="button" onClick="{{toggle}}">{{switchText}}</button>
+<p class="note">Prototype: your details stay in this browser only. Real accounts connect in the build phase.</p>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+constructor(p) { super(p); this.state = { mode: 'signup', err: '' }; this.v = { name: '', company: '', email: '' }; }
+read(id) { var el = document.getElementById(id); return el ? el.value.trim() : ''; }
+renderVals() {
+var self = this, up = this.state.mode === 'signup';
+return {
+isSignup: up, v: this.v, err: this.state.err, hasErr: !!this.state.err,
+heading: up ? 'Create your account' : 'Welcome back',
+subheading: up ? 'Start planning your first campaign in a few minutes.' : 'Sign in to pick up where you left off.',
+cta: up ? 'Create account' : 'Sign in',
+pwAuto: up ? 'new-password' : 'current-password',
+switchText: up ? 'Already have an account? Sign in' : 'New to CampaignForge Pro? Create an account',
+toggle: function () { self.v.email = self.read('au-email'); self.setState({ mode: up ? 'signin' : 'signup', err: '' }); },
+google: function () { if (window.CFP) window.CFP.signIn({ name: 'Google user', email: '' }); location.hash = 'Main'; },
+submit: function (e) {
+if (e && e.preventDefault) e.preventDefault();
+var name = up ? self.read('au-name') : '', company = up ? self.read('au-company') : '';
+var email = self.read('au-email'), pw = (document.getElementById('au-pass') || {}).value || '';
+self.v = { name: name, company: company, email: email };
+var err = '';
+if (up && !name) err = 'Enter your name.';
+else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) err = 'Enter a valid email address, like you@company.com.';
+else if (pw.length < 8) err = 'Use a password of at least 8 characters.';
+if (err) { self.setState({ err: err }); return; }
+if (window.CFP) window.CFP.signIn({ name: name || email.split('@')[0], email: email, company: company });
+location.hash = 'Main';
+}
+};
+}
+}
+</script>
+</body>
+</html>

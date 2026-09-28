@@ -8,7 +8,7 @@ import json, os, re
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 DESIGN = os.path.join(HERE, '..', 'design')
-ORDER = ['Main', 'Brand', 'Dates', 'New', 'Plan', 'Score', 'Studio', 'Brief',
+ORDER = ['Home', 'Auth', 'Main', 'Brand', 'Dates', 'New', 'Plan', 'Score', 'Studio', 'Brief',
          'Reel', 'Publish', 'Budget', 'Timeline', 'Prioritise', 'Report']
 
 screens, scripts = {}, []
