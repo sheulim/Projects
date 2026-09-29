@@ -54,7 +54,7 @@ h1,h2,h3{margin:0;letter-spacing:-.02em}
 .btn.block{width:100%;justify-content:center;white-space:normal;padding:14px;font-size:16px;border-radius:14px}
 .btn.danger{color:var(--danger)}
 .textlink{background:none;border:0;padding:0;color:var(--teal);font-weight:700}
-input[type=text],input[type=number],input[type=month],select,textarea{width:100%;background:var(--sunk);border:1px solid var(--line);border-radius:12px;padding:10px 12px;min-width:0}
+input[type=text],input[type=number],input[type=month],input[type=email],input[type=url],select,textarea{width:100%;background:var(--sunk);border:1px solid var(--line);border-radius:12px;padding:10px 12px;min-width:0}
 input:focus,select:focus,textarea:focus{outline:2px solid var(--teal);outline-offset:1px}
 .ico{width:40px;height:40px;border-radius:12px;background:var(--sunk);display:grid;place-items:center;font-size:19px;flex:none}
 
@@ -142,6 +142,14 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--teal);outline-of
 .checkin b{font-size:16px}
 .importcard small{font-size:12px}
 .lastimp{display:block;margin-top:6px;color:var(--teal);font-weight:700}
+.acct [data-acct-status].bad{color:var(--danger);font-weight:700}
+.acct .row input{flex:1}
+.howto{margin-top:10px;border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.howto summary{font-weight:700;cursor:pointer}
+.howto ol{margin:8px 0;padding-left:20px;font-size:13px;color:var(--muted)}
+.howto li{margin:4px 0}
+.kv{display:grid;grid-template-columns:96px 1fr auto;gap:8px;align-items:center;font-size:12px;margin-top:6px}
+.kv code{background:var(--sunk);border-radius:8px;padding:4px 6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
 .srcs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
 .src{border:1px solid var(--line);background:var(--sunk);border-radius:14px;padding:10px 8px;text-align:left;display:grid;gap:1px}
 .src span{font-size:18px}.src b{font-size:13px;line-height:1.25}.src small{color:var(--muted);font-size:11px}
@@ -332,6 +340,8 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--teal);outline-of
     <button class="path main" id="goVoiceSetup"><span class="ico">🎙</span><span><b>Speak my plan</b><small>About 60 seconds. Correct anything afterwards.</small></span></button>
     <button class="path" id="goManualSetup"><span class="ico">⌨</span><span><b>Build it by hand</b><small>One page with sensible suggestions.</small></span></button>
     <p style="text-align:center;margin-top:18px"><button class="textlink" id="goSample">Just looking? Open with sample data →</button></p>
+    <p style="text-align:center;margin-top:10px"><button class="textlink" id="goSignin">Already use BudgetSense? Sign in →</button></p>
+    <div class="card acct hide" id="acctWelcome"></div>
   </section>
 
   <section id="s-voice" class="hide">
@@ -360,12 +370,12 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--teal);outline-of
     </div>
 
     <div class="card">
-      <h3>Must-pay every month</h3>
+      <h3>Needs: bills every month</h3>
       <div id="bMust"></div>
     </div>
 
     <div class="card">
-      <h3>Lifestyle spends</h3>
+      <h3>Wants: lifestyle spends</h3>
       <p class="muted" style="margin:-6px 0 4px;font-size:13px">The things you enjoy. Guess a monthly amount; you can change it any time.</p>
       <div id="bLife"></div>
       <div class="toggles" id="bLifeAdd"></div>
@@ -398,9 +408,9 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--teal);outline-of
     <div class="mswitch"><button id="mPrev" aria-label="Previous month">‹</button><span id="mLabel"></span><button id="mNext" aria-label="Next month">›</button></div>
   </div>
   <nav class="tabs" role="tablist">
-    <button role="tab" data-tab="pulse" aria-selected="true">Pulse</button>
-    <button role="tab" data-tab="envelopes" aria-selected="false">Envelopes</button>
-    <button role="tab" data-tab="timeline" aria-selected="false">Timeline</button>
+    <button role="tab" data-tab="pulse" aria-selected="true">Overview</button>
+    <button role="tab" data-tab="envelopes" aria-selected="false">Budgets</button>
+    <button role="tab" data-tab="timeline" aria-selected="false">Spending log</button>
     <button role="tab" data-tab="me" aria-selected="false">Me</button>
   </nav>
   <div class="sample hide" id="sampleNote"><b>Sample data.</b> Try your voice on it freely. Say <b>“wipe everything”</b> or go to <b>Me</b> to set up your own plan.</div>
@@ -416,7 +426,7 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--teal);outline-of
       <div id="buyResult"></div>
     </div>
     <div class="card readout" id="readout"></div>
-    <div class="h2row"><h2>Milestones</h2><small>Say “put 5,000 in Goa trip”</small></div>
+    <div class="h2row"><h2>Savings goals</h2><small>Say “put 5,000 in Goa trip”</small></div>
     <div class="hscroll" id="milestones"></div>
     <div id="recurWrap"></div>
     <div class="h2row"><h2>Ask me</h2><small>Tap one, or just say it</small></div>
@@ -428,15 +438,15 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--teal);outline-of
   <section id="t-envelopes" class="hide">
     <div class="spread" style="margin-bottom:10px"><div class="filters" id="filters"></div><span class="row"><button class="btn" id="moveBtn">↔ Move</button><button class="btn primary" id="newEnvBtn">＋ New</button></span></div>
     <form class="card hide" id="moveForm">
-      <div class="spread"><h3 style="font-size:16px;font-weight:800">Move money between envelopes</h3><button type="button" class="x" id="moveClose" aria-label="Close">✕</button></div>
+      <div class="spread"><h3 style="font-size:16px;font-weight:800">Move money between budgets</h3><button type="button" class="x" id="moveClose" aria-label="Close">✕</button></div>
       <p class="hint" style="margin:4px 0 0">Or say <b>“move 2,000 from shopping to eating out”</b>.</p>
       <div class="movebox"><label class="fields">From <select id="mvFrom"></select></label><label class="fields">To <select id="mvTo"></select></label>
       <input class="full" type="number" id="mvAmt" inputmode="numeric" min="1" placeholder="₹ amount" required><button class="btn primary block full" type="submit">Move</button></div>
     </form>
     <form class="card newenv hide" id="newEnv">
-      <div class="spread"><h3 style="font-size:16px;font-weight:800">Create an envelope</h3><button type="button" class="x" id="newEnvClose" aria-label="Close">✕</button></div>
+      <div class="spread"><h3 style="font-size:16px;font-weight:800">Create a budget</h3><button type="button" class="x" id="newEnvClose" aria-label="Close">✕</button></div>
       <p class="hint" style="margin:0 0 10px">Quicker by voice: <b>“pet care limit 2,000”</b> or <b>“new goal laptop 80,000 by March”</b>.</p>
-      <div class="seg" id="neKind"><button type="button" data-k="goal">🎯 Milestone</button><button type="button" data-k="must">📌 Must-pay</button><button type="button" data-k="life" aria-pressed="true">✨ Lifestyle</button></div>
+      <div class="seg" id="neKind"><button type="button" data-k="goal">🎯 Savings goal</button><button type="button" data-k="must">📌 Need</button><button type="button" data-k="life" aria-pressed="true">✨ Want</button></div>
       <div class="fields" style="margin-top:10px">
         <label>Name <input type="text" id="neName" placeholder="e.g. Pet care, Laptop" required></label>
         <div class="two"><label><span id="neAmtLabel">Monthly limit (₹)</span><input type="number" id="neAmt" inputmode="numeric" min="0" required></label><label id="neByWrap" class="hide">Reach it by <input type="month" id="neBy"></label></div>
@@ -472,7 +482,7 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--teal);outline-of
       </form>
     </div>
     <div class="tlbar"><div class="filters" id="tlType"><button data-tt="all">All</button><button data-tt="expense">Money out</button><button data-tt="income">Money in</button></div>
-      <select id="tlCat" aria-label="Filter by envelope"></select><input type="search" id="tlSearch" placeholder="Search entries" aria-label="Search entries"></div>
+      <select id="tlCat" aria-label="Filter by budget"></select><input type="search" id="tlSearch" placeholder="Search entries" aria-label="Search entries"></div>
     <div class="card" style="padding:12px 14px"><p class="hint" style="margin:0">🎙 Say <b>“undo”</b>, <b>“move last to shopping”</b>, <b>“happy with it”</b> or <b>“regret it”</b>. Tap ▶ to hear the original note.</p></div>
     <div id="timeline"></div>
   </section>
@@ -480,16 +490,16 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--teal);outline-of
   <section id="t-me" class="hide">
     <div class="card me"><span class="avatar" id="meAvatar">A</span><div><b style="font-size:18px" id="meName"></b><div class="muted" id="meSince"></div><div class="muted" id="meIncome"></div></div></div>
     <div class="tiles"><div class="tile"><span class="label">Put aside, all time</span><b id="meSaved"></b></div><div class="tile b"><span class="label">Money notes this month</span><b id="meNotes"></b></div></div>
+    <div class="card acct" id="acctMe"></div>
     <div class="card">
       <ul class="set">
-        <li><span><b>Edit my plan</b><small>Income, envelopes and savings target</small></span><button class="btn" id="editPlan">Open</button></li>
+        <li><span><b>Edit my plan</b><small>Income, budgets and savings goals</small></span><button class="btn" id="editPlan">Open</button></li>
         <li><span><b>Re-speak my plan</b><small>Record a fresh setup note</small></span><button class="btn" id="respeak">🎙</button></li>
         <li><span><b>Spoken replies</b><small>BudgetSense talks back</small></span><button class="sw" id="swReplies" aria-label="Spoken replies"></button></li>
         <li><span><b>Quick save</b><small>Save confident AI picks without asking</small></span><button class="sw" id="swQuick" aria-label="Quick save"></button></li>
         <li><span><b>Dark mode</b></span><button class="sw" id="swDark" aria-label="Dark mode"></button></li>
         <li><span><b>Spending alarm</b><small>Beep, vibration and a spoken warning when spending crosses 50%, 75%, 90% and 100% of the month's income</small></span><button class="sw" id="swAlarm" aria-label="Spending alarm"></button></li>
         <li><span><b>Evening check-in</b><small id="checkinNote">A nudge each evening to add cash spends you forgot</small></span><span class="row"><select id="checkinTime" aria-label="Check-in time" style="width:auto"><option>20:00</option><option>21:00</option><option>22:00</option></select><button class="sw" id="swCheckin" aria-label="Evening check-in"></button></span></li>
-        <li><span><b>Bank alert emails</b><small>Coming with sign-in: a private address you can auto-forward bank alerts to, so they are added without you doing anything</small></span><span class="tagx t-none">Next phase</span></li>
         <li><span><b>Voice tour</b><small>Screen-by-screen guide with narration</small></span><button class="btn" id="tourReplay">🎧 Start</button></li>
         <li><span><b>Guided voice demo</b><small>Watch setup-to-summary by voice alone</small></span><button class="btn primary" id="demoBtn">▶ Play</button></li>
         <li><span><b>Download voice diary</b><small>Every note, transcript and result (CSV)</small></span><button class="btn" id="exportBtn">⬇ CSV</button></li>
@@ -521,7 +531,7 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--teal);outline-of
     <form class="typeform hide" id="typeForm">
       <div class="two"><input type="number" id="tfAmt" inputmode="decimal" min="0" step="any" placeholder="Amount ₹" required><select id="tfType"><option value="expense">Spent</option><option value="income">Received</option></select></div>
       <input type="text" id="tfDesc" placeholder="What was it? e.g. Swiggy dinner" required>
-      <div class="two"><select id="tfCat" aria-label="Envelope"></select><select id="tfDay"><option value="0">Today</option><option value="1">Yesterday</option><option value="2">2 days ago</option></select></div>
+      <div class="two"><select id="tfCat" aria-label="Budget"></select><select id="tfDay"><option value="0">Today</option><option value="1">Yesterday</option><option value="2">2 days ago</option></select></div>
       <button class="btn primary block" type="submit" style="padding:11px">Save entry</button>
     </form>
   </div>
@@ -781,7 +791,7 @@ function interpret(raw){
   if (mv){
     const a = parseAmount(mv[1] + ' ' + low), from = findCategory(mv[2], 'expense'), to = findCategory(mv[3], 'expense');
     if (a && from && to && from !== to) return {kind:'move', amount:a.value, from, to};
-    if (a && (from || to)) return {kind:'error', msg:'Tell me both envelopes, for example “move 2,000 from shopping to eating out”.'};
+    if (a && (from || to)) return {kind:'error', msg:'Tell me both budgets, for example “move 2,000 from shopping to eating out”.'};
   }
   if (/\bhow much\b.*\b(left|remaining)\b/.test(low)){ const c = findCategory(low, 'expense'); return {kind:'ask', q: c ? 'left' : 'free', category:c}; }
   if (/\b(how much|what)\b.*\b(did i )?(spend|spent)\b/.test(low)){
@@ -795,8 +805,8 @@ function interpret(raw){
   if (/\b(undo|delete last|remove last|delete that|scratch that)\b/.test(low)) return {kind:'undo'};
   if (/\b(regret|not worth it|wasn'?t worth|shouldn'?t have)\b/.test(low)) return {kind:'mood', value:false};
   if (/\b(happy with it|worth it|glad i bought|no regrets|loved it|buy it again)\b/.test(low)) return {kind:'mood', value:true};
-  const nav = low.match(/\b(show|open|go to|take me to)\b.*\b(pulse|envelopes?|timeline|history|me|profile|diary|recordings?)\b/);
-  if (nav) return {kind:'nav', to: /env/.test(nav[2]) ? 'envelopes' : /time|hist/.test(nav[2]) ? 'timeline' : /pulse/.test(nav[2]) ? 'pulse' : 'me'};
+  const nav = low.match(/\b(show|open|go to|take me to)\b.*\b(pulse|overview|envelopes?|budgets?|timeline|spending log|log|history|me|profile|diary|recordings?)\b/);
+  if (nav) return {kind:'nav', to: /env|budget/.test(nav[2]) ? 'envelopes' : /time|hist|log/.test(nav[2]) ? 'timeline' : /pulse|overview/.test(nav[2]) ? 'pulse' : 'me'};
 
   const nm = low.match(/\b(?:call me|my name is)\s+([a-z]+)/);
   if (nm) return {kind:'name', name: nm[1].charAt(0).toUpperCase() + nm[1].slice(1)};
@@ -806,7 +816,7 @@ function interpret(raw){
     const last = lastEntry();
     const c = last && findCategory(low.replace(/\blast\b/,''), last.type === 'income' ? 'income' : 'expense');
     if (c) return {kind:'recat', category:c};
-    return {kind:'error', msg:'Tell me the envelope, for example “move last to groceries”.'};
+    return {kind:'error', msg:'Tell me the budget, for example “move last to groceries”.'};
   }
   // Milestones
   if (/\b(new|create|add|start|set up)\b.*\b(goal|milestone)\b/.test(low)){
@@ -828,10 +838,10 @@ function interpret(raw){
     if (cat && (/\b(remove|clear|delete|no|zero)\b/.test(low) || (a && a.value === 0))) return {kind:'limit', category:cat, amount:0};
     if (cat && a) return {kind:'limit', category:cat, amount:a.value};
     if (a && !cat){
-      const name = low.replace(a.match,' ').replace(/\b(new|set|create|add|make|my|a|an|the|limit|budget|envelope|cap|to|of|at|for|is|lifestyle|must[- ]pay|rupees?|rs|a month|per month|monthly)\b/g,' ').replace(/\s+/g,' ').trim();
-      if (name && name.split(' ').length <= 3) return {kind:'newenv', name: name.replace(/\b\w/g, x => x.toUpperCase()), amount:a.value, kindOf: /\bmust[- ]?pay\b/.test(low) ? 'must' : 'life'};
+      const name = low.replace(a.match,' ').replace(/\b(new|set|create|add|make|my|a|an|the|limit|budget|envelope|cap|to|of|at|for|is|lifestyle|must[- ]pay|needs?|wants?|rupees?|rs|a month|per month|monthly)\b/g,' ').replace(/\s+/g,' ').trim();
+      if (name && name.split(' ').length <= 3) return {kind:'newenv', name: name.replace(/\b\w/g, x => x.toUpperCase()), amount:a.value, kindOf: /\b(must[- ]?pay|needs?)\b/.test(low) ? 'must' : 'life'};
     }
-    return {kind:'error', msg:'I need an envelope and an amount, for example “groceries limit 8,000”.'};
+    return {kind:'error', msg:'I need a budget and an amount, for example “groceries limit 8,000”.'};
   }
   if (/\b(automatic|auto[- ]?debit|recurring|subscriptions?|standing instructions?|mandates?)\b/.test(low) && /\b(what|show|list|how much|which|my)\b/.test(low)) return {kind:'ask', q:'recurring'};
   if (/^(nothing|no(ne)?|nothing today|nothing else|that'?s all|all done)\b/.test(low) && checkinDue()) return {kind:'checkinDone'};
@@ -874,20 +884,29 @@ const iso = d => d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDa
 const monthKey = d => d.getFullYear() + '-' + pad(d.getMonth()+1);
 function todayIST(){ const [y,m,d] = new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Kolkata'}).split('-').map(Number); return new Date(y, m-1, d); }
 const uid = () => Math.random().toString(36).slice(2,9) + Date.now().toString(36);
-const state = {month: monthKey(todayIST()), profile:null, plan:{}, goals:[], txs:[], recs:[], sample:false, pending:null, pendingNote:null, tab:'pulse', custom:{}, planByMonth:{}, filter:'all', tlf:{type:'all', cat:'', q:''}, editing:null, checkins:{}, recurDecisions:{}, alarms:{}, prefs:{replies:true, quick:false, checkin:true, checkinTime:'21:00', alarm:true}};
+const state = {month: monthKey(todayIST()), profile:null, plan:{}, goals:[], txs:[], recs:[], sample:false, pending:null, pendingNote:null, tab:'pulse', custom:{}, planByMonth:{}, filter:'all', tlf:{type:'all', cat:'', q:''}, editing:null, checkins:{}, recurDecisions:{}, alarms:{}, deleted:[], savedAt:0, prefs:{replies:true, quick:false, checkin:true, checkinTime:'21:00', alarm:true}};
+function applyData(s){
+  Object.assign(state, {profile:s.profile||null, plan:s.plan||{}, goals:s.goals||[], txs:s.txs||[], recs:s.recs||[], sample:!!s.sample, lastImport:s.lastImport||null, custom:s.custom||{}, planByMonth:s.planByMonth||{}, checkins:s.checkins||{}, recurDecisions:s.recurDecisions||{}, alarms:s.alarms||{}, deleted:s.deleted||[], savedAt:s.savedAt||0, prefs:Object.assign(state.prefs, s.prefs||{})});
+  for (const [n,c] of Object.entries(state.custom)) addCustom(n, c.kind, c.icon);
+}
 function load(){
   try {
     const s = JSON.parse(localStorage.getItem(LS) || 'null');
     if (!s) return false;
-    Object.assign(state, {profile:s.profile||null, plan:s.plan||{}, goals:s.goals||[], txs:s.txs||[], recs:s.recs||[], sample:!!s.sample, lastImport:s.lastImport||null, custom:s.custom||{}, planByMonth:s.planByMonth||{}, checkins:s.checkins||{}, recurDecisions:s.recurDecisions||{}, alarms:s.alarms||{}, prefs:Object.assign(state.prefs, s.prefs||{})});
-    for (const [n,c] of Object.entries(state.custom)) addCustom(n, c.kind, c.icon);
-    return true;
+    applyData(s); return true;
   } catch(e){ return false; }
 }
+function snapshot(){
+  return {profile:state.profile, plan:state.plan, goals:state.goals, txs:state.txs, recs:state.recs, sample:state.sample, custom:state.custom, lastImport:state.lastImport, planByMonth:state.planByMonth, checkins:state.checkins, recurDecisions:state.recurDecisions, alarms:state.alarms, deleted:state.deleted, savedAt:state.savedAt, prefs:state.prefs};
+}
+function persist(){ try { localStorage.setItem(LS, JSON.stringify(snapshot())); } catch(e){} }
 function save(){
   // Snapshot this month's limits so each month is judged against the plan it actually had.
   if (state.profile && !state.sample) state.planByMonth[monthKey(todayIST())] = {...state.plan};
-  try { localStorage.setItem(LS, JSON.stringify({profile:state.profile, plan:state.plan, goals:state.goals, txs:state.txs, recs:state.recs, sample:state.sample, custom:state.custom, lastImport:state.lastImport, planByMonth:state.planByMonth, checkins:state.checkins, recurDecisions:state.recurDecisions, alarms:state.alarms, prefs:state.prefs})); } catch(e){} }
+  state.savedAt = Date.now(); persist(); schedulePush();
+}
+// Remembers deleted entries so a sync from another device does not bring them back.
+function forget(id){ state.deleted.push(id); if (state.deleted.length > 2000) state.deleted.splice(0, state.deleted.length - 2000); }
 
 const memAudio = new Map(); let dbp = null;
 function db(){ if (dbp) return dbp; dbp = new Promise(res => { try { const r = indexedDB.open('budgetsense-voice', 1); r.onupgradeneeded = () => r.result.createObjectStore('notes'); r.onsuccess = () => res(r.result); r.onerror = () => res(null); } catch(e){ res(null); } }); return dbp; }
@@ -1023,18 +1042,18 @@ function readout(){
   const keep = F.income ? Math.round((F.income - F.spent) / F.income * 100) : null;
   const p = [];
   p.push(`${mName}: ${inr(F.spent)} out${F.income ? ` against ${inr(F.income)} in${F.salaryPending ? ' (salary expected)' : ''} — you are keeping about ${keep}%` : ''}.`);
-  p.push(`Must-pay was ${inr(F.must)}, lifestyle ${inr(F.life)}${life[0] ? `, with ${life[0][0]} the biggest at ${inr(life[0][1])}` : ''}.`);
+  p.push(`Needs came to ${inr(F.must)}, wants ${inr(F.life)}${life[0] ? `, with ${life[0][0]} the biggest at ${inr(life[0][1])}` : ''}.`);
   if (over.length) p.push(`Overdrawn: ${over.map(o => `${o.c} by ${inr(o.by)}`).join(', ')}.`);
   else if (watch.length) p.push(`${watch.join(' and ')} ${watch.length > 1 ? 'need' : 'needs'} watching.`);
-  else if (Object.keys(F.plan).length) p.push('Every envelope is comfortable.');
-  if (F.saved) p.push(`${inr(F.saved)} went to milestones.`);
+  else if (Object.keys(F.plan).length) p.push('Every budget is comfortable.');
+  if (F.saved) p.push(`${inr(F.saved)} went to savings goals.`);
   const autoP = recurring().filter(x => state.recurDecisions[x.key] !== 'ignore');
   if (autoP.length) p.push(`Automatic payments add up to ${inr(autoP.reduce((a,x) => a + x.monthly, 0))} a month.`);
   let tip;
-  if (regrets.length) tip = `You regretted ${regrets.map(r => r.description).slice(0,2).join(' and ')}. Next time, wait a day before a similar buy and send that money to a milestone instead.`;
-  else if (over.length) tip = `Pause ${over[0].c.toLowerCase()} for the rest of the month, or cover the ${inr(over[0].by)} from an envelope with room.`;
+  if (regrets.length) tip = `You regretted ${regrets.map(r => r.description).slice(0,2).join(' and ')}. Next time, wait a day before a similar buy and send that money to a savings goal instead.`;
+  else if (over.length) tip = `Pause ${over[0].c.toLowerCase()} for the rest of the month, or cover the ${inr(over[0].by)} from a budget with room.`;
   else if (watch.length) tip = `Go gently on ${watch[0].toLowerCase()} — ${inr(Math.max(0, F.plan[watch[0]] - (F.byCat[watch[0]]||0)))} left in it.`;
-  else if (F.isNow && F.safeToday) tip = `You can spend about ${inr(F.safeToday)} a day for the rest of the month and still cover your must-pays.`;
+  else if (F.isNow && F.safeToday) tip = `You can spend about ${inr(F.safeToday)} a day for the rest of the month and still cover your needs.`;
   else tip = 'Keep the notes coming — five seconds each is enough.';
   return {html: p.map(x => `<p>${esc(x)}</p>`).join('') + `<p class="tip"><b>Next step:</b> ${esc(tip)}</p>`, spoken: p.join(' ') + ' Next step: ' + tip};
 }
@@ -1060,11 +1079,11 @@ function answer(r){
       const m = R.reduce((a,x) => a + x.monthly, 0);
       return `${R.length} automatic payment${R.length > 1 ? 's' : ''}: ${R.map(x => `${x.name} ${inr(x.monthly)}`).join(', ')}. That is about ${inr(m)} a month, or ${inr(m * 12)} a year.`;
     }
-    case 'saved': return `You have put aside ${inr(state.goals.reduce((a,g) => a + g.saved, 0))} across ${state.goals.length} milestone${state.goals.length === 1 ? '' : 's'}.`;
+    case 'saved': return `You have put aside ${inr(state.goals.reduce((a,g) => a + g.saved, 0))} across ${state.goals.length} savings goal${state.goals.length === 1 ? '' : 's'}.`;
     case 'afford': {
       if (!F.isNow) return 'Ask me that for the current month.';
       const room = F.free - F.unpaidMust - F.goalDue;
-      return r.amount <= room ? `Yes. After ${inr(r.amount)} you would still have ${inr(room - r.amount)} spare this month, after must-pays and milestone savings.` : `Not comfortably. It is ${inr(r.amount - room)} more than you can spare this month once must-pays and milestone savings are covered.`;
+      return r.amount <= room ? `Yes. After ${inr(r.amount)} you would still have ${inr(room - r.amount)} spare this month, after needs and savings goals.` : `Not comfortably. It is ${inr(r.amount - room)} more than you can spare this month once needs and savings goals are covered.`;
     }
   }
   return '';
@@ -1100,7 +1119,7 @@ function whatIf(amount, item){
   const weeks = endAfter < 0 ? Math.ceil(-endAfter / Math.max(1, (F.income * 0.1) / 4.3)) : 0;
   const lines = [
     `Month-end: ${inr(endBefore)} → ${inr(endAfter)} left after bills, goals and your usual spending.`,
-    limit ? `${category}: ${envLeftAfter >= 0 ? inr(envLeftAfter) + ' left in the envelope after this' : 'goes over its limit by ' + inr(-envLeftAfter)}.` : `${category} has no limit set.`,
+    limit ? `${category}: ${envLeftAfter >= 0 ? inr(envLeftAfter) + ' left in the budget after this' : 'goes over its limit by ' + inr(-envLeftAfter)}.` : `${category} has no limit set.`,
     slips.length ? `Goals: ${slips.map(x => `${x.name} slips about ${x.months} month${x.months > 1 ? 's' : ''}`).join(', ')}.` : (state.goals.length ? 'Goals: no delay.' : ''),
     tone === 'over' ? `Better: wait until your next salary (${next.toLocaleDateString('en-IN',{day:'numeric',month:'short'})}) or set it aside as a goal, about ${weeks} week${weeks === 1 ? '' : 's'} of saving 10% of income.` :
     coverFrom.length ? `To stay within limits, move ${coverFrom.map(x => `${inr(x.amount)} from ${x.c}`).join(' and ')}.` : '',
@@ -1227,7 +1246,9 @@ function splitAlerts(text){
   return out;
 }
 function isDuplicate(a){
-  return state.txs.some(t => (a.ref && t.ref === a.ref) ||
+  return state.txs.some(t => (a.ref && t.ref) ? t.ref === a.ref :   // bank reference numbers are unique per payment
+    // The same payment often arrives twice, by SMS and by email, worded differently.
+    (a.recvAt && t.recvAt && a.channel !== t.channel && t.amount === a.amount && t.type === a.type && Math.abs(t.recvAt - a.recvAt) <= 30 * 60e3) ||
     (t.amount === a.amount && t.type === a.type && Math.abs(new Date(t.date) - new Date(a.date)) <= 864e5 &&
      (payeeKey(t.description) === payeeKey(a.description) || t.source !== 'bank')));
 }
@@ -1470,7 +1491,7 @@ function handleCommand(text, recId, opts = {}){
         say(`${tx.type === 'income' ? 'Received' : 'Spent'} ${inr(tx.amount)} · ${tx.category}.${alertFor(tx)}`, `${tx.amount} rupees to ${tx.category}.${alertFor(tx)}`);
       } else {
         state.pending = tx; state.pendingNote = note; renderDraft();
-        say(`Draft: ${inr(tx.amount)} in ${tx.category}. Say “yes”, or name another envelope.`,
+        say(`Draft: ${inr(tx.amount)} in ${tx.category}. Say “yes”, or name another budget.`,
             `${tx.type === 'income' ? 'Received' : 'Spent'} ${tx.amount} rupees on ${tx.description}. I'd file it under ${tx.category}. Yes?`);
       }
       break;
@@ -1479,7 +1500,7 @@ function handleCommand(text, recId, opts = {}){
     case 'undo': {
       const t = [...state.txs].sort((a,b) => b.at - a.at)[0];
       if (!t){ say('Nothing to undo.'); break; }
-      state.txs = state.txs.filter(x => x !== t);
+      state.txs = state.txs.filter(x => x !== t); forget(t.id);
       if (t.type === 'saving'){ const g = state.goals.find(g => g.name === t.category); if (g) g.saved -= t.amount; }
       save(); note('Removed ' + t.description); say(`Removed ${t.description}.`); break;
     }
@@ -1489,22 +1510,22 @@ function handleCommand(text, recId, opts = {}){
       save(); note(r.amount ? `${r.category} limit → ${inr(r.amount)}` : `Removed ${r.category} limit`); break;
     case 'newenv':
       createEnvelope(r.name, r.kindOf, r.kindOf === 'must' ? '📌' : '✨', r.amount);
-      note(`New envelope ${r.name} → ${inr(r.amount)}`); say(`Created a ${r.kindOf === 'must' ? 'must-pay' : 'lifestyle'} envelope, ${r.name}, with ${inr(r.amount)} a month.`); break;
+      note(`New budget ${r.name} → ${inr(r.amount)}`); say(`Created a ${r.kindOf === 'must' ? 'needs' : 'wants'} budget, ${r.name}, with ${inr(r.amount)} a month.`); break;
     case 'newgoal':
       state.goals.push({id:uid(), name:r.name, icon:goalIcon(r.name), target:r.target, saved:0, by:r.by});
-      save(); note(`New milestone ${r.name} ${inr(r.target)} by ${mShort(r.by)}`);
-      say(`New milestone: ${r.name}, ${inr(r.target)} by ${mShort(r.by)}. ${forecast(state.goals.at(-1)).text}.`); break;
+      save(); note(`New savings goal ${r.name} ${inr(r.target)} by ${mShort(r.by)}`);
+      say(`New savings goal: ${r.name}, ${inr(r.target)} by ${mShort(r.by)}. ${forecast(state.goals.at(-1)).text}.`); break;
     case 'contribute': {
       r.goal.saved += r.amount;
       state.txs.push({id:uid(), date:iso(todayIST()), type:'saving', amount:r.amount, description:`${r.goal.name} top-up`, category:r.goal.name, recId:recId||null, source:opts.source, at:Date.now()});
       save(); note(`${inr(r.amount)} → ${r.goal.name}`);
       const left = r.goal.target - r.goal.saved;
-      say(`${inr(r.amount)} added to ${r.goal.name}. ${left > 0 ? inr(left) + ' to go.' : 'Milestone reached! 🎉'}`); break;
+      say(`${inr(r.amount)} added to ${r.goal.name}. ${left > 0 ? inr(left) + ' to go.' : 'Goal reached! 🎉'}`); break;
     }
     case 'mood': {
       const pool = [...state.txs].filter(x => x.type === 'expense' && CATS[x.category]?.kind === 'life').sort((a,b) => b.at - a.at);
       const t = pool.find(x => x.mood == null) || pool[0];
-      if (!t){ say('No lifestyle spends to rate yet.'); break; }
+      if (!t){ say('No wants to rate yet.'); break; }
       t.mood = r.value; save(); note(`${t.description}: ${r.value ? 'happy' : 'regret'}`);
       say(r.value ? `Noted — ${t.description} was worth it.` : `Noted — you regret ${t.description}. I'll remind you in your monthly read-out.`); break;
     }
@@ -1517,7 +1538,7 @@ function handleCommand(text, recId, opts = {}){
     case 'whatifAct': whatIfAction(r.act, $('draft')); note('Before you buy: ' + r.act); setStatus({buy:'Logged it.', goal:'Saved as a goal.', skip:'Okay, not now.', move:'Moved budget and logged it.'}[r.act]); reply({buy:'Logged it.', goal:'Saved as a new goal.', skip:'Okay.', move:'Budget moved and purchase logged.'}[r.act]); break;
     case 'move': {
       const moved = moveBudget(r.from, r.to, r.amount);
-      if (!moved){ say(`${r.from} has no budget to move.`); note('Move failed: empty envelope'); break; }
+      if (!moved){ say(`${r.from} has no budget to move.`); note('Move failed: empty budget'); break; }
       const F = figures(monthKey(todayIST()));
       note(`Moved ${inr(moved)} ${r.from} → ${r.to}`);
       say(`Moved ${inr(moved)} from ${r.from} to ${r.to}. ${r.to} now has ${inr((F.plan[r.to] || 0) - (F.byCat[r.to] || 0))} left; ${r.from} has ${inr(Math.max(0, (F.plan[r.from] || 0) - (F.byCat[r.from] || 0)))}.`);
@@ -1783,7 +1804,7 @@ $('goSample').onclick = () => { loadSample(); enterApp(); };
 
 const setupRec = Recorder({button:$('setupMic'), wordsEl:$('setupWords'), waveEl:$('setupWave'), onStatus:s => $('setupStatus').textContent = s, onLive:on => showNotes('setupVisual', on ? 'listening' : null), onText:t => renderChecks(setupCoverage(parseSetup(t)))});
 function renderChecks(c){
-  $('setupChecks').innerHTML = [['income','Take-home pay'],['must','Must-pay bills'],['life','Lifestyle spends'],['goal','A savings target']]
+  $('setupChecks').innerHTML = [['income','Take-home pay'],['must','Needs (bills)'],['life','Wants (lifestyle)'],['goal','A savings target']]
     .map(([k,l]) => `<div class="check ${c[k] ? 'got' : ''}">${l}</div>`).join('');
 }
 let setupNoteId = null;
@@ -1850,15 +1871,15 @@ function updatePlanBar(){
   const free = p.income - must - life, base = Math.max(p.income, must + life, 1);
   const pct = v => (Math.max(0, v) / base * 100).toFixed(1) + '%';
   $('pbSplit').innerHTML = `<i style="width:${pct(must)};background:var(--slate)"></i><i style="width:${pct(life)};background:var(--saffron)"></i><i style="width:${pct(free)};background:var(--teal)"></i>`;
-  $('pbLegend').innerHTML = `<span style="--c:var(--slate)">Must-pay ${inr(must)}</span><span style="--c:var(--saffron)">Lifestyle ${inr(life)}</span><span style="--c:var(--teal)">Free ${inr(Math.max(0, free))}</span>`;
+  $('pbLegend').innerHTML = `<span style="--c:var(--slate)">Needs ${inr(must)}</span><span style="--c:var(--saffron)">Wants ${inr(life)}</span><span style="--c:var(--teal)">Free ${inr(Math.max(0, free))}</span>`;
   $('pbFree').textContent = p.income ? `${inr(free)} free / month` : '';
   let v = '';
   if (!p.income) v = '<span class="muted">Add your take-home pay to see the split.</span>';
-  else if (free < 0) v = `<span style="color:var(--danger)">Your plan spends ${inr(-free)} more than you take home. Trim a lifestyle envelope.</span>`;
+  else if (free < 0) v = `<span style="color:var(--danger)">Your plan spends ${inr(-free)} more than you take home. Trim a wants budget.</span>`;
   else if (p.goal){
     const left = Math.max(1, monthsBetween(monthKey(todayIST()), p.goal.by)), need = Math.max(0, Math.ceil((p.goal.target - p.goal.saved) / left / 100) * 100);
     v = need <= free ? `<span class="ok">✓ ${esc(p.goal.name)} needs ${inr(need)}/month for ${left} months — your plan covers it with ${inr(free - need)} to spare.</span>`
-                     : `<span class="short">${esc(p.goal.name)} needs ${inr(need)}/month; your plan frees ${inr(free)}. Push the date out or trim lifestyle by ${inr(need - free)}.</span>`;
+                     : `<span class="short">${esc(p.goal.name)} needs ${inr(need)}/month; your plan frees ${inr(free)}. Push the date out or trim wants by ${inr(need - free)}.</span>`;
   } else v = `<span class="ok">${inr(free)} a month is free for savings. Add a target to put it to work.</span>`;
   $('pbVerdict').innerHTML = v;
 }
@@ -1964,15 +1985,15 @@ function renderPulse(){
         <div class="mid"><b class="${F.free < 0 ? 'short' : ''}">${inr(F.free)}</b><small>${F.free < 0 ? 'over income' : 'unassigned'}</small></div></div>
       <div class="stats">
         <div class="stat" style="--c:transparent"><span>Coming in${F.salaryPending ? ' (expected)' : ''}</span><b>${inr(F.income)}</b></div>
-        <div class="stat" style="--c:var(--slate)"><span>Must-pay</span><b>${inr(F.must)}</b></div>
-        <div class="stat" style="--c:var(--saffron)"><span>Lifestyle</span><b>${inr(F.life)}</b></div>
-        <div class="stat" style="--c:var(--teal)"><span>To milestones</span><b>${inr(F.saved)}</b></div>
+        <div class="stat" style="--c:var(--slate)"><span>Needs</span><b>${inr(F.must)}</b></div>
+        <div class="stat" style="--c:var(--saffron)"><span>Wants</span><b>${inr(F.life)}</b></div>
+        <div class="stat" style="--c:var(--teal)"><span>To savings goals</span><b>${inr(F.saved)}</b></div>
         ${F.extra ? `<div class="stat" style="--c:transparent"><span>incl. extra income</span><b class="in">+${inr(F.extra)}</b></div>` : ''}
       </div>
     </div>
     ${F.isNow && F.income ? `<div class="forecast"><span class="muted">Month-end forecast<br><b class="${F.forecastEnd < 0 ? 'short' : 'ok'}">${inr(F.forecastEnd)}</b> ${F.forecastEnd < 0 ? 'short' : 'left'} after bills, goals and your usual pace</span>
       <span class="pace ${F.pace > 1.1 ? 't-over' : F.pace > 0.95 ? 't-watch' : 't-ok'}">${F.pace > 1.1 ? `Spending ${F.pace.toFixed(1)}× faster than the month` : F.pace > 0.95 ? 'On pace with the month' : 'Slower than the month 👍'}</span></div>` : ''}
-    ${F.isNow ? `<div class="safe"><span><small>Safe to spend today</small><b>${inr(F.safeToday)}</b></span><span style="text-align:right"><small>${F.daysLeft} day${F.daysLeft === 1 ? '' : 's'} left · holding ${inr(F.unpaidMust)} for must-pays${F.goalDue ? ' and ' + inr(F.goalDue) + ' for milestones' : ''}</small></span></div>` : ''}
+    ${F.isNow ? `<div class="safe"><span><small>Safe to spend today</small><b>${inr(F.safeToday)}</b></span><span style="text-align:right"><small>${F.daysLeft} day${F.daysLeft === 1 ? '' : 's'} left · holding ${inr(F.unpaidMust)} for needs${F.goalDue ? ' and ' + inr(F.goalDue) + ' for savings goals' : ''}</small></span></div>` : ''}
     <div class="chips" style="margin-top:12px">${streak() ? `<span class="chip streak">🔥 ${streak()}-day voice streak</span>` : ''}<span class="chip">${F.txs.length} entries in ${mShort(state.month)}</span></div>`;
 
   const alerts = Object.entries(F.plan).map(([c,l]) => ({c, l, s:F.byCat[c]||0})).filter(x => x.s / x.l >= .75).sort((a,b) => b.s / b.l - a.s / a.l);
@@ -1988,7 +2009,7 @@ function renderPulse(){
     const f = forecast(g), pct = Math.min(100, g.saved / g.target * 100);
     return `<div class="card ms"><div class="row"><span class="ico">${g.icon}</span><div style="min-width:0"><div class="name">${esc(g.name)}</div><div class="muted" style="font-size:13px">${inr(g.saved)} of ${inr(g.target)} · by ${mShort(g.by)}</div></div></div>
       <div class="meter"><i style="width:${pct}%;background:var(--teal)"></i></div><div class="fc ${f.ok ? 'ok' : 'short'}">${esc(f.text)}</div></div>`;
-  }).join('') : '<div class="card ms empty">No milestones yet. Say “new goal Goa trip 60,000 by December”.</div>';
+  }).join('') : '<div class="card ms empty">No savings goals yet. Say “new goal Goa trip 60,000 by December”.</div>';
 
   const R = recurring();
   const active = R.filter(x => state.recurDecisions[x.key] !== 'ignore');
@@ -2009,7 +2030,7 @@ function renderPulse(){
   $('latest').innerHTML = latest.length ? latest.map(t => itemRow(t, false)).join('') : '<li class="empty">Nothing yet. Tap Speak and say “four fifty at Swiggy”.</li>';
   bind();
 }
-const FILTERS = [['all','Everything'],['goal','Milestones'],['must','Must-pay'],['life','Lifestyle']];
+const FILTERS = [['all','Everything'],['goal','Savings goals'],['must','Needs'],['life','Wants']];
 function renderEnvelopes(){
   const F = figures();
   $('filters').innerHTML = FILTERS.map(([k,l]) => `<button data-f="${k}" aria-pressed="${state.filter === k}">${l}</button>`).join('');
@@ -2024,13 +2045,13 @@ function renderEnvelopes(){
   const show = list => list.filter(c => F.plan[c] || F.byCat[c]);
   const sumL = list => list.reduce((a,c) => a + (F.plan[c]||0), 0);
   const f = state.filter, parts = [];
-  if (f === 'all' || f === 'goal') parts.push(`<div class="h2row"><h2>Milestones</h2><small>${inr(state.goals.reduce((a,g) => a + g.saved, 0))} put aside</small></div>` +
+  if (f === 'all' || f === 'goal') parts.push(`<div class="h2row"><h2>Savings goals</h2><small>${inr(state.goals.reduce((a,g) => a + g.saved, 0))} put aside</small></div>` +
     (state.goals.length ? state.goals.map(g => { const fc = forecast(g), pct = Math.min(100, g.saved / g.target * 100);
       return `<div class="card"><div class="row"><span class="ico">${g.icon}</span><div style="flex:1;min-width:0"><b>${esc(g.name)}</b><div class="muted" style="font-size:13px">${inr(g.saved)} of ${inr(g.target)} · by ${mShort(g.by)}</div></div><b>${Math.round(pct)}%</b></div>
         <div class="meter"><i style="width:${pct}%;background:var(--teal)"></i></div><div class="fc ${fc.ok ? 'ok' : 'short'}" style="font-size:13px;font-weight:600">${esc(fc.text)}</div></div>`; }).join('')
-      : '<div class="card empty">No milestones yet.</div>'));
-  if (f === 'all' || f === 'must'){ const m = show(MUST); parts.push(`<div class="h2row"><h2>Must-pay</h2><small>${inr(F.must)} of ${inr(sumL(MUST))}</small></div><div class="egrid">${m.length ? m.map(tile).join('') : '<div class="card empty" style="grid-column:1/-1">No must-pay envelopes yet.</div>'}</div>`); }
-  if (f === 'all' || f === 'life'){ const l = show(LIFE); parts.push(`<div class="h2row"><h2>Lifestyle</h2><small>${inr(F.life)} of ${inr(sumL(LIFE))}</small></div><div class="egrid">${l.length ? l.map(tile).join('') : '<div class="card empty" style="grid-column:1/-1">No lifestyle envelopes yet.</div>'}</div>`); }
+      : '<div class="card empty">No savings goals yet.</div>'));
+  if (f === 'all' || f === 'must'){ const m = show(MUST); parts.push(`<div class="h2row"><h2>Needs</h2><small>${inr(F.must)} of ${inr(sumL(MUST))}</small></div><div class="egrid">${m.length ? m.map(tile).join('') : '<div class="card empty" style="grid-column:1/-1">No needs budgets yet.</div>'}</div>`); }
+  if (f === 'all' || f === 'life'){ const l = show(LIFE); parts.push(`<div class="h2row"><h2>Wants</h2><small>${inr(F.life)} of ${inr(sumL(LIFE))}</small></div><div class="egrid">${l.length ? l.map(tile).join('') : '<div class="card empty" style="grid-column:1/-1">No wants budgets yet.</div>'}</div>`); }
   $('envBody').innerHTML = parts.join('');
 }
 /* Move money between envelopes (secondary to voice) */
@@ -2047,7 +2068,7 @@ $('moveClose').onclick = () => $('moveForm').classList.add('hide');
 $('moveForm').onsubmit = e => {
   e.preventDefault();
   const from = $('mvFrom').value, to = $('mvTo').value, amt = parseFloat($('mvAmt').value);
-  if (from === to || !(amt > 0)){ toast('Pick two different envelopes and an amount'); return; }
+  if (from === to || !(amt > 0)){ toast('Pick two different budgets and an amount'); return; }
   const moved = moveBudget(from, to, amt);
   toast(moved ? `Moved ${inr(moved)} from ${from} to ${to}` : `${from} has no budget to move`);
   $('moveForm').reset(); $('moveForm').classList.add('hide'); render();
@@ -2076,14 +2097,14 @@ $('newEnv').onsubmit = e => {
 };
 function itemRow(t, full){
   const icon = t.type === 'saving' ? (state.goals.find(g => g.name === t.category)?.icon || '🎯') : (CATS[t.category]?.icon || '🧾');
-  const kind = t.type === 'income' ? 'In' : t.type === 'saving' ? 'Milestone' : CATS[t.category]?.kind === 'must' ? 'Must-pay' : 'Lifestyle';
+  const kind = t.type === 'income' ? 'In' : t.type === 'saving' ? 'Savings goal' : CATS[t.category]?.kind === 'must' ? 'Need' : 'Want';
   const clip = t.recId && (memAudio.has(t.recId) || state.recs.find(r => r.id === t.recId)?.hasAudio);
   const base = {sample:'sample', typed:'typed', demo:'demo', bank:'bank alert', statement:'statement'}[t.source] || 'voice';
   const src = t.via || t.acct ? `${base} · ${t.via && !/^(bank)$/.test(t.via) ? t.via : ''}${t.acct ? ' ··' + t.acct : ''}`.replace(/ · $/, '') : base;
-  const ask = full && kind === 'Lifestyle' && t.mood == null;
+  const ask = full && kind === 'Want' && t.mood == null;
   const editing = full && state.editing === t.id;
   const pool = t.type === 'income' ? INCOME : SPEND;
-  const editor = editing ? `<div class="edit"><select id="edCat" aria-label="Envelope">${t.type === 'saving' ? `<option>${esc(t.category)}</option>` : pool.map(c => `<option ${c === t.category ? 'selected' : ''}>${c}</option>`).join('')}</select>
+  const editor = editing ? `<div class="edit"><select id="edCat" aria-label="Budget">${t.type === 'saving' ? `<option>${esc(t.category)}</option>` : pool.map(c => `<option ${c === t.category ? 'selected' : ''}>${c}</option>`).join('')}</select>
       <input type="number" id="edAmt" value="${t.amount}" min="0" step="any" aria-label="Amount">
       <div class="row"><button class="btn primary" data-edsave="${t.id}">Save</button><button class="btn danger" data-eddel="${t.id}">Delete</button><button class="btn" data-edcancel="1">Cancel</button></div></div>` : '';
   return `<li><span class="ico">${icon}</span><span class="t"><b>${esc(t.description)}</b><small>${esc(t.category)} · ${full ? src : dayLabel(t.date)}${t.mood === true ? ' · 😊' : t.mood === false ? ' · 😕' : ''}</small>${clip ? `<button class="playb" data-play="${t.recId}" aria-label="Play the original voice note">▶</button>` : ''}
@@ -2097,7 +2118,7 @@ function renderTimeline(){
   const f = state.tlf, all = figures().txs;
   document.querySelectorAll('[data-tt]').forEach(b => b.setAttribute('aria-pressed', b.getAttribute('data-tt') === f.type));
   const cats = [...new Set(all.map(t => t.category))].sort();
-  $('tlCat').innerHTML = `<option value="">All envelopes</option>` + cats.map(c => `<option ${c === f.cat ? 'selected' : ''}>${esc(c)}</option>`).join('');
+  $('tlCat').innerHTML = `<option value="">All budgets</option>` + cats.map(c => `<option ${c === f.cat ? 'selected' : ''}>${esc(c)}</option>`).join('');
   const q = f.q.toLowerCase();
   const txs = all.filter(t => (f.type === 'all' || t.type === f.type) && (!f.cat || t.category === f.cat) && (!q || (t.description + ' ' + t.category).toLowerCase().includes(q)))
                  .sort((a,b) => b.date.localeCompare(a.date) || b.at - a.at);
@@ -2110,6 +2131,7 @@ function renderTimeline(){
   bind();
 }
 function renderMe(){
+  renderAccount();
   const p = state.profile;
   $('meAvatar').textContent = (p.name || '?').charAt(0).toUpperCase(); $('meName').textContent = p.name;
   $('meSince').textContent = 'Planning since ' + mLong(p.since); $('meIncome').textContent = 'Take-home ' + inr(p.income) + ' a month';
@@ -2124,7 +2146,7 @@ function renderMe(){
     const F = figures(k), kept = F.income ? Math.round((F.income - F.spent) / F.income * 100) : null;
     const over = Object.entries(F.plan).filter(([c,l]) => (F.byCat[c]||0) > l).length;
     return `<button data-month="${k}"><b>${mLong(k)}</b><span class="kept ${kept !== null && kept < 20 ? 'short' : 'ok'}">${kept === null ? '—' : kept + '% kept'}</span>
-      <small>In ${inr(F.income)} · out ${inr(F.spent)} · to milestones ${inr(F.saved)}</small><small>${over ? over + ' envelope' + (over > 1 ? 's' : '') + ' overdrawn' : 'All envelopes within limit'}</small></button>`;
+      <small>In ${inr(F.income)} · out ${inr(F.spent)} · to savings goals ${inr(F.saved)}</small><small>${over ? over + ' budget' + (over > 1 ? 's' : '') + ' overdrawn' : 'All budgets within limit'}</small></button>`;
   }).join('') : '<div class="card empty">Your months appear here once you log something.</div>';
   document.querySelectorAll('[data-month]').forEach(b => b.onclick = () => { state.month = b.getAttribute('data-month'); tab('pulse'); });
   const list = [...state.recs].sort((a,b) => b.at - a.at);
@@ -2158,7 +2180,7 @@ function bind(){
     if (!b.dataset.armed){ b.dataset.armed = '1'; b.textContent = 'Tap to delete'; return; }
     const t = state.txs.find(x => x.id === b.getAttribute('data-eddel')); if (!t) return;
     if (t.type === 'saving'){ const g = state.goals.find(g => g.name === t.category); if (g) g.saved -= t.amount; }
-    state.txs = state.txs.filter(x => x !== t); state.editing = null; save(); toast('Entry deleted'); render();
+    state.txs = state.txs.filter(x => x !== t); forget(t.id); state.editing = null; save(); toast('Entry deleted'); render();
   });
   document.querySelectorAll('[data-mood]').forEach(b => b.onclick = () => { const [id, v] = b.getAttribute('data-mood').split(':'); const t = state.txs.find(x => x.id === id); if (t){ t.mood = v === '1'; save(); render(); } });
 }
@@ -2192,7 +2214,7 @@ function twoTap(btn, ask, action){
 twoTap($('sampleBtn'), 'Tap to replace', async () => { await clearAudio(); loadSample(); enterApp(); toast('Sample data loaded'); });
 twoTap($('wipeBtn'), 'Tap to wipe', () => wipe());
 $('exportBtn').onclick = () => {
-  const rows = [['recorded_at_ist','source','seconds','transcript','corrected','result','date','type','amount_inr','envelope','description']];
+  const rows = [['recorded_at_ist','source','seconds','transcript','corrected','result','date','type','amount_inr','budget','description']];
   for (const r of [...state.recs].sort((a,b) => a.at - b.at)){
     const t = state.txs.find(x => x.recId === r.id);
     rows.push([fmtTime(r.at), r.source, r.durationMs ? (r.durationMs / 1000).toFixed(1) : '', r.transcript, r.edited ? 'yes' : '', r.outcome, t?.date||'', t?.type||'', t?.amount||'', t?.category||'', t?.description||'']);
@@ -2287,15 +2309,15 @@ $('demoStop').onclick = () => { demoAbort = true; try { speechSynthesis.cancel()
 const TOUR = [
   {title:'Welcome to BudgetSense', body:'You run your money here by talking. I will walk you through each screen using sample figures for a person called Asha. Nothing you see now is saved. Tap Next when you are ready.'},
   {tab:'pulse', target:'#speakBtn', title:'One button does most of the work', body:'Tap Speak a money note, say what happened, then tap again to stop. Say amounts the way you normally would, like four fifty or one point five lakh.', say:'Four fifty at Swiggy'},
-  {tab:'pulse', sheet:true, target:'#draft', title:'Check what I heard', body:'I show the amount and the envelope I picked. Say yes to save it, no to drop it, or name another envelope. If I mishear, tap Fix what I heard. You can also type instead.', say:'Yes  ·  Make it coffee'},
-  {tab:'pulse', target:'#pulseCard', title:'Your month at a glance', body:'The ring splits your income into must-pay bills, lifestyle spends and money sent to milestones. Safe to spend today tells you how much you can use each day and still cover your bills and savings.', say:'Safe to spend today?'},
-  {tab:'pulse', target:'#buyCard', title:'Before you buy', body:'Thinking of a big purchase? Ask first. I show how your month ends, which envelope it hits and whether any goal slips, then tell you to go ahead, move budget, wait for salary, or save for it.', say:'Should I buy a 45,000 phone?'},
+  {tab:'pulse', sheet:true, target:'#draft', title:'Check what I heard', body:'I show the amount and the budget I picked. Say yes to save it, no to drop it, or name another budget. If I mishear, tap Fix what I heard. You can also type instead.', say:'Yes  ·  Make it coffee'},
+  {tab:'pulse', target:'#pulseCard', title:'Your month at a glance', body:'The ring splits your income into needs (bills), wants (lifestyle spends) and money sent to savings goals. Safe to spend today tells you how much you can use each day and still cover your bills and savings.', say:'Safe to spend today?'},
+  {tab:'pulse', target:'#buyCard', title:'Before you buy', body:'Thinking of a big purchase? Ask first. I show how your month ends, which budget it hits and whether any goal slips, then tell you to go ahead, move budget, wait for salary, or save for it.', say:'Should I buy a 45,000 phone?'},
   {tab:'pulse', target:'#readout', title:'Your month, explained', body:'This read-out summarises the month and gives one next step. Tap Listen, or say explain my month, and I will read it out.', say:'Explain my month'},
-  {tab:'pulse', target:'#milestones', title:'Milestones', body:'Milestones are what you are saving for. Each one shows whether you will get there on time at your current pace, and how much to add if not.', say:'New goal laptop 80,000 by March  ·  Put 5,000 in laptop'},
-  {tab:'pulse', target:'#askChips', title:'Ask me anything', body:'Ask about your money in plain words: what is left in an envelope, what you spent on something, or whether you can afford a purchase.', say:'Can I afford 3,000 shoes?'},
-  {tab:'envelopes', target:'#envBody', title:'Envelopes', body:'Each envelope is a monthly limit. Green is comfortable, amber means watch it, red means overdrawn. I warn you out loud at 75 percent and when you go over. Use the filters on top, Move to shift money from one envelope to another, or New to add one.', say:'Move 2,000 from shopping to eating out  ·  Groceries limit 8,000'},
-  {tab:'timeline', target:'#timeline', title:'Timeline', body:'Every entry, day by day. Tap the play button to hear the original voice note. For lifestyle spends, tell me whether you would buy it again, and I will learn from your regrets.', say:'Undo  ·  Move last to shopping  ·  Regret it'},
-  {tab:'me', target:'#history', title:'Your months are kept', body:'Everything you record is saved on this device: your plan, limits, milestones, entries and voice notes. Each month keeps its own limits, so this history shows how every month went. Me also holds the full voice diary, settings and a spreadsheet export.'},
+  {tab:'pulse', target:'#milestones', title:'Savings goals', body:'Savings goals are what you are saving for. Each one shows whether you will get there on time at your current pace, and how much to add if not.', say:'New goal laptop 80,000 by March  ·  Put 5,000 in laptop'},
+  {tab:'pulse', target:'#askChips', title:'Ask me anything', body:'Ask about your money in plain words: what is left in a budget, what you spent on something, or whether you can afford a purchase.', say:'Can I afford 3,000 shoes?'},
+  {tab:'envelopes', target:'#envBody', title:'Budgets', body:'Each budget is a monthly limit. Green is comfortable, amber means watch it, red means overdrawn. I warn you out loud at 75 percent and when you go over. Use the filters on top, Move to shift money from one budget to another, or New to add one.', say:'Move 2,000 from shopping to eating out  ·  Groceries limit 8,000'},
+  {tab:'timeline', target:'#timeline', title:'Spending log', body:'Every entry, day by day. Tap the play button to hear the original voice note. For wants, tell me whether you would buy it again, and I will learn from your regrets.', say:'Undo  ·  Move last to shopping  ·  Regret it'},
+  {tab:'me', target:'#history', title:'Your months are kept', body:'Everything you record is saved on this device: your plan, limits, savings goals, entries and voice notes. Each month keeps its own limits, so this history shows how every month went. Me also holds the full voice diary, settings and a spreadsheet export.'},
   {end:true, title:'Ready to set up your own plan?', body:'The quickest way is one voice note of about a minute: your take-home pay, bills, what you enjoy spending on, and one thing you are saving for.'},
 ];
 let tourI = 0, tourBackup = undefined, tourVoice = true, tourSheet = false;
@@ -2324,7 +2346,7 @@ async function showStep(){
   if (st.tab && state.tab !== st.tab) tab(st.tab);
   if (st.sheet){
     tourSheet = true; $('scrim').classList.remove('hide'); $('typeForm').classList.add('hide');
-    $('sheetTitle').textContent = 'Heard you'; $('words').textContent = 'Four fifty at Swiggy'; setStatus('Draft: ₹450 in Eating out. Say “yes”, or name another envelope.');
+    $('sheetTitle').textContent = 'Heard you'; $('words').textContent = 'Four fifty at Swiggy'; setStatus('Draft: ₹450 in Eating out. Say “yes”, or name another budget.');
     state.pending = {type:'expense', amount:450, description:'Swiggy', category:'Eating out', confidence:'high', date:iso(todayIST())}; renderDraft();
   }
   $('tStep').textContent = st.end ? 'All done' : `Step ${tourI + 1} of ${TOUR.length - 1}`;
@@ -2367,11 +2389,300 @@ addEventListener('resize', () => { if (!$('tour').classList.contains('hide')) sh
 document.addEventListener('keydown', e => { if ($('tour').classList.contains('hide')) return; if (e.key === 'Escape') endTour(); if (e.key === 'ArrowRight') $('tNext').click(); if (e.key === 'ArrowLeft') $('tBack').click(); });
 
 /* =====================================================================
+   Account: Supabase sign-in, sync between devices, and automatic capture
+   of bank SMS and emails. Plain REST calls; the tables and functions
+   come from supabase/setup.sql.
+   ===================================================================== */
+// Fill in once the project is fixed, so other people skip the connection step. Both values are public by design.
+const SB_DEFAULT = {url:'', key:''};
+const CL = 'budgetsense.cloud';
+let cloud = {};
+try { cloud = JSON.parse(localStorage.getItem(CL) || '{}') || {}; } catch(e){}
+if (!cloud.url && SB_DEFAULT.url) Object.assign(cloud, SB_DEFAULT);
+function saveCloud(){ try { localStorage.setItem(CL, JSON.stringify(cloud)); } catch(e){} }
+const hasProject = () => !!(cloud.url && cloud.key);
+const signedIn = () => hasProject() && !!cloud.session;
+const sbBase = () => cloud.url.trim().replace(/\/+$/, '');
+async function sbFetch(path, {method = 'GET', body, headers = {}, user = true} = {}){
+  const h = Object.assign({apikey: cloud.key, 'Content-Type': 'application/json'}, headers);
+  if (user && cloud.session) h.Authorization = 'Bearer ' + await accessToken();
+  let r;
+  try { r = await fetch(sbBase() + path, {method, headers: h, body: body === undefined ? undefined : JSON.stringify(body)}); }
+  catch(e){ throw new Error('Could not reach Supabase. Check the project address and your connection.'); }
+  const t = await r.text(); let j = null; try { j = t ? JSON.parse(t) : null; } catch(e){ j = t; }
+  if (!r.ok){ const e = new Error((j && (j.msg || j.message || j.error_description || j.error)) || 'Supabase said ' + r.status); e.status = r.status; throw e; }
+  return j;
+}
+function setSession(j, email){
+  const old = cloud.session || {};
+  cloud.session = {access_token: j.access_token, refresh_token: j.refresh_token,
+    expires_at: +j.expires_at || Math.floor(Date.now() / 1000) + (+j.expires_in || 3600),
+    email: (j.user && j.user.email) || email || old.email || '', uid: (j.user && j.user.id) || old.uid || ''};
+  saveCloud();
+}
+async function accessToken(){
+  const s = cloud.session;
+  if (s.expires_at * 1000 - Date.now() > 60e3) return s.access_token;
+  try { setSession(await sbFetch('/auth/v1/token?grant_type=refresh_token', {method: 'POST', body: {refresh_token: s.refresh_token}, user: false})); }
+  catch(e){
+    if (e.status >= 400 && e.status < 500){ cloud.session = null; saveCloud(); renderAccount(); throw new Error('Your sign-in has expired. Sign in again.'); }
+    throw e;
+  }
+  return cloud.session.access_token;
+}
+async function sendLink(email){
+  const back = location.origin + location.pathname;
+  await sbFetch('/auth/v1/otp?redirect_to=' + encodeURIComponent(back), {method: 'POST', body: {email, create_user: true}, user: false});
+  cloud.pendingEmail = email; saveCloud();
+}
+async function verifyCode(code){
+  setSession(await sbFetch('/auth/v1/verify', {method: 'POST', body: {type: 'email', email: cloud.pendingEmail, token: code}, user: false}), cloud.pendingEmail);
+  await afterSignIn();
+}
+// The emailed link returns here with the session in the address (#access_token=…).
+async function readAuthHash(){
+  if (!/(access_token|error_description)=/.test(location.hash)) return;
+  const q = new URLSearchParams(location.hash.slice(1));
+  history.replaceState(null, '', location.pathname + location.search);
+  if (q.get('error_description')){ toast(q.get('error_description')); return; }
+  if (!hasProject()){ toast('This browser has no Supabase details yet. Enter them, then use the 6-digit code.'); return; }
+  setSession({access_token: q.get('access_token'), refresh_token: q.get('refresh_token'), expires_at: q.get('expires_at'), expires_in: q.get('expires_in')});
+  try { const u = await sbFetch('/auth/v1/user'); Object.assign(cloud.session, {email: u.email, uid: u.id}); saveCloud(); } catch(e){}
+  await afterSignIn();
+}
+async function afterSignIn(){
+  delete cloud.pendingEmail; saveCloud();
+  toast('Signed in as ' + cloud.session.email); renderAccount();
+  await syncNow();
+  try { if (!cloud.ingestKey) await ensureKey(); } catch(e){ cloud.syncErr = e.message; }
+  await pullInbox(); renderAccount();
+}
+function signOut(){
+  const s = cloud.session; cloud.session = null; delete cloud.ingestKey; delete cloud.syncedAt; saveCloud(); renderAccount();
+  if (s) fetch(sbBase() + '/auth/v1/logout', {method: 'POST', headers: {apikey: cloud.key, Authorization: 'Bearer ' + s.access_token}}).catch(() => {});
+  toast('Signed out. Your data stays on this device.');
+}
+async function ensureKey(fresh){ cloud.ingestKey = await sbFetch('/rest/v1/rpc/bs_my_key', {method: 'POST', body: {fresh: !!fresh}}); saveCloud(); }
+
+/* ---------- Sync: pull, merge, push. Entries are merged by id, so two devices never overwrite each other's entries. ---------- */
+function mergeData(mine, theirs, theirsNewer){
+  const [older, newer] = theirsNewer ? [mine, theirs] : [theirs, mine];
+  const gone = new Set([...(mine.deleted || []), ...(theirs.deleted || [])]);
+  const byKey = (a = [], b = [], k = 'id') => { const m = new Map(); [...a, ...b].forEach(x => m.set(x[k], Object.assign({}, m.get(x[k]), x))); return [...m.values()].filter(x => !gone.has(x[k])); };
+  const obj = key => Object.assign({}, older[key], newer[key]);
+  return Object.assign({}, older, newer, {
+    txs: byKey(older.txs, newer.txs), recs: byKey(older.recs, newer.recs), goals: byKey(older.goals, newer.goals, 'name'),
+    custom: obj('custom'), planByMonth: obj('planByMonth'), checkins: obj('checkins'), recurDecisions: obj('recurDecisions'), alarms: obj('alarms'),
+    deleted: [...gone].slice(-2000), savedAt: Math.max(mine.savedAt || 0, theirs.savedAt || 0)});
+}
+function adopt(data){
+  const wasIn = !!state.profile;
+  applyData(data); persist();
+  if (state.profile && !wasIn){ closeSheet(); enterApp(); } else if (state.profile) render();
+}
+const tourOn = () => !$('tour').classList.contains('hide');
+let pushT = null, syncing = null;
+function schedulePush(){
+  if (!signedIn() || state.sample || !state.profile || tourOn()) return;
+  clearTimeout(pushT); pushT = setTimeout(() => syncNow(), 1500);
+}
+async function syncNow(){
+  if (!signedIn() || tourOn()) return;
+  if (syncing) return syncing;
+  syncing = (async () => {
+    try {
+      const rows = await sbFetch('/rest/v1/bs_state?select=data,updated_at');
+      const remote = rows && rows[0];
+      const mineReal = !!state.profile && !state.sample;
+      if (remote && remote.data && remote.data.profile){
+        adopt(mineReal ? mergeData(snapshot(), remote.data, Date.parse(remote.updated_at) > (state.savedAt || 0)) : remote.data);
+      }
+      if (state.profile && !state.sample){
+        const at = new Date().toISOString();
+        await sbFetch('/rest/v1/bs_state', {method: 'POST', headers: {Prefer: 'resolution=merge-duplicates,return=minimal'},
+          body: Object.assign({data: snapshot(), updated_at: at}, cloud.session.uid ? {user_id: cloud.session.uid} : {})});
+        cloud.syncedAt = at;
+      } else if (remote) cloud.syncedAt = remote.updated_at;
+      cloud.syncErr = '';
+    } catch(e){ cloud.syncErr = e.message; }
+    saveCloud(); syncing = null; renderAccountStatus();
+  })();
+  return syncing;
+}
+
+/* ---------- Automatic capture: bank SMS (phone) and emails (Gmail) arrive in the inbox table ---------- */
+function isTestMessage(raw){ return /^budgetsense test\b/i.test(raw.trim()); }
+let pulling = null;
+function pullInbox(){
+  if (!signedIn() || !state.profile || state.sample || tourOn()) return Promise.resolve();
+  return pulling || (pulling = readInbox().finally(() => { pulling = null; }));
+}
+async function readInbox(){
+  let rows;
+  try { rows = await sbFetch('/rest/v1/bs_inbox?select=id,raw,channel,received_at&order=received_at.asc&limit=200'); }
+  catch(e){ cloud.syncErr = e.message; saveCloud(); renderAccountStatus(); return; }
+  if (!rows || !rows.length) return;
+  const k = monthKey(todayIST()), before = figures(k).spent;
+  let n = 0, tests = 0; const names = [];
+  for (const r of rows){
+    if (isTestMessage(r.raw)){ tests++; continue; }
+    const recvAt = Date.parse(r.received_at) || Date.now();
+    for (const piece of splitAlerts(r.raw)){
+      const a = parseAlert(piece); if (!a) continue;
+      Object.assign(a, {recvAt, channel: r.channel});
+      if (isDuplicate(a)) continue;
+      state.txs.push({id: uid(), date: a.date, amount: a.amount, type: a.type, description: a.description, category: a.category, source: 'bank',
+        ref: a.ref, acct: a.acct, via: a.via, autopay: a.autopay, channel: r.channel, recvAt, at: Date.now() + n});
+      n++; names.push(a.description);
+    }
+  }
+  const label = rows.some(r => r.channel === 'email') && rows.some(r => r.channel === 'sms') ? 'bank SMS and emails' : rows[0].channel === 'email' ? 'bank emails' : 'bank SMS';
+  if (rows.length > tests) cloud.lastCapture = {at: Date.now(), n, seen: rows.length - tests, label};
+  if (tests) cloud.testOK = Date.now();
+  saveCloud();
+  if (n){
+    state.recs.push({id: uid(), at: Date.now(), durationMs: 0, transcript: `Captured ${rows.length - tests} message${rows.length - tests === 1 ? '' : 's'} from ${label}`, source: 'import', hasAudio: false, outcome: `Added ${n}: ${names.slice(0, 4).join(', ')}${names.length > 4 ? '…' : ''}`});
+    state.lastImport = {at: Date.now(), label: label + ' (automatic)', n};
+    save(); spendAlarm(k, before);
+    toast(`Added ${n} payment${n === 1 ? '' : 's'} from your ${label}`); render();
+  } else if (tests) toast('Test message received. Automatic capture is working.');
+  // Messages are deleted once read, so no SMS or email text stays in the database.
+  try { await sbFetch('/rest/v1/bs_inbox?id=in.(' + rows.map(r => r.id).join(',') + ')', {method: 'DELETE', headers: {Prefer: 'return=minimal'}}); } catch(e){}
+  renderAccount();
+}
+async function sendTest(){
+  await sbFetch('/rest/v1/rpc/bs_add', {method: 'POST', user: false, body: {raw: 'BudgetSense test: Rs.1.00 debited from A/c XX0000', key: cloud.ingestKey, channel: 'email'}});
+  await pullInbox();
+}
+function gmailScript(){
+  return `// BudgetSense: sends new bank alert emails from this Gmail to BudgetSense every 10 minutes.
+// Set up once: script.google.com → New project → delete what is there → paste this → Save (disk icon).
+// Then choose "start" in the function list at the top → Run → allow access when Google asks.
+const BS_URL = ${JSON.stringify(sbBase())};
+const BS_APIKEY = ${JSON.stringify(cloud.key)};
+const BS_KEY = ${JSON.stringify(cloud.ingestKey || '')};
+// Bank alerts only: subjects about debits, credits and transactions; OTPs, offers and statements are skipped.
+const SEARCH = 'newer_than:2d subject:(debited OR credited OR debit OR credit OR transaction OR txn OR spent OR UPI OR alert OR payment) -subject:(OTP OR offer OR offers OR statement OR reward OR cashback)';
+
+function start(){
+  ScriptApp.getProjectTriggers().forEach(t => ScriptApp.deleteTrigger(t));
+  ScriptApp.newTrigger('sendNew').timeBased().everyMinutes(10).create();
+  PropertiesService.getScriptProperties().setProperty('since', String(Date.now() - 24 * 3600 * 1000));
+  sendNew();
+}
+function sendNew(){
+  const props = PropertiesService.getScriptProperties();
+  const since = Number(props.getProperty('since') || Date.now() - 24 * 3600 * 1000);
+  const messages = [];
+  GmailApp.search(SEARCH, 0, 50).forEach(th => th.getMessages().forEach(m => { if (m.getDate().getTime() > since) messages.push(m); }));
+  messages.sort((a, b) => a.getDate() - b.getDate()).forEach(m => {
+    const text = (m.getSubject() + '. ' + m.getPlainBody()).replace(/\\s+/g, ' ').slice(0, 700);
+    const r = UrlFetchApp.fetch(BS_URL + '/rest/v1/rpc/bs_add', {method: 'post', contentType: 'application/json', muteHttpExceptions: true,
+      headers: {apikey: BS_APIKEY}, payload: JSON.stringify({raw: text, key: BS_KEY, channel: 'email'})});
+    if (r.getResponseCode() >= 300) throw new Error('BudgetSense said ' + r.getResponseCode() + ': ' + r.getContentText());
+    props.setProperty('since', String(m.getDate().getTime()));
+  });
+}
+`;
+}
+async function copyText(text, what){
+  try { await navigator.clipboard.writeText(text); toast(what + ' copied'); }
+  catch(e){ const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); toast(what + ' copied'); } catch(x){ toast('Copy failed: select and copy it by hand'); } ta.remove(); }
+}
+function ago(ms){ const m = Math.round((Date.now() - ms) / 60000); return m < 1 ? 'just now' : m < 60 ? m + ' min ago' : m < 1440 ? Math.round(m / 60) + ' h ago' : fmtTime(ms) + ' IST'; }
+function renderAccountStatus(){
+  document.querySelectorAll('[data-acct-status]').forEach(el => {
+    el.textContent = cloud.syncErr ? '⚠ ' + cloud.syncErr : cloud.syncedAt ? 'Synced ' + ago(Date.parse(cloud.syncedAt)) : 'Not synced yet';
+    el.classList.toggle('bad', !!cloud.syncErr);
+  });
+}
+let acctOpenStep = '';
+function accountHTML(){
+  if (!hasProject() || acctOpenStep === 'project') return `<b>🔐 Sign in and sync</b>
+    <small class="muted" style="display:block;margin:2px 0 10px">One-time: paste your Supabase project address and publishable (anon) key. Supabase → Project Settings → API.</small>
+    <input type="url" data-acct="url" placeholder="https://yourproject.supabase.co" value="${esc(cloud.url || '')}" aria-label="Supabase project address" autocomplete="off">
+    <input type="text" data-acct="key" placeholder="Publishable or anon key" value="${esc(cloud.key || '')}" aria-label="Supabase publishable key" autocomplete="off" style="margin-top:8px">
+    <button type="button" class="btn primary block" data-acct-do="project" style="margin-top:10px">Save connection</button>`;
+  if (!cloud.session) return `<b>🔐 Sign in and sync</b>
+    <small class="muted" style="display:block;margin:2px 0 10px">Keeps your plan and entries safe in your own account, on every device, and switches on automatic capture of bank SMS and emails.</small>
+    ${cloud.pendingEmail ? `<p class="hint" style="margin:0 0 8px">We emailed a sign-in link to <b>${esc(cloud.pendingEmail)}</b>. Open it on this device, or type the 6-digit code from the email.</p>
+      <div class="row"><input type="text" inputmode="numeric" data-acct="code" placeholder="6-digit code" aria-label="Sign-in code" autocomplete="one-time-code"><button type="button" class="btn primary" data-acct-do="verify">Sign in</button></div>
+      <p style="margin:8px 0 0"><button type="button" class="textlink" data-acct-do="restart">Use a different email</button></p>`
+    : `<div class="row"><input type="email" data-acct="email" placeholder="you@example.com" aria-label="Email" autocomplete="email"><button type="button" class="btn primary" data-acct-do="send">Email me a link</button></div>`}
+    <p style="margin:8px 0 0"><button type="button" class="textlink" data-acct-do="editproject">Change Supabase connection</button></p>`;
+  const lc = cloud.lastCapture;
+  const key = cloud.ingestKey || '';
+  return `<div class="spread"><b>🔐 Signed in</b><button type="button" class="textlink" data-acct-do="signout">Sign out</button></div>
+    <small class="muted" style="display:block">${esc(cloud.session.email)} · <span data-acct-status></span></small>
+    <div class="row" style="margin-top:8px;flex-wrap:wrap"><button type="button" class="btn" data-acct-do="sync">↻ Sync now</button><button type="button" class="btn" data-acct-do="check">📥 Check for payments</button></div>
+    <h3 style="font-size:15px;margin:16px 0 4px">Automatic capture</h3>
+    <small class="muted" style="display:block">${lc ? `Last check ${ago(lc.at)}: ${lc.seen} message${lc.seen === 1 ? '' : 's'}, ${lc.n} payment${lc.n === 1 ? '' : 's'} added.` : 'Nothing captured yet.'}${cloud.testOK ? ' Test passed ✓' : ''} Messages are deleted from the server once read.</small>
+    ${key ? `<details class="howto"><summary>📱 Bank SMS on Android (MacroDroid)</summary><ol>
+        <li>Install <b>MacroDroid</b> from the Play Store and allow it to read SMS.</li>
+        <li>Add macro → Trigger <b>SMS Received</b> → any number → message <b>contains “debited”</b>. Add two more triggers for <b>“spent”</b> and <b>“credited”</b>.</li>
+        <li>Action <b>HTTP Request</b> → method <b>POST</b> → URL below → headers below → body type <b>text/plain</b> → body: insert the <b>SMS message</b> magic text.</li>
+        <li>Save, then send yourself a test SMS with the word “debited”, or tap Send a test below.</li></ol>
+        <div class="kv"><span>URL</span><code>${esc(sbBase())}/rest/v1/rpc/bs_ingest</code><button type="button" class="textlink" data-copy="url">Copy</button></div>
+        <div class="kv"><span>apikey</span><code>${esc(cloud.key.slice(0, 14))}…</code><button type="button" class="textlink" data-copy="apikey">Copy</button></div>
+        <div class="kv"><span>x-bs-key</span><code>${esc(key.slice(0, 8))}…</code><button type="button" class="textlink" data-copy="key">Copy</button></div>
+        <div class="kv"><span>x-bs-channel</span><code>sms</code></div></details>
+      <details class="howto"><summary>✉️ Bank emails from Gmail</summary><ol>
+        <li>Tap <b>Copy Gmail script</b>. It already holds your details.</li>
+        <li>Open <b>script.google.com</b> → New project → paste → Save.</li>
+        <li>Pick <b>start</b> at the top → Run → allow access. It then checks every 10 minutes for bank alert emails and sends only those.</li></ol>
+        <button type="button" class="btn primary block" data-copy="gmail">Copy Gmail script</button></details>
+      <div class="row" style="margin-top:10px;flex-wrap:wrap"><button type="button" class="btn" data-acct-do="test">Send a test</button><button type="button" class="textlink" data-acct-do="rekey">Replace capture key</button></div>
+      <small class="muted" style="display:block;margin-top:6px">The capture key only lets messages in; it cannot read anything. If it leaks, replace it and update MacroDroid and the Gmail script.</small>`
+    : `<button type="button" class="btn block" data-acct-do="getkey">Set up automatic capture</button>`}`;
+}
+function renderAccount(){
+  ['acctMe', 'acctWelcome'].forEach(id => { const box = $(id); if (box && !box.contains(document.activeElement) || box && document.activeElement.tagName === 'BUTTON') box.innerHTML = accountHTML(); });
+  renderAccountStatus();
+}
+async function accountAction(what, box){
+  const val = k => (box.querySelector(`[data-acct="${k}"]`) || {}).value || '';
+  const btn = box.querySelector(`[data-acct-do="${what}"]`); if (btn) btn.disabled = true;
+  try {
+    if (what === 'project'){
+      const url = val('url').trim(), key = val('key').trim();
+      if (!/^https:\/\/[^\s/]+/.test(url) || key.length < 20){ toast('Paste the https:// project address and the publishable key'); return; }
+      Object.assign(cloud, {url, key}); acctOpenStep = ''; saveCloud(); toast('Connection saved');
+    }
+    if (what === 'editproject'){ acctOpenStep = 'project'; }
+    if (what === 'send'){ const email = val('email').trim(); if (!/^\S+@\S+\.\S+$/.test(email)){ toast('Enter your email address'); return; } await sendLink(email); toast('Check your email'); }
+    if (what === 'verify'){ const code = val('code').replace(/\D/g, ''); if (code.length < 6){ toast('Enter the code from the email'); return; } await verifyCode(code); return; }
+    if (what === 'restart'){ delete cloud.pendingEmail; saveCloud(); }
+    if (what === 'signout') signOut();
+    if (what === 'sync'){ await syncNow(); toast(cloud.syncErr ? 'Sync failed' : 'Synced'); }
+    if (what === 'check'){ await pullInbox(); if (!cloud.syncErr) toast('Checked for new payments'); }
+    if (what === 'getkey' || what === 'rekey'){ await ensureKey(what === 'rekey'); toast(what === 'rekey' ? 'New capture key made. Update MacroDroid and the Gmail script.' : 'Automatic capture is ready to set up'); }
+    if (what === 'test'){ await sendTest(); }
+  } catch(e){ toast(e.message); cloud.syncErr = e.message; saveCloud(); }
+  finally { renderAccount(); }
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-acct-do], [data-copy]'); if (!b) return;
+  const box = b.closest('.acct'); if (!box) return;
+  if (b.dataset.copy){
+    const c = b.dataset.copy;
+    copyText(c === 'url' ? sbBase() + '/rest/v1/rpc/bs_ingest' : c === 'apikey' ? cloud.key : c === 'key' ? cloud.ingestKey : gmailScript(),
+      {url: 'URL', apikey: 'apikey', key: 'Capture key', gmail: 'Gmail script'}[c]);
+    return;
+  }
+  accountAction(b.dataset.acctDo, box);
+});
+$('goSignin').onclick = () => { $('acctWelcome').classList.toggle('hide'); renderAccount(); };
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible'){ syncNow(); pullInbox(); } });
+setInterval(() => { if (document.visibilityState === 'visible') pullInbox(); }, 60000);
+
+/* =====================================================================
    Boot
    ===================================================================== */
 load();
 if (state.profile) enterApp(); else { renderChecks({}); showSetup('welcome'); }
-if (location.hash === '#test') window.__bs = {handleCommand, state, uid, interpret, normalise, parseSetup, parseAmount, answer, figures, runDemo, save, parseAlert, splitAlerts, recurring, statementItems, parseCSV, narrationPayee, whatIf};
+renderAccount();
+readAuthHash().then(() => { if (signedIn()){ syncNow().then(pullInbox); } });
+if (location.hash === '#test') window.__bs = {mergeData, gmailScript, isDuplicate, handleCommand, state, uid, interpret, normalise, parseSetup, parseAmount, answer, figures, runDemo, save, parseAlert, splitAlerts, recurring, statementItems, parseCSV, narrationPayee, whatIf};
 })();
 </script>
 </body>
