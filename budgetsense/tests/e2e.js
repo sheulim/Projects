@@ -281,7 +281,7 @@ const FAKE_SR = () => {
 
   await test('Envelopes: filters and the ＋ New form', async () => {
     await page.click('[data-tab=envelopes]');
-    for (const [f, must] of [['goal', 'Milestones'], ['must', 'Must-pay'], ['life', 'Lifestyle']]){
+    for (const [f, must] of [['goal', 'Savings goals'], ['must', 'Needs'], ['life', 'Wants']]){
       await page.click(`[data-f=${f}]`);
       const h = await page.$$eval('#envBody h2', els => els.map(e => e.textContent));
       check(h.length === 1 && h[0] === must, `filter ${f} shows ${h}`);
