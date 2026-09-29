@@ -522,6 +522,8 @@ const FAKE_SR = () => {
     check(rows.some(r => /Cash withdrawal/.test(r)), 'CSV: ATM withdrawal not recognised');
     const n = (await st()).txs.length; await page.click('#importAdd'); await page.waitForTimeout(200);
     check((await st()).txs.length === n + 6 && (await st()).txs.at(-1).source === 'statement', 'CSV entries not added');
+    check(/Last import: statement/.test(await text('#lastImport')) && /6 added/.test(await text('#lastImport')), 'last-import note missing: ' + await text('#lastImport'));
+    check(/statement · UPI/.test(await text('#timeline')), 'entry source (statement · UPI) not shown');
     // Same statement again: everything is already logged.
     await page.click('#stmtOpen'); await page.setInputFiles('#stmtFile', path.join(dir, 'stmt.csv')); await page.waitForTimeout(400);
     check(/Add 0 new/.test(await text('#importAdd')), 'CSV re-import not deduplicated');
@@ -578,8 +580,21 @@ const FAKE_SR = () => {
 
   await test('Load sample data needs two taps', async () => {
     await page.click('[data-tab=me]'); await page.click('#sampleBtn'); await page.click('#sampleBtn'); await page.waitForTimeout(300);
+    check(/this month · \d+ days? left/.test(await text('#today')), 'header summary missing: ' + await text('#today'));
     check((await st()).sample && (await st()).txs.length === 23, 'sample data not loaded: ' + (await st()).txs.length);
     check(/Netflix/.test(await text('#recurWrap')) && /Linkedin|LinkedIn/.test(await text('#recurWrap')), 'sample automatic payments missing');
+  });
+
+  await test('Connect bank or UPI on sample data: 3 steps, fetching, then payments to add', async () => {
+    await page.click('[data-tab=timeline]'); await page.click('#connectOpen');
+    check(/Step 1 of 3/.test(await text('#connectBody')), 'step label missing');
+    await page.click('#connectBody [data-src="PhonePe"]'); check(/Step 2 of 3/.test(await text('#connectBody')), 'step 2 label missing');
+    await page.click('#cOk'); check(/Step 3 of 3 · Fetching/.test(await text('#connectBody')), 'fetching stage missing');
+    await page.waitForTimeout(1400);
+    check((await page.$$('#connectBody .found li')).length === 8, 'sample payments not listed after fetching');
+    const n = (await st()).txs.length; await page.click('#importAdd'); await page.waitForTimeout(200);
+    check((await st()).txs.length === n + 8, 'sample connect entries not added');
+    check(/PhonePe/.test(await text('#timeline')), 'connected source not shown on entries');
   });
 
   await test('Guided demo runs from setup to summary', async () => {
