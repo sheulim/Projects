@@ -1,0 +1,14 @@
+# BudgetSense as its own Netlify site.
+# In Netlify: Add new project → Import from GitHub → sheulim/Projects → Base directory: budgetsense
+# Everything else is read from this file.
+[build]
+  # Publish only the app itself (page and note-taking video), not the tests or setup files.
+  command = "rm -rf _site && mkdir _site && cp index.html _site/ && cp -R media _site/media"
+  publish = "_site"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Permissions-Policy = "microphone=(self)"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"

@@ -8,7 +8,9 @@ A voice-first version of the BudgetSense MVP (see *05_BudgetSense_MVP_Playbook*)
 2. Allow microphone access when asked.
 3. New users: start with **Take the 2-minute voice tour**. It narrates each screen on sample figures and saves nothing. Then choose **Speak my plan** or **Build it by hand**. **Me → Guided voice demo** plays a full month by voice without a microphone.
 
-On this repo's Netlify site, BudgetSense is served at `/budgetsense/` (CampaignForge Pro stays at the root). To share it elsewhere, host the single file on any static host (Netlify, GitHub Pages). The microphone needs an `https://` address or a local file.
+BudgetSense is its own Netlify site, separate from CampaignForge. To create it once: Netlify → **Add new project → Import an existing project → GitHub → sheulim/Projects**, set **Base directory** to `budgetsense`, leave the other fields as they are (they come from `budgetsense/netlify.toml`), and deploy. Rename the site under **Project configuration → Change project name** (for example `budgetsense-in` → `https://budgetsense-in.netlify.app`). From then on, every change merged into `main` that touches `budgetsense/` republishes it.
+
+The single file also runs on any other static host. The microphone needs an `https://` address or a local file.
 
 ## What it does
 
@@ -48,7 +50,7 @@ Additional features beyond the reference app: safe-to-spend today, spoken limit 
 ## Sign-in, sync and automatic capture: one-time setup
 
 1. **Supabase project** → SQL Editor → New query → paste `supabase/setup.sql` → Run.
-2. **Authentication → URL Configuration**: set the Site URL to the address where BudgetSense runs (for this repo, `https://campaign-forge.netlify.app/budgetsense/`) and add the same address under Redirect URLs.
+2. **Authentication → URL Configuration**: set the Site URL to the address where BudgetSense runs (the BudgetSense site's own address, e.g. `https://budgetsense-in.netlify.app/`) and add the same address under Redirect URLs.
 3. *Optional, recommended:* **Authentication → Email Templates** → *Magic Link* and *Confirm signup*: add `Your code: {{ .Token }}`, so the 6-digit code works when the emailed link opens in a different browser.
 4. In BudgetSense: **Me → Sign in and sync** → paste the project address and publishable (anon) key from **Project Settings → API** → email yourself a link → sign in.
 5. **Me → Set up automatic capture**, then follow the two guides shown there: *Bank SMS on Android (MacroDroid)* and *Bank emails from Gmail*. **Send a test** confirms the path works.
