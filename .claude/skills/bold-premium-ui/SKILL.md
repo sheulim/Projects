@@ -105,3 +105,6 @@ When producing a design or a spec, structure it so it maps 1:1 to Figma:
 - [ ] No invented numbers, logos or testimonials — placeholders marked
 - [ ] Works at 390px, 768px, 1440px
 - [ ] At least one decorative element removed since the first draft (Apple restraint pass)
+
+## 10. Automatic quality gate (hook)
+A project hook (`.claude/hooks/web_quality_gate.py`, wired in `.claude/settings.json`) runs after every Write/Edit of an `.html` file. BLOCKERS must be fixed before the page is presented; WARNINGS should be fixed or the reason for keeping them stated to the user. Do not disable or bypass the hook to get a clean result.

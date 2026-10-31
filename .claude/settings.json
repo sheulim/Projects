@@ -1,0 +1,17 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/web_quality_gate.py\"",
+            "timeout": 30,
+            "statusMessage": "Running web quality gate..."
+          }
+        ]
+      }
+    ]
+  }
+}
